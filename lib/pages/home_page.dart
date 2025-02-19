@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:portifolio/controllers/language_controller.dart' show LanguageController;
+import 'package:portifolio/controllers/language_controller.dart'
+    show LanguageController;
 import 'package:portifolio/l10n/app_localizations.dart' show AppLocalizations;
 import 'package:portifolio/widgets/footer.dart' show Footer;
 import 'package:portifolio/widgets/language_selector.dart';
-import 'package:portifolio/widgets/parallax_background.dart' show ParallaxBackground;
-import 'package:portifolio/widgets/responsive_layout.dart' show ResponsiveLayout;
+import 'package:portifolio/widgets/parallax_background.dart'
+    show ParallaxBackground;
+import 'package:portifolio/widgets/responsive_layout.dart'
+    show ResponsiveLayout;
 import 'package:portifolio/widgets/screen_animation.dart' show ScreenAnimation;
 import 'package:provider/provider.dart' show Provider;
 import 'package:url_launcher/url_launcher.dart' show canLaunchUrl, launchUrl;
@@ -23,10 +26,9 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-// Add to your state class
 class _HomePageState extends State<HomePage> {
   String _currentLanguage = 'en';
-  
+
   final GitHubService _githubService = GitHubService();
   final ScrollController _scrollController = ScrollController();
   List<Project> _projects = [];
@@ -41,8 +43,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _loadProjects();
   }
-
-
 
   Future<void> _loadProjects() async {
     try {
@@ -84,7 +84,10 @@ class _HomePageState extends State<HomePage> {
             ),
             Text(
               experience.role,
-              style: const TextStyle(fontSize: 18, color: AppTheme.secondaryColor),
+              style: const TextStyle(
+                fontSize: 18,
+                color: AppTheme.secondaryColor,
+              ),
             ),
             Text(experience.period),
             const SizedBox(height: 8),
@@ -92,12 +95,17 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
-              children: experience.technologies
-                  .map((tech) => Chip(
-                        label: Text(tech),
-                        backgroundColor: AppTheme.accentColor.withOpacity(0.2),
-                      ))
-                  .toList(),
+              children:
+                  experience.technologies
+                      .map(
+                        (tech) => Chip(
+                          label: Text(tech),
+                          backgroundColor: AppTheme.accentColor.withOpacity(
+                            0.2,
+                          ),
+                        ),
+                      )
+                      .toList(),
             ),
           ],
         ),
@@ -155,12 +163,17 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 16),
               Wrap(
                 spacing: 8,
-                children: project.technologies
-                    .map((tech) => Chip(
-                          label: Text(tech),
-                          backgroundColor: AppTheme.primaryColor.withOpacity(0.2),
-                        ))
-                    .toList(),
+                children:
+                    project.technologies
+                        .map(
+                          (tech) => Chip(
+                            label: Text(tech),
+                            backgroundColor: AppTheme.primaryColor.withOpacity(
+                              0.2,
+                            ),
+                          ),
+                        )
+                        .toList(),
               ),
             ],
           ),
@@ -173,15 +186,21 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final languageController = Provider.of<LanguageController>(context);
     final l10n = AppLocalizations.of(context);
-    final experiences = [
-      Experience(
-        company: l10n.companyName,
-        role: l10n.role,
-        period: "2021 - Present",
-        description: l10n.experienceDescription,
-        technologies: ["Flutter", "Dart", "iOS", "Android"],
-      ),
-    ];
+    final experiences =
+        l10n.experiences.map((exp) {
+          return Experience(
+            company: exp['company'] ?? '',
+            role: exp['role'] ?? '',
+            period: exp['period'] ?? '',
+            description: exp['description'] ?? '',
+            technologies:
+                exp['technologies'] == null
+                    ? []
+                    : (exp['technologies'] as List<dynamic>)
+                        .map((tech) => tech.toString())
+                        .toList(),
+          );
+        }).toList();
 
     return ResponsiveLayout(
       child: Scaffold(
@@ -198,43 +217,53 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       AnimatedTextKit(
-                        animatedTexts: [
-                          TypewriterAnimatedText('Hello'),
-                          TypewriterAnimatedText('Olá'),
-                          TypewriterAnimatedText('Hola'),
-                          TypewriterAnimatedText('Bonjour'),
-                          TypewriterAnimatedText('こんにちは (Konnichiwa)'),
-                          TypewriterAnimatedText('안녕하세요 (Annyeonghaseyo)'),
-                          TypewriterAnimatedText('你好 (Nǐ hǎo)'),
-                        ],
-                        repeatForever: true,
-                        pause: const Duration(milliseconds: 1000),
-                        displayFullTextOnTap: true,
-                      ).animate()
-                        .fadeIn(duration: const Duration(milliseconds: 800))
-                        .slideY(begin: 1, end: 0, duration: const Duration(milliseconds: 800), curve: Curves.easeOutQuad),
+                            animatedTexts: [
+                              TypewriterAnimatedText('Hello'),
+                              TypewriterAnimatedText('Olá'),
+                              TypewriterAnimatedText('Hola'),
+                              TypewriterAnimatedText('Bonjour'),
+                              TypewriterAnimatedText('こんにちは (Konnichiwa)'),
+                              TypewriterAnimatedText('안녕하세요 (Annyeonghaseyo)'),
+                              TypewriterAnimatedText('你好 (Nǐ hǎo)'),
+                            ],
+                            repeatForever: true,
+                            pause: const Duration(milliseconds: 1000),
+                            displayFullTextOnTap: true,
+                          )
+                          .animate()
+                          .fadeIn(duration: const Duration(milliseconds: 800))
+                          .slideY(
+                            begin: 1,
+                            end: 0,
+                            duration: const Duration(milliseconds: 800),
+                            curve: Curves.easeOutQuad,
+                          ),
                       if (!ResponsiveLayout.isMobile(context))
                         Row(
                           children: [
                             ...(_sectionKeys.keys.map(
                               (section) => Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0,
+                                ),
                                 child: TextButton(
                                   onPressed: () => scrollToSection(section),
                                   child: Text(
                                     l10n.getSection(section),
-                                    style: const TextStyle(color: AppTheme.textColor),
+                                    style: const TextStyle(
+                                      color: AppTheme.textColor,
+                                    ),
                                   ),
                                 ),
                               ),
                             )),
                             LanguageSelector(
-                              currentLanguage: languageController.currentLanguage,
+                              currentLanguage:
+                                  languageController.currentLanguage,
                               onLanguageChanged: _onLanguageChanged,
                             ),
                           ],
-                        )
-    
+                        ),
                     ],
                   ),
                 ),
@@ -243,36 +272,45 @@ class _HomePageState extends State<HomePage> {
                   child: Container(
                     height: MediaQuery.of(context).size.height,
                     padding: EdgeInsets.symmetric(
-                      horizontal: ResponsiveLayout.getHorizontalPadding(context),
+                      horizontal: ResponsiveLayout.getHorizontalPadding(
+                        context,
+                      ),
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        AnimatedTextKit(
-                          animatedTexts: [
-                            TypewriterAnimatedText(
-                              l10n.hello,
-                              textStyle: TextStyle(
-                                fontSize: ResponsiveLayout.isDesktop(context) ? 48 : 40,
-                                fontWeight: FontWeight.bold,
-                                color: AppTheme.textColor,
-                              ),
+                      children:
+                          [
+                            AnimatedTextKit(
+                              animatedTexts: [
+                                TypewriterAnimatedText(
+                                  l10n.hello,
+                                  textStyle: TextStyle(
+                                    fontSize:
+                                        ResponsiveLayout.isDesktop(context)
+                                            ? 48
+                                            : 40,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppTheme.textColor,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        AnimatedTextKit(
-                          animatedTexts: [
-                            TypewriterAnimatedText(
-                              l10n.role,
-                              textStyle: TextStyle(
-                                fontSize: ResponsiveLayout.isDesktop(context) ? 32 : 24,
-                                color: AppTheme.secondaryColor,
-                              ),
+                            const SizedBox(height: 16),
+                            AnimatedTextKit(
+                              animatedTexts: [
+                                TypewriterAnimatedText(
+                                  l10n.role,
+                                  textStyle: TextStyle(
+                                    fontSize:
+                                        ResponsiveLayout.isDesktop(context)
+                                            ? 32
+                                            : 24,
+                                    color: AppTheme.secondaryColor,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ].animate().fade().scale(),
+                          ].animate().fade().scale(),
                     ),
                   ),
                 ),
@@ -281,26 +319,29 @@ class _HomePageState extends State<HomePage> {
                   child: Container(
                     key: _sectionKeys['about'],
                     padding: EdgeInsets.symmetric(
-                      horizontal: ResponsiveLayout.getHorizontalPadding(context),
+                      horizontal: ResponsiveLayout.getHorizontalPadding(
+                        context,
+                      ),
                       vertical: 24,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.about,
-                          style: const TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.primaryColor,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          l10n.bio,
-                          style: const TextStyle(fontSize: 18),
-                        ),
-                      ].animate().fadeIn().slideX(),
+                      children:
+                          [
+                            Text(
+                              l10n.about,
+                              style: const TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.primaryColor,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              l10n.bio,
+                              style: const TextStyle(fontSize: 18),
+                            ),
+                          ].animate().fadeIn().slideX(),
                     ),
                   ),
                 ),
@@ -309,7 +350,9 @@ class _HomePageState extends State<HomePage> {
                   child: Container(
                     key: _sectionKeys['experience'],
                     padding: EdgeInsets.symmetric(
-                      horizontal: ResponsiveLayout.getHorizontalPadding(context),
+                      horizontal: ResponsiveLayout.getHorizontalPadding(
+                        context,
+                      ),
                       vertical: 24,
                     ),
                     child: Column(
@@ -334,7 +377,9 @@ class _HomePageState extends State<HomePage> {
                   child: Container(
                     key: _sectionKeys['projects'],
                     padding: EdgeInsets.symmetric(
-                      horizontal: ResponsiveLayout.getHorizontalPadding(context),
+                      horizontal: ResponsiveLayout.getHorizontalPadding(
+                        context,
+                      ),
                       vertical: 24,
                     ),
                     child: Column(
@@ -362,9 +407,7 @@ class _HomePageState extends State<HomePage> {
                   hasScrollBody: false,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Footer(),
-                    ],
+                    children: [Footer()],
                   ),
                 ),
               ],
@@ -372,22 +415,23 @@ class _HomePageState extends State<HomePage> {
             ScreenAnimation(scrollController: _scrollController),
           ],
         ),
-        endDrawer: ResponsiveLayout.isMobile(context) 
-            ? buildMobileDrawer(l10n) 
-            : null,
+        endDrawer:
+            ResponsiveLayout.isMobile(context) ? buildMobileDrawer(l10n) : null,
       ),
     );
   }
-  // Add this method to handle language changes
+
   void _onLanguageChanged(String languageCode) {
-    final languageController = Provider.of<LanguageController>(context, listen: false);
+    final languageController = Provider.of<LanguageController>(
+      context,
+      listen: false,
+    );
     setState(() {
       _currentLanguage = languageCode;
     });
     languageController.setLocale(Locale(languageCode));
   }
 
-  // Add this method to build the mobile drawer
   Widget buildMobileDrawer(AppLocalizations l10n) {
     return Drawer(
       child: Container(
@@ -395,15 +439,10 @@ class _HomePageState extends State<HomePage> {
         child: ListView(
           children: [
             DrawerHeader(
-              decoration: const BoxDecoration(
-                color: AppTheme.surfaceColor,
-              ),
+              decoration: const BoxDecoration(color: AppTheme.surfaceColor),
               child: Text(
                 l10n.hello,
-                style: const TextStyle(
-                  color: AppTheme.textColor,
-                  fontSize: 24,
-                ),
+                style: const TextStyle(color: AppTheme.textColor, fontSize: 24),
               ),
             ),
             ..._sectionKeys.keys.map(

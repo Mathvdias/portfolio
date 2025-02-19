@@ -9,7 +9,7 @@ class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
   }
 
-  static final Map<String, Map<String, String>> _localizedValues = {
+  static final Map<String, Map<String, dynamic>> _localizedValues = {
     "en": {
       "hello": "Hello, I'm Matheus Dias",
       "role": "Software Engineer",
@@ -21,6 +21,50 @@ class AppLocalizations {
       "companyName": "Your Company",
       "experienceDescription":
           "Developing mobile applications using Kotlin, Flutter, and modern technologies.",
+      "experiences": [
+        {
+          "company": "Banco Pan",
+          "role": "Mobile Software Engineer",
+          "period": "Jan 2024 - Present",
+          "description":
+              "Led the modularization of DSKit components to enhance efficiency and maintainability. Analyzed Crashlytics data to identify and resolve performance and stability issues. Managed versioning and incident tracking in production to ensure high product quality.",
+          "technologies": [
+            "Flutter",
+            "Kotlin",
+            "Android",
+            "iOS",
+            "Crashlytics",
+            "Testing",
+          ],
+        },
+        {
+          "company":
+              "Instituto Conecthus - Tecnologia e Biotecnologia do Amazonas",
+          "role": "Mobile Developer PL",
+          "period": "Jan 2022 - Nov 2023",
+          "description":
+              "Developed cross-platform mobile applications using Flutter with modern UI/UX. Integrated native Android features with Kotlin and Java for performance optimization. Designed POS and self-service kiosk solutions, integrating AI and machine learning for automated processes.",
+          "technologies": [
+            "Flutter",
+            "Kotlin",
+            "Java",
+            "Android",
+            "POS",
+            "TensorFlow Lite",
+            "ML Kit",
+            "Scrum",
+            "Kanban",
+          ],
+        },
+        {
+          "company": "Oi",
+          "role": "Maintenance Technician",
+          "period": "Aug 2019 - Jul 2021",
+          "description":
+              "Managed fiber optic network maintenance at a national scale to ensure service stability. Developed Java-based applications for Huawei router configuration. Conducted SQL database maintenance and troubleshooting.",
+          "technologies": ["Java", "SQL", "Networking", "Huawei Routers"],
+        },
+      ],
     },
     "es": {
       "hello": "Hola, soy Matheus Dias",
@@ -33,6 +77,50 @@ class AppLocalizations {
       "companyName": "Tu Empresa",
       "experienceDescription":
           "Desarrollando aplicaciones móviles con Kotlin, Flutter y tecnologías modernas.",
+      "experiences": [
+        {
+          "company": "Banco Pan",
+          "role": "Ingeniero de Software Móvil",
+          "period": "Ene 2024 - Presente",
+          "description":
+              "Lideré la modularización de componentes DSKit para mejorar la eficiencia y el mantenimiento. Analicé datos de Crashlytics para identificar y resolver problemas de rendimiento y estabilidad. Gestioné el versionado y el seguimiento de incidentes en producción para garantizar la alta calidad del producto.",
+          "technologies": [
+            "Flutter",
+            "Kotlin",
+            "Android",
+            "iOS",
+            "Crashlytics",
+            "Testing",
+          ],
+        },
+        {
+          "company":
+              "Instituto Conecthus - Tecnología y Biotecnología del Amazonas",
+          "role": "Desarrollador Móvil PL",
+          "period": "Ene 2022 - Nov 2023",
+          "description":
+              "Desarrollé aplicaciones móviles multiplataforma utilizando Flutter con UI/UX modernas. Integré características nativas de Android con Kotlin y Java para optimizar el rendimiento. Diseñé soluciones POS y quioscos de autoservicio, integrando IA y aprendizaje automático.",
+          "technologies": [
+            "Flutter",
+            "Kotlin",
+            "Java",
+            "Android",
+            "POS",
+            "TensorFlow Lite",
+            "ML Kit",
+            "Scrum",
+            "Kanban",
+          ],
+        },
+        {
+          "company": "Oi",
+          "role": "Técnico de Mantenimiento",
+          "period": "Ago 2019 - Jul 2021",
+          "description":
+              "Gestioné el mantenimiento de la red de fibra óptica a nivel nacional para garantizar la estabilidad del servicio. Desarrollé aplicaciones en Java para la configuración de routers Huawei. Realicé mantenimiento y solución de problemas en bases de datos SQL.",
+          "technologies": ["Java", "SQL", "Redes", "Routers Huawei"],
+        },
+      ],
     },
     "fr": {
       "hello": "Bonjour, je suis Matheus Dias",
@@ -45,6 +133,50 @@ class AppLocalizations {
       "companyName": "Votre Entreprise",
       "experienceDescription":
           "Développement d'applications mobiles avec Kotlin, Flutter et technologies modernes.",
+      "experiences": [
+        {
+          "company": "Banco Pan",
+          "role": "Ingénieur Logiciel Mobile",
+          "period": "Jan 2024 - Présent",
+          "description":
+              "J'ai dirigé la modularisation des composants DSKit pour améliorer l'efficacité et la maintenance. J'ai analysé les données Crashlytics pour identifier et résoudre les problèmes de performance et de stabilité. J'ai géré le versionnement et le suivi des incidents en production pour assurer une haute qualité du produit.",
+          "technologies": [
+            "Flutter",
+            "Kotlin",
+            "Android",
+            "iOS",
+            "Crashlytics",
+            "Testing",
+          ],
+        },
+        {
+          "company":
+              "Instituto Conecthus - Technologie et Biotechnologie de l'Amazonas",
+          "role": "Développeur Mobile PL",
+          "period": "Jan 2022 - Nov 2023",
+          "description":
+              "J'ai développé des applications mobiles multiplateformes en utilisant Flutter avec une UI/UX moderne. J'ai intégré des fonctionnalités natives Android avec Kotlin et Java pour optimiser les performances. J'ai conçu des solutions POS et des kiosques en libre-service, en intégrant l'IA et l'apprentissage automatique.",
+          "technologies": [
+            "Flutter",
+            "Kotlin",
+            "Java",
+            "Android",
+            "POS",
+            "TensorFlow Lite",
+            "ML Kit",
+            "Scrum",
+            "Kanban",
+          ],
+        },
+        {
+          "company": "Oi",
+          "role": "Technicien de Maintenance",
+          "period": "Août 2019 - Juil 2021",
+          "description":
+              "J'ai géré la maintenance du réseau de fibre optique à l'échelle nationale pour assurer la stabilité du service. J'ai développé des applications en Java pour la configuration des routeurs Huawei. J'ai effectué la maintenance et le dépannage des bases de données SQL.",
+          "technologies": ["Java", "SQL", "Réseaux", "Routeurs Huawei"],
+        },
+      ],
     },
     "it": {
       "hello": "Ciao, sono Matheus Dias",
@@ -57,6 +189,50 @@ class AppLocalizations {
       "companyName": "La Tua Azienda",
       "experienceDescription":
           "Sviluppo di applicazioni mobili con Kotlin, Flutter e tecnologie moderne.",
+      "experiences": [
+        {
+          "company": "Banco Pan",
+          "role": "Ingegnere del Software Mobile",
+          "period": "Gen 2024 - Presente",
+          "description":
+              "Ho guidato la modularizzazione dei componenti DSKit per migliorare l'efficienza e la manutenzione. Ho analizzato i dati di Crashlytics per identificare e risolvere problemi di prestazioni e stabilità. Ho gestito il versionamento e il monitoraggio degli incidenti in produzione per garantire un'alta qualità del prodotto.",
+          "technologies": [
+            "Flutter",
+            "Kotlin",
+            "Android",
+            "iOS",
+            "Crashlytics",
+            "Testing",
+          ],
+        },
+        {
+          "company":
+              "Instituto Conecthus - Tecnologia e Biotecnologia dell'Amazzonia",
+          "role": "Sviluppatore Mobile PL",
+          "period": "Gen 2022 - Nov 2023",
+          "description":
+              "Ho sviluppato applicazioni mobili multipiattaforma utilizzando Flutter con un'interfaccia utente moderna. Ho integrato funzionalità native di Android con Kotlin e Java per ottimizzare le prestazioni. Ho progettato soluzioni POS e chioschi self-service, integrando IA e apprendimento automatico.",
+          "technologies": [
+            "Flutter",
+            "Kotlin",
+            "Java",
+            "Android",
+            "POS",
+            "TensorFlow Lite",
+            "ML Kit",
+            "Scrum",
+            "Kanban",
+          ],
+        },
+        {
+          "company": "Oi",
+          "role": "Tecnico di Manutenzione",
+          "period": "Ago 2019 - Lug 2021",
+          "description":
+              "Ho gestito la manutenzione della rete in fibra ottica a livello nazionale per garantire la stabilità del servizio. Ho sviluppato applicazioni in Java per la configurazione dei router Huawei. Ho eseguito manutenzione e risoluzione dei problemi nei database SQL.",
+          "technologies": ["Java", "SQL", "Reti", "Router Huawei"],
+        },
+      ],
     },
     "pt": {
       "hello": "Olá, eu sou Matheus Dias",
@@ -69,15 +245,55 @@ class AppLocalizations {
       "companyName": "Sua Empresa",
       "experienceDescription":
           "Desenvolvendo aplicativos móveis com Kotlin, Flutter e tecnologias modernas.",
+      "experiences": [
+        {
+          "company": "Banco Pan",
+          "role": "Engenheiro de Software Mobile",
+          "period": "Jan 2024 - Presente",
+          "description":
+              "Lidero a modularização dos componentes DSKit para melhorar a eficiência e a manutenção. Analiso dados do Crashlytics para identificar e corrigir problemas de desempenho e estabilidade. Gerencio versões e rastreamento de incidentes em produção para garantir alta qualidade do produto.",
+          "technologies": [
+            "Flutter",
+            "Kotlin",
+            "Android",
+            "iOS",
+            "Crashlytics",
+            "Testing",
+          ],
+        },
+        {
+          "company":
+              "Instituto Conecthus - Tecnologia e Biotecnologia do Amazonas",
+          "role": "Desenvolvedor Mobile PL",
+          "period": "Jan 2022 - Nov 2023",
+          "description":
+              "Desenvolvi aplicativos móveis multiplataforma utilizando Flutter com UI/UX moderna. Integrei funcionalidades nativas do Android com Kotlin e Java para otimizar o desempenho. Projetei soluções POS e totens de autoatendimento, integrando IA e aprendizado de máquina.",
+          "technologies": [
+            "Flutter",
+            "Kotlin",
+            "Java",
+            "Android",
+            "POS",
+            "TensorFlow Lite",
+            "ML Kit",
+            "Scrum",
+            "Kanban",
+          ],
+        },
+        {
+          "company": "Oi",
+          "role": "Técnico de Manutenção",
+          "period": "Ago 2019 - Jul 2021",
+          "description":
+              "Gerenciei a manutenção da rede de fibra óptica em nível nacional para garantir a estabilidade do serviço. Desenvolvi aplicativos em Java para configuração de roteadores Huawei. Realizei manutenção e resolução de problemas em bancos de dados SQL.",
+          "technologies": ["Java", "SQL", "Redes", "Roteadores Huawei"],
+        },
+      ],
     },
   };
 
-  // Add getters for the new strings
-  String get companyName =>
-      _localizedValues[locale.languageCode]?['companyName'] ?? '';
-  String get experienceDescription =>
-      _localizedValues[locale.languageCode]?['experienceDescription'] ?? '';
-
+  /// GETTERS para retornar os valores que já existem no dicionário.
+  /// Sempre usamos `?[]` e `?? ''` para evitar erros de chave nula.
   String get hello => _localizedValues[locale.languageCode]?['hello'] ?? '';
   String get role => _localizedValues[locale.languageCode]?['role'] ?? '';
   String get about => _localizedValues[locale.languageCode]?['about'] ?? '';
@@ -86,6 +302,17 @@ class AppLocalizations {
   String get projects =>
       _localizedValues[locale.languageCode]?['projects'] ?? '';
   String get bio => _localizedValues[locale.languageCode]?['bio'] ?? '';
+  String get companyName =>
+      _localizedValues[locale.languageCode]?['companyName'] ?? '';
+  String get experienceDescription =>
+      _localizedValues[locale.languageCode]?['experienceDescription'] ?? '';
+
+  List<Map<String, dynamic>> get experiences {
+    final list =
+        _localizedValues[locale.languageCode]?['experiences'] as List<dynamic>?;
+    if (list == null) return [];
+    return list.map((e) => e as Map<String, dynamic>).toList();
+  }
 
   String getSection(String section) {
     switch (section) {
@@ -106,12 +333,13 @@ class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
 
   @override
   bool isSupported(Locale locale) {
+    // Verifica se o idioma está na lista
     return ['en', 'es', 'fr', 'it', 'pt'].contains(locale.languageCode);
   }
 
   @override
-  Future<AppLocalizations> load(Locale locale) {
-    return Future.value(AppLocalizations(locale));
+  Future<AppLocalizations> load(Locale locale) async {
+    return AppLocalizations(locale);
   }
 
   @override
