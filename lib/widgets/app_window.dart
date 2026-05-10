@@ -66,15 +66,11 @@ class _AppWindowState extends State<AppWindow> {
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildTitleBar(),
           Expanded(
-            child: Container(
-              color: AppTheme.background,
-              child: SingleChildScrollView(
-                child: widget.child,
-              ),
-            ),
+            child: Container(color: AppTheme.background, child: widget.child),
           ),
         ],
       ),
@@ -98,24 +94,12 @@ class _AppWindowState extends State<AppWindow> {
             GestureDetector(
               key: const Key('close_button'),
               onTap: widget.onClose,
-              child: Container(
-                width: 12,
-                height: 12,
-                color: AppTheme.red,
-              ),
+              child: Container(width: 12, height: 12, color: AppTheme.red),
             ),
             const SizedBox(width: 6),
-            Container(
-              width: 12,
-              height: 12,
-              color: AppTheme.yellow,
-            ),
+            Container(width: 12, height: 12, color: AppTheme.yellow),
             const SizedBox(width: 6),
-            Container(
-              width: 12,
-              height: 12,
-              color: AppTheme.green,
-            ),
+            Container(width: 12, height: 12, color: AppTheme.green),
             // Centered title
             Expanded(
               child: Center(

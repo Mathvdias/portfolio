@@ -69,8 +69,9 @@ class _ScreenAnimationState extends State<ScreenAnimation> {
                                   onTap: () {
                                     widget.scrollController.animateTo(
                                       0,
-                                      duration:
-                                          const Duration(milliseconds: 800),
+                                      duration: const Duration(
+                                        milliseconds: 800,
+                                      ),
                                       curve: Curves.easeInOut,
                                     );
                                   },
@@ -82,8 +83,9 @@ class _ScreenAnimationState extends State<ScreenAnimation> {
                                       borderRadius: BorderRadius.circular(12),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: AppTheme.blue
-                                              .withValues(alpha: 0.3),
+                                          color: AppTheme.blue.withValues(
+                                            alpha: 0.3,
+                                          ),
                                           blurRadius: 10,
                                           offset: const Offset(0, 4),
                                         ),

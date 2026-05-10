@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class ParallaxBackground extends StatelessWidget {
   final ScrollController scrollController;
 
-  const ParallaxBackground({
-    super.key,
-    required this.scrollController,
-  });
+  const ParallaxBackground({super.key, required this.scrollController});
 
   @override
   Widget build(BuildContext context) {
@@ -16,8 +13,7 @@ class ParallaxBackground extends StatelessWidget {
         final offset =
             scrollController.hasClients ? scrollController.offset : 0.0;
         final screenHeight = MediaQuery.of(context).size.height;
-        final opacity =
-            (1 - (offset / (screenHeight * 0.8))).clamp(0.0, 1.0);
+        final opacity = (1 - (offset / (screenHeight * 0.8))).clamp(0.0, 1.0);
 
         return Positioned(
           top: -offset,
@@ -69,16 +65,14 @@ class ParallaxPainter extends CustomPainter {
   final double scrollOffset;
   final double opacity;
 
-  ParallaxPainter({
-    required this.scrollOffset,
-    required this.opacity,
-  });
+  ParallaxPainter({required this.scrollOffset, required this.opacity});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.1 * opacity)
-      ..strokeWidth = 1;
+    final paint =
+        Paint()
+          ..color = Colors.white.withValues(alpha: 0.1 * opacity)
+          ..strokeWidth = 1;
 
     const dotSpacing = 30.0;
     final rows = (size.height / dotSpacing).ceil() + 10;
@@ -92,11 +86,7 @@ class ParallaxPainter extends CustomPainter {
         final y = (row * dotSpacing) + yOffset;
 
         if (y >= -dotSpacing && y <= size.height + dotSpacing) {
-          canvas.drawCircle(
-            Offset(x, y),
-            2 * opacity,
-            paint,
-          );
+          canvas.drawCircle(Offset(x, y), 2 * opacity, paint);
         }
       }
     }

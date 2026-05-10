@@ -35,16 +35,13 @@ class Footer extends StatelessWidget {
           ),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 8),
-            child: Text(
-              '|',
-              style: TextStyle(color: Colors.white),
-            ),
+            child: Text('|', style: TextStyle(color: Colors.white)),
           ),
           MouseRegion(
             cursor: SystemMouseCursors.click,
             child: GestureDetector(
-              onTap: () =>
-                  _launchURL('https://www.linkedin.com/in/matheusvdias/'),
+              onTap:
+                  () => _launchURL('https://www.linkedin.com/in/matheusvdias/'),
               child: const Text(
                 'LinkedIn',
                 style: TextStyle(

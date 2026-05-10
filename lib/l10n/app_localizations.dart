@@ -23,6 +23,14 @@ class AppLocalizations {
       "companyName": "Your Company",
       "experienceDescription":
           "Developing mobile applications using Kotlin, Flutter, and modern technologies.",
+      "stickyNoteTodo": "Todo:\n\n- Build amazing apps\n- Pray 🙏\n\nPhil 4:13",
+      "notificationCenter": "Notification Center",
+      "dailyVerse": "Daily Verse",
+      "dailyVerseText":
+          "I can do all things through Christ who strengthens me. - Phil 4:13",
+      "system": "System",
+      "portfolioUpdated": "Portfolio updated successfully.",
+      "musicPlaying": "Regina Caeli Jubila",
       "experiences": [
         {
           "company": "Zallpy Digital / West Shore Solutions",
@@ -30,7 +38,15 @@ class AppLocalizations {
           "period": "Sep 2024 – Present",
           "description":
               "Led the development and refactoring of mobile solutions for global B2B clients, ensuring compliance with WCAG accessibility standards and full i18n support. Implemented Clean Architecture in legacy modules, reducing new engineer onboarding time by 10%. Defined development standards for distributed squads, focusing on long-term performance and maintainability.",
-          "technologies": ["Flutter", "Dart", "Kotlin", "Clean Architecture", "WCAG", "i18n", "B2B"],
+          "technologies": [
+            "Flutter",
+            "Dart",
+            "Kotlin",
+            "Clean Architecture",
+            "WCAG",
+            "i18n",
+            "B2B",
+          ],
         },
         {
           "company": "Banco Pan",
@@ -89,6 +105,14 @@ class AppLocalizations {
       "companyName": "Tu Empresa",
       "experienceDescription":
           "Desarrollando aplicaciones móviles con Kotlin, Flutter y tecnologías modernas.",
+      "stickyNoteTodo":
+          "Todo:\n\n- Crear apps increíbles\n- Rezar 🙏\n\nDe mil soldados não teme a espada quem pugna à sombra da Imaculada!",
+      "notificationCenter": "Centro de Notificaciones",
+      "dailyVerse": "Versículo Diario",
+      "dailyVerseText": "Todo lo puedo en Cristo que me fortalece. - Fil 4:13",
+      "system": "Sistema",
+      "portfolioUpdated": "Portafolio actualizado con éxito.",
+      "musicPlaying": "Regina Caeli Jubila",
       "experiences": [
         {
           "company": "Zallpy Digital / West Shore Solutions",
@@ -96,7 +120,15 @@ class AppLocalizations {
           "period": "Sep 2024 – Presente",
           "description":
               "Liderazgo en proyecto internacional (B2B): desarrollo y refactorización de soluciones móviles para clientes globales, garantizando conformidad con estándares WCAG de accesibilidad y soporte completo de i18n. Implementación de Clean Architecture en módulos legados, reduciendo en un 10% el tiempo de integración de nuevos ingenieros.",
-          "technologies": ["Flutter", "Dart", "Kotlin", "Clean Architecture", "WCAG", "i18n", "B2B"],
+          "technologies": [
+            "Flutter",
+            "Dart",
+            "Kotlin",
+            "Clean Architecture",
+            "WCAG",
+            "i18n",
+            "B2B",
+          ],
         },
         {
           "company": "Banco Pan",
@@ -155,6 +187,14 @@ class AppLocalizations {
       "companyName": "Votre Entreprise",
       "experienceDescription":
           "Développement d'applications mobiles avec Kotlin, Flutter et technologies modernes.",
+      "stickyNoteTodo":
+          "Todo:\n\n- Créer des apps géniales\n- Prier 🙏\n\nPhil 4:13",
+      "notificationCenter": "Centre de Notifications",
+      "dailyVerse": "Verset Quotidien",
+      "dailyVerseText": "Je puis tout par celui qui me fortifie. - Phil 4:13",
+      "system": "Système",
+      "portfolioUpdated": "Portfolio mis à jour avec succès.",
+      "musicPlaying": "Regina Caeli Jubila",
       "experiences": [
         {
           "company": "Zallpy Digital / West Shore Solutions",
@@ -162,7 +202,15 @@ class AppLocalizations {
           "period": "Sep 2024 – Présent",
           "description":
               "Leadership dans un projet international (B2B) : développement et refactorisation de solutions mobiles pour des clients mondiaux, garantissant la conformité aux normes WCAG et le support complet i18n. Implémentation de Clean Architecture dans des modules hérités, réduisant de 10% le temps d'intégration des nouveaux ingénieurs.",
-          "technologies": ["Flutter", "Dart", "Kotlin", "Clean Architecture", "WCAG", "i18n", "B2B"],
+          "technologies": [
+            "Flutter",
+            "Dart",
+            "Kotlin",
+            "Clean Architecture",
+            "WCAG",
+            "i18n",
+            "B2B",
+          ],
         },
         {
           "company": "Banco Pan",
@@ -221,6 +269,14 @@ class AppLocalizations {
       "companyName": "La Tua Azienda",
       "experienceDescription":
           "Sviluppo di applicazioni mobili con Kotlin, Flutter e tecnologie moderne.",
+      "stickyNoteTodo":
+          "Todo:\n\n- Creare app fantastiche\n- Pregare 🙏\n\nFil 4:13",
+      "notificationCenter": "Centro Notifiche",
+      "dailyVerse": "Versetto Quotidiano",
+      "dailyVerseText": "Tutto posso in colui che mi dà forza. - Fil 4:13",
+      "system": "Sistema",
+      "portfolioUpdated": "Portfolio aggiornato con successo.",
+      "musicPlaying": "Regina Caeli Jubila",
       "experiences": [
         {
           "company": "Zallpy Digital / West Shore Solutions",
@@ -228,7 +284,15 @@ class AppLocalizations {
           "period": "Set 2024 – Presente",
           "description":
               "Leadership in un progetto internazionale (B2B): sviluppo e refactoring di soluzioni mobile per clienti globali, garantendo la conformità agli standard WCAG di accessibilità e il supporto completo all'i18n. Implementazione di Clean Architecture in moduli legacy, riducendo del 10% il tempo di integrazione dei nuovi ingegneri.",
-          "technologies": ["Flutter", "Dart", "Kotlin", "Clean Architecture", "WCAG", "i18n", "B2B"],
+          "technologies": [
+            "Flutter",
+            "Dart",
+            "Kotlin",
+            "Clean Architecture",
+            "WCAG",
+            "i18n",
+            "B2B",
+          ],
         },
         {
           "company": "Banco Pan",
@@ -287,6 +351,15 @@ class AppLocalizations {
       "companyName": "Sua Empresa",
       "experienceDescription":
           "Desenvolvendo aplicativos móveis com Kotlin, Flutter e tecnologias modernas.",
+      "stickyNoteTodo":
+          "Todo:\n\n- Construir apps incríveis\n- Rezar 🙏\n\nFl 4:13",
+      "notificationCenter": "Central de Notificações",
+      "dailyVerse": "Versículo Diário",
+      "dailyVerseText":
+          "De mil soldados não teme a espada quem pugna à sombra da Imaculada!",
+      "system": "Sistema",
+      "portfolioUpdated": "Portfólio atualizado com sucesso.",
+      "musicPlaying": "Regina Caeli Jubila",
       "experiences": [
         {
           "company": "Zallpy Digital / West Shore Solutions",
@@ -294,7 +367,15 @@ class AppLocalizations {
           "period": "Set 2024 – Atual",
           "description":
               "Liderança em projeto internacional (B2B): desenvolvimento e refatoração de soluções mobile para clientes globais, garantindo conformidade com padrões WCAG de acessibilidade e suporte completo a i18n. Implementação de Clean Architecture em módulos legados, reduzindo em 10% o tempo de integração de novos engenheiros. Definição de padrões de desenvolvimento para squads distribuídas.",
-          "technologies": ["Flutter", "Dart", "Kotlin", "Clean Architecture", "WCAG", "i18n", "B2B"],
+          "technologies": [
+            "Flutter",
+            "Dart",
+            "Kotlin",
+            "Clean Architecture",
+            "WCAG",
+            "i18n",
+            "B2B",
+          ],
         },
         {
           "company": "Banco Pan",
@@ -357,6 +438,20 @@ class AppLocalizations {
   String get name => _localizedValues[locale.languageCode]?['name'] ?? '';
   String get location =>
       _localizedValues[locale.languageCode]?['location'] ?? '';
+
+  String get stickyNoteTodo =>
+      _localizedValues[locale.languageCode]?['stickyNoteTodo'] ?? '';
+  String get notificationCenter =>
+      _localizedValues[locale.languageCode]?['notificationCenter'] ?? '';
+  String get dailyVerse =>
+      _localizedValues[locale.languageCode]?['dailyVerse'] ?? '';
+  String get dailyVerseText =>
+      _localizedValues[locale.languageCode]?['dailyVerseText'] ?? '';
+  String get system => _localizedValues[locale.languageCode]?['system'] ?? '';
+  String get portfolioUpdated =>
+      _localizedValues[locale.languageCode]?['portfolioUpdated'] ?? '';
+  String get musicPlaying =>
+      _localizedValues[locale.languageCode]?['musicPlaying'] ?? '';
 
   List<Map<String, dynamic>> get experiences {
     final list =

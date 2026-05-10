@@ -48,9 +48,10 @@ class _HomePageState extends State<HomePage> {
     try {
       final repos = await _githubService.getRepositories();
       setState(() {
-        _projects = repos
-            .map((repo) => Project.fromJson(repo as Map<String, dynamic>))
-            .toList();
+        _projects =
+            repos
+                .map((repo) => Project.fromJson(repo as Map<String, dynamic>))
+                .toList();
       });
     } catch (_) {}
   }
@@ -84,10 +85,7 @@ class _HomePageState extends State<HomePage> {
             ),
             Text(
               experience.role,
-              style: const TextStyle(
-                fontSize: 18,
-                color: AppTheme.teal,
-              ),
+              style: const TextStyle(fontSize: 18, color: AppTheme.teal),
             ),
             Text(experience.period),
             const SizedBox(height: 8),
@@ -95,14 +93,17 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
-              children: experience.technologies
-                  .map(
-                    (tech) => Chip(
-                      label: Text(tech),
-                      backgroundColor: AppTheme.mauve.withValues(alpha: 0.2),
-                    ),
-                  )
-                  .toList(),
+              children:
+                  experience.technologies
+                      .map(
+                        (tech) => Chip(
+                          label: Text(tech),
+                          backgroundColor: AppTheme.mauve.withValues(
+                            alpha: 0.2,
+                          ),
+                        ),
+                      )
+                      .toList(),
             ),
           ],
         ),
@@ -160,14 +161,17 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 16),
               Wrap(
                 spacing: 8,
-                children: project.technologies
-                    .map(
-                      (tech) => Chip(
-                        label: Text(tech),
-                        backgroundColor: AppTheme.blue.withValues(alpha: 0.2),
-                      ),
-                    )
-                    .toList(),
+                children:
+                    project.technologies
+                        .map(
+                          (tech) => Chip(
+                            label: Text(tech),
+                            backgroundColor: AppTheme.blue.withValues(
+                              alpha: 0.2,
+                            ),
+                          ),
+                        )
+                        .toList(),
               ),
             ],
           ),
@@ -180,19 +184,21 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final languageController = Provider.of<LanguageController>(context);
     final l10n = AppLocalizations.of(context);
-    final experiences = l10n.experiences.map((exp) {
-      return Experience(
-        company: exp['company'] as String? ?? '',
-        role: exp['role'] as String? ?? '',
-        period: exp['period'] as String? ?? '',
-        description: exp['description'] as String? ?? '',
-        technologies: exp['technologies'] == null
-            ? []
-            : (exp['technologies'] as List<dynamic>)
-                .map((tech) => tech.toString())
-                .toList(),
-      );
-    }).toList();
+    final experiences =
+        l10n.experiences.map((exp) {
+          return Experience(
+            company: exp['company'] as String? ?? '',
+            role: exp['role'] as String? ?? '',
+            period: exp['period'] as String? ?? '',
+            description: exp['description'] as String? ?? '',
+            technologies:
+                exp['technologies'] == null
+                    ? []
+                    : (exp['technologies'] as List<dynamic>)
+                        .map((tech) => tech.toString())
+                        .toList(),
+          );
+        }).toList();
 
     return ResponsiveLayout(
       child: Scaffold(
@@ -270,38 +276,39 @@ class _HomePageState extends State<HomePage> {
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        AnimatedTextKit(
-                          animatedTexts: [
-                            TypewriterAnimatedText(
-                              l10n.hello,
-                              textStyle: TextStyle(
-                                fontSize:
-                                    ResponsiveLayout.isDesktop(context)
-                                        ? 48
-                                        : 40,
-                                fontWeight: FontWeight.bold,
-                                color: AppTheme.text,
-                              ),
+                      children:
+                          [
+                            AnimatedTextKit(
+                              animatedTexts: [
+                                TypewriterAnimatedText(
+                                  l10n.hello,
+                                  textStyle: TextStyle(
+                                    fontSize:
+                                        ResponsiveLayout.isDesktop(context)
+                                            ? 48
+                                            : 40,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppTheme.text,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        AnimatedTextKit(
-                          animatedTexts: [
-                            TypewriterAnimatedText(
-                              l10n.role,
-                              textStyle: TextStyle(
-                                fontSize:
-                                    ResponsiveLayout.isDesktop(context)
-                                        ? 32
-                                        : 24,
-                                color: AppTheme.teal,
-                              ),
+                            const SizedBox(height: 16),
+                            AnimatedTextKit(
+                              animatedTexts: [
+                                TypewriterAnimatedText(
+                                  l10n.role,
+                                  textStyle: TextStyle(
+                                    fontSize:
+                                        ResponsiveLayout.isDesktop(context)
+                                            ? 32
+                                            : 24,
+                                    color: AppTheme.teal,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ].animate().fade().scale(),
+                          ].animate().fade().scale(),
                     ),
                   ),
                 ),
@@ -317,21 +324,22 @@ class _HomePageState extends State<HomePage> {
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'About',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.blue,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          l10n.bio,
-                          style: const TextStyle(fontSize: 18),
-                        ),
-                      ].animate().fadeIn().slideX(),
+                      children:
+                          [
+                            const Text(
+                              'About',
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.blue,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              l10n.bio,
+                              style: const TextStyle(fontSize: 18),
+                            ),
+                          ].animate().fadeIn().slideX(),
                     ),
                   ),
                 ),
@@ -405,9 +413,8 @@ class _HomePageState extends State<HomePage> {
             ScreenAnimation(scrollController: _scrollController),
           ],
         ),
-        endDrawer: ResponsiveLayout.isMobile(context)
-            ? buildMobileDrawer(l10n)
-            : null,
+        endDrawer:
+            ResponsiveLayout.isMobile(context) ? buildMobileDrawer(l10n) : null,
       ),
     );
   }

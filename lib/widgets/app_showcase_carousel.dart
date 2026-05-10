@@ -26,9 +26,10 @@ class _AppShowcaseCarouselState extends State<AppShowcaseCarousel> {
         controller: controller,
         itemSnapping: true,
         flexWeights: const <int>[1, 7, 1],
-        children: AppShowcase.values.map((AppShowcase app) {
-          return AppShowcaseCard(app: app);
-        }).toList(),
+        children:
+            AppShowcase.values.map((AppShowcase app) {
+              return AppShowcaseCard(app: app);
+            }).toList(),
       ),
     );
   }
@@ -49,10 +50,7 @@ class AppShowcaseCard extends StatelessWidget {
           child: OverflowBox(
             maxWidth: width * 7 / 8,
             minWidth: width * 7 / 8,
-            child: Image(
-              fit: BoxFit.cover,
-              image: NetworkImage(app.imageUrl),
-            ),
+            child: Image(fit: BoxFit.cover, image: NetworkImage(app.imageUrl)),
           ),
         ),
         Padding(
@@ -65,14 +63,18 @@ class AppShowcaseCard extends StatelessWidget {
                 app.name,
                 overflow: TextOverflow.clip,
                 softWrap: false,
-                style: Theme.of(context).textTheme.headlineLarge?.copyWith(color: Colors.white),
+                style: Theme.of(
+                  context,
+                ).textTheme.headlineLarge?.copyWith(color: Colors.white),
               ),
               const SizedBox(height: 10),
               Text(
                 app.description,
                 overflow: TextOverflow.clip,
                 softWrap: false,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: Colors.white),
               ),
             ],
           ),
@@ -83,7 +85,11 @@ class AppShowcaseCard extends StatelessWidget {
 }
 
 enum AppShowcase {
-  app1('Flutter App 1', 'A beautiful mobile application', 'URL_TO_APP_1_SCREENSHOT'),
+  app1(
+    'Flutter App 1',
+    'A beautiful mobile application',
+    'URL_TO_APP_1_SCREENSHOT',
+  ),
   app2('Flutter App 2', 'An innovative solution', 'URL_TO_APP_2_SCREENSHOT'),
   app3('Flutter App 3', 'Cutting-edge technology', 'URL_TO_APP_3_SCREENSHOT');
 
@@ -115,9 +121,6 @@ class CarouselView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      scrollDirection: Axis.horizontal,
-      children: children,
-    );
+    return ListView(scrollDirection: Axis.horizontal, children: children);
   }
 }

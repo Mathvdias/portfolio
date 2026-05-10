@@ -15,6 +15,12 @@ class Dock extends StatelessWidget {
       url: 'https://github.com/Mathvdias',
     ),
     _DockItemData(
+      pixels: kMediumPixels,
+      label: 'Medium',
+      color: AppTheme.yellow,
+      url: 'https://medium.com/@matheusvdias',
+    ),
+    _DockItemData(
       pixels: kPackagePixels,
       label: 'pub.dev',
       color: AppTheme.teal,
@@ -37,18 +43,17 @@ class Dock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 60,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       decoration: BoxDecoration(
-        color: AppTheme.surface.withValues(alpha: 0.85),
-        border: const Border(
-          top: BorderSide(color: AppTheme.surface0, width: 1),
-        ),
+        color: AppTheme.surface.withValues(alpha: 0.90),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppTheme.surface0, width: 1),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           for (int i = 0; i < _items.length; i++) ...[
-            if (i > 0) const SizedBox(width: 16),
+            if (i > 0) const SizedBox(width: 20),
             _DockItem(data: _items[i]),
           ],
         ],
@@ -97,14 +102,14 @@ class _DockItemState extends State<_DockItem> {
       child: GestureDetector(
         onTap: _launch,
         child: AnimatedScale(
-          scale: _hovered ? 1.15 : 1.0,
+          scale: _hovered ? 1.2 : 1.0,
           duration: const Duration(milliseconds: 150),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
               SizedBox(
-                width: 44,
-                height: 44,
+                width: 40,
+                height: 40,
                 child: CustomPaint(
                   painter: PixelIconPainter(
                     pixels: widget.data.pixels,
@@ -112,10 +117,11 @@ class _DockItemState extends State<_DockItem> {
                   ),
                 ),
               ),
+              const SizedBox(height: 4),
               Text(
                 widget.data.label,
                 style: GoogleFonts.pressStart2p(
-                  fontSize: 5,
+                  fontSize: 6,
                   color: AppTheme.subtext,
                 ),
               ),

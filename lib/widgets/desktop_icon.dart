@@ -34,12 +34,13 @@ class _DesktopIconState extends State<DesktopIcon> {
         child: Container(
           width: 88,
           padding: const EdgeInsets.all(8),
-          decoration: _hovered
-              ? BoxDecoration(
-                  color: AppTheme.blue.withValues(alpha: 0.15),
-                  border: Border.all(color: AppTheme.blue, width: 1),
-                )
-              : null,
+          decoration:
+              _hovered
+                  ? BoxDecoration(
+                    color: AppTheme.blue.withValues(alpha: 0.15),
+                    border: Border.all(color: AppTheme.blue, width: 1),
+                  )
+                  : null,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -59,7 +60,7 @@ class _DesktopIconState extends State<DesktopIcon> {
                 child: Text(
                   widget.label,
                   style: GoogleFonts.pressStart2p(
-                    fontSize: 5,
+                    fontSize: 7,
                     color: AppTheme.text,
                     height: 1.6,
                   ),

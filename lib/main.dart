@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:portifolio/widgets/scroll_behavior.dart' show AppCustomScrollBehavior;
+import 'package:portifolio/widgets/scroll_behavior.dart'
+    show AppCustomScrollBehavior;
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'theme/app_theme.dart';
 import 'pages/desktop_page.dart';
 import 'l10n/app_localizations.dart';
 import 'controllers/language_controller.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    debugPrint('Firebase init error: \$e');
+  }
+
   runApp(
     ChangeNotifierProvider(
       create: (_) => LanguageController(),
