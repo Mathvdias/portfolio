@@ -1,38 +1,172 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
 
-  <!-- iOS meta tags & icons -->
+  <!-- Primary SEO -->
+  <title>Matheus Dias | Mobile Software Engineer</title>
+  <meta name="description" content="Matheus Dias — Mobile Software Engineer specializing in Flutter and Kotlin for Android. Portfolio with hands-on experience, open-source projects and technical skills.">
+  <meta name="keywords" content="Matheus Dias, Mobile Engineer, Flutter, Kotlin, Android, Dart, Software Engineer, intercepted_http, Brazil">
+  <meta name="author" content="Matheus Dias">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://matheusdiasportfolio.web.app">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://matheusdiasportfolio.web.app">
+  <meta property="og:site_name" content="Matheus Dias">
+  <meta property="og:title" content="Matheus Dias | Mobile Software Engineer">
+  <meta property="og:description" content="Mobile Software Engineer specializing in Flutter and Kotlin. Interactive pixel-art macOS-style portfolio.">
+  <meta property="og:image" content="https://matheusdiasportfolio.web.app/icons/Icon-512.png">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
+  <meta property="og:image:alt" content="Matheus Dias portfolio icon">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://matheusdiasportfolio.web.app">
+  <meta name="twitter:title" content="Matheus Dias | Mobile Software Engineer">
+  <meta name="twitter:description" content="Mobile Software Engineer specializing in Flutter and Kotlin. Interactive pixel-art macOS-style portfolio.">
+  <meta name="twitter:image" content="https://matheusdiasportfolio.web.app/icons/Icon-512.png">
+
+  <!-- PWA / iOS -->
+  <meta name="theme-color" content="#1E1E2E">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="portifolio">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Matheus Dias">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
-
-  <title>portifolio</title>
+  <!-- Favicon & manifest -->
+  <link rel="icon" type="image/png" href="favicon.png">
   <link rel="manifest" href="manifest.json">
+
+  <!-- Preconnect (fonts loaded by Flutter at runtime) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Matheus Dias",
+    "url": "https://matheusdiasportfolio.web.app",
+    "image": "https://matheusdiasportfolio.web.app/icons/Icon-512.png",
+    "jobTitle": "Mobile Software Engineer",
+    "description": "Mobile Software Engineer specializing in Flutter and Kotlin for Android development, with experience in medium-sized mobile projects from conception to deployment.",
+    "email": "mattmvc56@gmail.com",
+    "knowsAbout": ["Flutter", "Kotlin", "Android", "Dart", "Mobile Development", "REST APIs", "Firebase"],
+    "sameAs": [
+      "https://github.com/Mathvdias",
+      "https://www.linkedin.com/in/matheusvdias/",
+      "https://medium.com/@matheusvdias",
+      "https://pub.dev/packages/intercepted_http"
+    ]
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      background-color: #1E1E2E;
+      overflow: hidden;
+    }
+
+    #loading-screen {
+      position: fixed;
+      inset: 0;
+      background: #1E1E2E;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      z-index: 9999;
+      transition: opacity 0.5s ease;
+    }
+
+    #loading-screen.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .ls-title {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: clamp(12px, 2.5vw, 18px);
+      color: #89B4FA;
+      letter-spacing: 8px;
+      text-transform: uppercase;
+    }
+
+    .ls-cursor {
+      display: inline-block;
+      width: 10px;
+      height: 1em;
+      background: #89B4FA;
+      vertical-align: middle;
+      margin-left: 4px;
+      animation: blink 1s step-end infinite;
+    }
+
+    .ls-sub {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: clamp(7px, 1vw, 10px);
+      color: #6C7086;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+    }
+
+    .ls-bar-track {
+      width: 160px;
+      height: 4px;
+      background: #313244;
+    }
+
+    .ls-bar-fill {
+      height: 100%;
+      width: 0;
+      background: #89B4FA;
+      animation: fill 2s ease-out forwards;
+    }
+
+    @keyframes fill {
+      0%   { width: 0%; }
+      30%  { width: 45%; }
+      70%  { width: 75%; }
+      100% { width: 100%; }
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+  </style>
 </head>
 <body>
+  <div id="loading-screen">
+    <div class="ls-title">MATHEUS DIAS<span class="ls-cursor"></span></div>
+    <div class="ls-sub">Mobile Software Engineer</div>
+    <div class="ls-bar-track">
+      <div class="ls-bar-fill"></div>
+    </div>
+  </div>
+
   <script src="flutter_bootstrap.js" async></script>
+  <script>
+    window.addEventListener('flutter-first-frame', function () {
+      var el = document.getElementById('loading-screen');
+      if (el) {
+        el.classList.add('fade-out');
+        setTimeout(function () { el.remove(); }, 550);
+      }
+    });
+  </script>
 </body>
 </html>

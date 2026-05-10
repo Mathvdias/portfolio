@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /resume.pdf
+
+Sitemap: https://matheusdiasportfolio.web.app/sitemap.xml
