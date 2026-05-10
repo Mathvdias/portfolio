@@ -74,99 +74,170 @@
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-    html, body {
-      height: 100%;
-      background-color: #1E1E2E;
-      overflow: hidden;
-    }
+    html, body { height: 100%; background: #000; overflow: hidden; }
 
-    #loading-screen {
+    /* ── Boot screen ── */
+    #boot {
       position: fixed;
       inset: 0;
-      background: #1E1E2E;
+      background: #000;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 24px;
-      z-index: 9999;
-      transition: opacity 0.5s ease;
-    }
-
-    #loading-screen.fade-out {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .ls-title {
+      justify-content: flex-start;
+      padding: clamp(16px, 4vw, 48px);
       font-family: 'Courier New', Courier, monospace;
-      font-size: clamp(12px, 2.5vw, 18px);
-      color: #89B4FA;
-      letter-spacing: 8px;
-      text-transform: uppercase;
+      z-index: 9999;
+      transition: opacity 0.6s ease;
+    }
+    #boot.fade-out { opacity: 0; pointer-events: none; }
+
+    /* BIOS header block */
+    #boot-bios {
+      color: #cdd6f4;
+      font-size: clamp(9px, 1.1vw, 13px);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+    #boot-bios .brand {
+      font-size: clamp(14px, 2vw, 22px);
+      color: #89b4fa;
+      font-weight: bold;
+      letter-spacing: 3px;
+    }
+    #boot-bios .dim { color: #6c7086; }
+
+    /* Separator */
+    .sep {
+      border: none;
+      border-top: 1px solid #313244;
+      margin: 16px 0;
     }
 
-    .ls-cursor {
+    /* Boot log */
+    #boot-log {
+      flex: 1;
+      font-size: clamp(9px, 1vw, 12px);
+      line-height: 2;
+      color: #a6adc8;
+      overflow: hidden;
+    }
+    #boot-log .ok   { color: #a6e3a1; }
+    #boot-log .warn { color: #f9e2af; }
+    #boot-log .tag  { color: #6c7086; }
+
+    /* Progress bar (bottom) */
+    #boot-footer {
+      margin-top: 24px;
+    }
+    #boot-footer .label {
+      font-size: clamp(8px, 0.9vw, 11px);
+      color: #6c7086;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    #boot-track {
+      width: 100%;
+      height: 3px;
+      background: #1e1e2e;
+    }
+    #boot-fill {
+      height: 100%;
+      width: 0%;
+      background: #89b4fa;
+      transition: width 0.4s ease;
+    }
+
+    /* Blinking cursor */
+    .cur {
       display: inline-block;
-      width: 10px;
+      width: 8px;
       height: 1em;
-      background: #89B4FA;
+      background: #89b4fa;
       vertical-align: middle;
-      margin-left: 4px;
+      margin-left: 2px;
       animation: blink 1s step-end infinite;
     }
-
-    .ls-sub {
-      font-family: 'Courier New', Courier, monospace;
-      font-size: clamp(7px, 1vw, 10px);
-      color: #6C7086;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-    }
-
-    .ls-bar-track {
-      width: 160px;
-      height: 4px;
-      background: #313244;
-    }
-
-    .ls-bar-fill {
-      height: 100%;
-      width: 0;
-      background: #89B4FA;
-      animation: fill 2s ease-out forwards;
-    }
-
-    @keyframes fill {
-      0%   { width: 0%; }
-      30%  { width: 45%; }
-      70%  { width: 75%; }
-      100% { width: 100%; }
-    }
-
-    @keyframes blink {
-      50% { opacity: 0; }
-    }
+    @keyframes blink { 50% { opacity: 0; } }
   </style>
 </head>
 <body>
-  <div id="loading-screen">
-    <div class="ls-title">MATHEUS DIAS<span class="ls-cursor"></span></div>
-    <div class="ls-sub">Mobile Software Engineer</div>
-    <div class="ls-bar-track">
-      <div class="ls-bar-fill"></div>
+
+  <div id="boot">
+    <!-- BIOS header -->
+    <div id="boot-bios">
+      <div class="brand">MathOS  v1.0.0</div>
+      <div class="dim">Copyright (C) 2026 Matheus Dias. All rights reserved.</div>
+      <div>CPU: Flutter Engine &nbsp;|&nbsp; RAM: 8192 MB OK &nbsp;|&nbsp; DISPLAY: 1920x1080</div>
+      <div class="dim">BIOS v2.26 &nbsp;—&nbsp; Press [F2] to enter Setup &nbsp;|&nbsp; [DEL] Boot Menu</div>
+    </div>
+
+    <hr class="sep">
+
+    <!-- Boot log — filled by JS -->
+    <div id="boot-log"></div>
+
+    <!-- Progress bar -->
+    <div id="boot-footer">
+      <div class="label">Starting MathOS<span class="cur"></span></div>
+      <div id="boot-track"><div id="boot-fill"></div></div>
     </div>
   </div>
 
   <script src="flutter_bootstrap.js" async></script>
   <script>
-    window.addEventListener('flutter-first-frame', function () {
-      var el = document.getElementById('loading-screen');
-      if (el) {
-        el.classList.add('fade-out');
-        setTimeout(function () { el.remove(); }, 550);
+    (function () {
+      var log     = document.getElementById('boot-log');
+      var fill    = document.getElementById('boot-fill');
+      var ready   = false;   // flutter first-frame received
+      var seqDone = false;   // all messages printed
+
+      var messages = [
+        { delay: 0,    pct: 8,   html: '<span class="tag">[    0.000]</span> Initializing MathOS kernel...' },
+        { delay: 280,  pct: 18,  html: '<span class="ok">[ OK ]</span> Loading hardware drivers' },
+        { delay: 520,  pct: 30,  html: '<span class="ok">[ OK ]</span> Mounting Flutter runtime' },
+        { delay: 760,  pct: 44,  html: '<span class="ok">[ OK ]</span> Starting pixel renderer' },
+        { delay: 980,  pct: 58,  html: '<span class="ok">[ OK ]</span> Loading experience modules' },
+        { delay: 1200, pct: 70,  html: '<span class="ok">[ OK ]</span> Importing work history' },
+        { delay: 1420, pct: 80,  html: '<span class="ok">[ OK ]</span> Mounting project filesystem' },
+        { delay: 1640, pct: 90,  html: '<span class="ok">[ OK ]</span> Starting dock services' },
+        { delay: 1860, pct: 98,  html: '<span class="ok">[ OK ]</span> <span style="color:#cdd6f4">Desktop environment ready</span>' },
+        { delay: 2100, pct: 100, html: '<span style="color:#89b4fa;letter-spacing:2px">Welcome, Developer.</span>' },
+      ];
+
+      function addLine(html) {
+        var p = document.createElement('p');
+        p.innerHTML = html;
+        log.appendChild(p);
       }
-    });
+
+      function tryDismiss() {
+        if (ready && seqDone) dismiss();
+      }
+
+      function dismiss() {
+        var el = document.getElementById('boot');
+        if (!el) return;
+        el.classList.add('fade-out');
+        setTimeout(function () { el.remove(); }, 650);
+      }
+
+      messages.forEach(function (m, i) {
+        setTimeout(function () {
+          addLine(m.html);
+          fill.style.width = m.pct + '%';
+          if (i === messages.length - 1) {
+            seqDone = true;
+            tryDismiss();
+          }
+        }, m.delay);
+      });
+
+      window.addEventListener('flutter-first-frame', function () {
+        ready = true;
+        tryDismiss();
+      });
+    })();
   </script>
 </body>
 </html>
