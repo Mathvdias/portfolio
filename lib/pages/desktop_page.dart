@@ -232,7 +232,7 @@ class _DesktopPageState extends State<DesktopPage> {
     icons.add(
       DesktopIcon(
         label: 'Skills',
-        pixels: kFlutterPixels,
+        pixels: kSkillsPixels,
         color: AppTheme.blue,
         onTap:
             () => _openWindow(
@@ -346,7 +346,7 @@ class _DesktopPageState extends State<DesktopPage> {
     icons.add(
       DesktopIcon(
         label: 'intercepted\n_http',
-        pixels: kDartPixels,
+        pixels: kShieldPixels,
         color: AppTheme.blue,
         onTap:
             () => _openWindow(

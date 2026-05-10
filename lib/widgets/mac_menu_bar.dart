@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:portifolio/services/visitor_service.dart' show VisitorService;
 
 import '../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
@@ -311,37 +310,4 @@ class _BatteryPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_BatteryPainter old) => old.level != level;
-}
-
-class _VisitorCounter extends StatelessWidget {
-  const _VisitorCounter();
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<int>(
-      stream: VisitorService().getVisitorCount(),
-      builder: (context, snapshot) {
-        final count = snapshot.data ?? 0;
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.remove_red_eye_outlined,
-              size: 14,
-              color: AppTheme.subtext,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              '$count',
-              style: GoogleFonts.spaceMono(
-                fontSize: 12,
-                color: AppTheme.subtext,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
 }

@@ -18,8 +18,8 @@ class SkillsWindowContent extends StatelessWidget {
             _section('Mobile', [
               _Skill('Flutter', kFlutterPixels, AppTheme.blue, 0.95),
               _Skill('Android', kAndroidPixels, AppTheme.green, 0.85),
-              _Skill('Dart', kTerminalPixels, AppTheme.teal, 0.95),
-              _Skill('Kotlin', kPackagePixels, AppTheme.mauve, 0.80),
+              _Skill('Dart', kDartPixels, AppTheme.teal, 0.95),
+              _Skill('Kotlin', kKotlinPixels, AppTheme.mauve, 0.80),
             ]),
             const SizedBox(height: 20),
             _section('Backend & Tools', [

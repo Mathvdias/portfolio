@@ -21,13 +21,13 @@ class Dock extends StatelessWidget {
       url: 'https://medium.com/@matheusvdias',
     ),
     _DockItemData(
-      pixels: kPackagePixels,
+      pixels: kDartPixels,
       label: 'pub.dev',
       color: AppTheme.teal,
       url: 'https://pub.dev/packages/intercepted_http',
     ),
     _DockItemData(
-      pixels: kLinkPixels,
+      pixels: kLinkedInPixels,
       label: 'LinkedIn',
       color: AppTheme.blue,
       url: 'https://www.linkedin.com/in/matheusvdias/',
