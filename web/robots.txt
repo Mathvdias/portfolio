@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /resume.pdf
 
-Sitemap: https://matheusdiasportfolio.web.app/sitemap.xml
+Sitemap: https://matheusvinicius.dev.br/sitemap.xml
