@@ -15,7 +15,7 @@ class Footer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24),
-      color: AppTheme.surfaceColor,
+      color: AppTheme.surface,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -23,10 +23,10 @@ class Footer extends StatelessWidget {
             cursor: SystemMouseCursors.click,
             child: GestureDetector(
               onTap: () => _launchURL('https://github.com/Mathvdias'),
-              child: Text(
+              child: const Text(
                 'GitHub',
                 style: TextStyle(
-                  color: AppTheme.primaryColor,
+                  color: AppTheme.blue,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
@@ -43,11 +43,12 @@ class Footer extends StatelessWidget {
           MouseRegion(
             cursor: SystemMouseCursors.click,
             child: GestureDetector(
-              onTap: () => _launchURL('https://www.linkedin.com/in/matheusvdias/'),
-              child: Text(
+              onTap: () =>
+                  _launchURL('https://www.linkedin.com/in/matheusvdias/'),
+              child: const Text(
                 'LinkedIn',
                 style: TextStyle(
-                  color: AppTheme.primaryColor,
+                  color: AppTheme.blue,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),

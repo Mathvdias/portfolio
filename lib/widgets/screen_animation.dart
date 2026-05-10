@@ -24,7 +24,7 @@ class _ScreenAnimationState extends State<ScreenAnimation> {
   void scrollListener() {
     final end = widget.scrollController.position.maxScrollExtent;
     final currentScroll = widget.scrollController.offset;
-    
+
     interpolation.value = (currentScroll / end).clamp(0.0, 1.0);
     showScrollToTop.value = currentScroll / end > 0.5;
   }
@@ -45,7 +45,7 @@ class _ScreenAnimationState extends State<ScreenAnimation> {
         final translateAnimation = const Interval(0.0, 0.5).transform(value);
         final opacityAnimation = const Interval(0.0, 0.5).transform(value);
         final rotateAnimation = const Interval(0.0, 0.5).transform(value);
-    
+
         return Stack(
           children: [
             ValueListenableBuilder<bool>(
@@ -69,7 +69,8 @@ class _ScreenAnimationState extends State<ScreenAnimation> {
                                   onTap: () {
                                     widget.scrollController.animateTo(
                                       0,
-                                      duration: const Duration(milliseconds: 800),
+                                      duration:
+                                          const Duration(milliseconds: 800),
                                       curve: Curves.easeInOut,
                                     );
                                   },
@@ -77,11 +78,12 @@ class _ScreenAnimationState extends State<ScreenAnimation> {
                                     width: 48,
                                     height: 48,
                                     decoration: BoxDecoration(
-                                      color: AppTheme.primaryColor,
+                                      color: AppTheme.blue,
                                       borderRadius: BorderRadius.circular(12),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: AppTheme.primaryColor.withOpacity(0.3),
+                                          color: AppTheme.blue
+                                              .withValues(alpha: 0.3),
                                           blurRadius: 10,
                                           offset: const Offset(0, 4),
                                         ),

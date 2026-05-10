@@ -3,7 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:portifolio/widgets/scroll_behavior.dart' show AppCustomScrollBehavior;
 import 'package:provider/provider.dart';
 import 'theme/app_theme.dart';
-import 'pages/home_page.dart';
+import 'pages/desktop_page.dart';
 import 'l10n/app_localizations.dart';
 import 'controllers/language_controller.dart';
 
@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          home: const HomePage(),
+          home: const DesktopPage(),
         );
       },
     );

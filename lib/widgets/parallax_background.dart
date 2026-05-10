@@ -13,15 +13,17 @@ class ParallaxBackground extends StatelessWidget {
     return AnimatedBuilder(
       animation: scrollController,
       builder: (context, child) {
-        final offset = scrollController.hasClients ? scrollController.offset : 0.0;
+        final offset =
+            scrollController.hasClients ? scrollController.offset : 0.0;
         final screenHeight = MediaQuery.of(context).size.height;
-        final opacity = (1 - (offset / (screenHeight * 0.8))).clamp(0.0, 1.0);
+        final opacity =
+            (1 - (offset / (screenHeight * 0.8))).clamp(0.0, 1.0);
 
         return Positioned(
           top: -offset,
           left: 0,
           right: 0,
-          bottom: -screenHeight,  // Extend beyond screen height to prevent gaps
+          bottom: -screenHeight,
           child: Transform.translate(
             offset: Offset(0, offset * 0.5),
             child: Opacity(
@@ -33,15 +35,17 @@ class ParallaxBackground extends StatelessWidget {
                     end: Alignment.bottomRight,
                     colors: [
                       Color.lerp(
-                        Colors.blue.withOpacity(0.1),
-                        Colors.transparent,
-                        1 - opacity,
-                      ) ?? Colors.transparent,
+                            Colors.blue.withValues(alpha: 0.1),
+                            Colors.transparent,
+                            1 - opacity,
+                          ) ??
+                          Colors.transparent,
                       Color.lerp(
-                        Colors.purple.withOpacity(0.1),
-                        Colors.transparent,
-                        1 - opacity,
-                      ) ?? Colors.transparent,
+                            Colors.purple.withValues(alpha: 0.1),
+                            Colors.transparent,
+                            1 - opacity,
+                          ) ??
+                          Colors.transparent,
                     ],
                   ),
                   backgroundBlendMode: BlendMode.overlay,
@@ -73,10 +77,10 @@ class ParallaxPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.1 * opacity)
+      ..color = Colors.white.withValues(alpha: 0.1 * opacity)
       ..strokeWidth = 1;
 
-    final dotSpacing = 30.0;
+    const dotSpacing = 30.0;
     final rows = (size.height / dotSpacing).ceil() + 10;
     final cols = (size.width / dotSpacing).ceil();
 
@@ -86,7 +90,7 @@ class ParallaxPainter extends CustomPainter {
       for (var col = 0; col < cols; col++) {
         final x = col * dotSpacing;
         final y = (row * dotSpacing) + yOffset;
-        
+
         if (y >= -dotSpacing && y <= size.height + dotSpacing) {
           canvas.drawCircle(
             Offset(x, y),
@@ -100,7 +104,7 @@ class ParallaxPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(ParallaxPainter oldDelegate) {
-    return oldDelegate.scrollOffset != scrollOffset || 
-           oldDelegate.opacity != opacity;
+    return oldDelegate.scrollOffset != scrollOffset ||
+        oldDelegate.opacity != opacity;
   }
 }

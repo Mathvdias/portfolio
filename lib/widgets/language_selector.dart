@@ -28,22 +28,22 @@ class LanguageSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
-      color: AppTheme.surfaceColor,
+      color: AppTheme.surface,
       icon: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(_getLanguageInfo(currentLanguage)['flag']!, 
+          Text(_getLanguageInfo(currentLanguage)['flag']!,
               style: const TextStyle(fontSize: 18)),
           const SizedBox(width: 4),
           Text(
             _getLanguageInfo(currentLanguage)['name']!,
             style: const TextStyle(
-              color: AppTheme.textColor,
+              color: AppTheme.text,
               fontSize: 16,
             ),
           ),
           const SizedBox(width: 4),
-          const Icon(Icons.arrow_drop_down, color: AppTheme.textColor),
+          const Icon(Icons.arrow_drop_down, color: AppTheme.text),
         ],
       ),
       onSelected: onLanguageChanged,
@@ -60,8 +60,8 @@ class LanguageSelector extends StatelessWidget {
             value: code,
             child: Container(
               decoration: BoxDecoration(
-                color: code == currentLanguage 
-                    ? AppTheme.primaryColor.withOpacity(0.1) 
+                color: code == currentLanguage
+                    ? AppTheme.blue.withValues(alpha: 0.1)
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(4),
               ),
@@ -73,11 +73,11 @@ class LanguageSelector extends StatelessWidget {
                   Text(
                     info['name']!,
                     style: TextStyle(
-                      color: code == currentLanguage 
-                          ? AppTheme.primaryColor 
-                          : AppTheme.textColor,
-                      fontWeight: code == currentLanguage 
-                          ? FontWeight.bold 
+                      color: code == currentLanguage
+                          ? AppTheme.blue
+                          : AppTheme.text,
+                      fontWeight: code == currentLanguage
+                          ? FontWeight.bold
                           : FontWeight.normal,
                     ),
                   ),
