@@ -1,6 +1,6 @@
+import 'package:app_window/app_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:portifolio/widgets/app_window.dart';
 
 void main() {
   testWidgets('AppWindow renders title', (tester) async {
@@ -24,7 +24,6 @@ void main() {
       ),
     );
     expect(find.text('Test Window'), findsOneWidget);
-    // suppress unused variable warnings
     expect(closed, isFalse);
     expect(focused, isFalse);
   });

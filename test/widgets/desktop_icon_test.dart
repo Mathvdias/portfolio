@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:portifolio/widgets/desktop_icon.dart';
-import 'package:portifolio/widgets/pixel_icon_painter.dart';
+import 'package:pixel_art/pixel_art.dart';
+import 'package:portifolio/shared/widgets/desktop_icon.dart';
 
 void main() {
   testWidgets('DesktopIcon renders label', (tester) async {
