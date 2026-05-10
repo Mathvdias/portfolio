@@ -337,8 +337,8 @@ class _DesktopPageState extends State<DesktopPage> {
         pixels: kLinkPixels,
         color: AppTheme.red,
         onTap: () async {
-          final uri = Uri.parse('assets/resume.pdf');
-          if (await canLaunchUrl(uri)) await launchUrl(uri);
+          final uri = Uri.parse('/resume.pdf');
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
         },
       ),
     );
