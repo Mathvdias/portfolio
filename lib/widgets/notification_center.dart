@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
 
 class NotificationCenter extends StatelessWidget {
@@ -7,6 +8,8 @@ class NotificationCenter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Container(
       width: 300,
       decoration: BoxDecoration(
@@ -19,7 +22,7 @@ class NotificationCenter extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
-              'Notification Center',
+              l10n.notificationCenter,
               style: GoogleFonts.spaceMono(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -31,28 +34,27 @@ class NotificationCenter extends StatelessWidget {
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(12),
-              children: const [
+              children: [
                 _NotificationItem(
-                  title: 'Daily Verse',
-                  message:
-                      'I can do all things through Christ who strengthens me. - Phil 4:13',
-                  time: 'Now',
+                  title: l10n.dailyVerse,
+                  message: l10n.dailyVerseText,
+                  time: l10n.timeNow,
                   icon: Icons.book,
                   color: AppTheme.mauve,
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 _NotificationItem(
-                  title: 'System',
-                  message: 'Portfolio updated successfully.',
-                  time: '2h ago',
+                  title: l10n.system,
+                  message: l10n.portfolioUpdated,
+                  time: l10n.time2hAgo,
                   icon: Icons.system_update_alt,
                   color: AppTheme.green,
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 _NotificationItem(
-                  title: 'GitHub',
-                  message: 'New commit pushed to intercepted_http.',
-                  time: '1d ago',
+                  title: l10n.github,
+                  message: l10n.githubUpdate,
+                  time: l10n.time1dAgo,
                   icon: Icons.code,
                   color: AppTheme.teal,
                 ),

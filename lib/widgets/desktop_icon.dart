@@ -34,13 +34,17 @@ class _DesktopIconState extends State<DesktopIcon> {
         child: Container(
           width: 88,
           padding: const EdgeInsets.all(8),
-          decoration:
-              _hovered
-                  ? BoxDecoration(
-                    color: AppTheme.blue.withValues(alpha: 0.15),
-                    border: Border.all(color: AppTheme.blue, width: 1),
-                  )
-                  : null,
+          decoration: BoxDecoration(
+            color:
+                _hovered
+                    ? AppTheme.blue.withValues(alpha: 0.15)
+                    : Colors.transparent,
+            border: Border.all(
+              color: _hovered ? AppTheme.blue : Colors.transparent,
+              width: 1,
+            ),
+            borderRadius: BorderRadius.circular(4),
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

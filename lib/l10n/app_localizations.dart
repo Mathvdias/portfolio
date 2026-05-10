@@ -31,6 +31,11 @@ class AppLocalizations {
       "system": "System",
       "portfolioUpdated": "Portfolio updated successfully.",
       "musicPlaying": "Regina Caeli Jubila",
+      "github": "GitHub",
+      "githubUpdate": "New commit pushed to intercepted_http.",
+      "timeNow": "Now",
+      "time2hAgo": "2h ago",
+      "time1dAgo": "1d ago",
       "experiences": [
         {
           "company": "Zallpy Digital / West Shore Solutions",
@@ -101,7 +106,7 @@ class AppLocalizations {
       "name": "Matheus Dias",
       "location": "Manaus, AM",
       "bio":
-          "Soy un Ingeniero de Software Móvil especializado en Kotlin para desarrollo Android, con amplia experiencia en Flutter para aplicaciones multiplataforma. Tengo un historial sólido en proyectos móviles de tamaño medio, participando en todas las etapas, desde la concepción hasta el lanzamiento y mantenimiento.\n\nMi enfoque está en la resolución de problemas complejos en el desarrollo móvil y la ingeniería de software, aplicando estructuras de datos y algoritmos para optimizar el rendimiento y la escalabilidad. Tengo experiencia en el diseño e implementación de arquitecturas modulares, garantizando la mantenibilidad y eficiencia del código.\n\nMi capacidad para analizar cuellos de botella de rendimiento y mejorar la estabilidad de las aplicaciones ha sido fundamental para la entrega de software de alta calidad. Me apasiona aprovechar la tecnología para crear soluciones innovadoras que mejoren la experiencia del usuario y agreguen valor a los productos.",
+          "Soy un Ingeniero de Software Móvil especializado en Kotlin para desarrollo Android, con amplia experiencia en Flutter para aplicaciones multiplataforma. Tengo un historial sólido en proyectos móviles de tamaño medio, participando en todas las etapas, desde la concepción hasta el lanzamiento y mantenimiento.\n\nMi enfoque está en la resolución de problemas complexes en el desarrollo móvil y la ingeniería de software, aplicando estructuras de datos y algoritmos para optimizar el rendimiento y la escalabilidad. Tengo experiencia en el diseño e implementación de arquitecturas modulares, garantizando la mantenibilidad y eficiencia del código.\n\nMi capacidad para analizar cuellos de botella de rendimiento y mejorar la estabilidad de las aplicaciones ha sido fundamental para la entrega de software de alta calidad. Me apasiona aprovechar la tecnología para crear soluciones innovadoras que mejoren la experiencia del usuario y agreguen valor a los productos.",
       "companyName": "Tu Empresa",
       "experienceDescription":
           "Desarrollando aplicaciones móviles con Kotlin, Flutter y tecnologías modernas.",
@@ -113,13 +118,18 @@ class AppLocalizations {
       "system": "Sistema",
       "portfolioUpdated": "Portafolio actualizado con éxito.",
       "musicPlaying": "Regina Caeli Jubila",
+      "github": "GitHub",
+      "githubUpdate": "Nuevo commit enviado a intercepted_http.",
+      "timeNow": "Ahora",
+      "time2hAgo": "hace 2h",
+      "time1dAgo": "hace 1d",
       "experiences": [
         {
           "company": "Zallpy Digital / West Shore Solutions",
           "role": "Ingeniero de Software Móvil",
           "period": "Sep 2024 – Presente",
           "description":
-              "Liderazgo en proyecto internacional (B2B): desarrollo y refactorización de soluciones móviles para clientes globales, garantizando conformidad con estándares WCAG de accesibilidad y soporte completo de i18n. Implementación de Clean Architecture en módulos legados, reduciendo en un 10% el tiempo de integración de nuevos ingenieros.",
+              "Liderazgo en proyecto internacional (B2B): desarrollo y refactorización de soluciones móviles para clientes globales, garantizando conformidad con estándares WCAG de accesibilidad y soporte completo de i18n. Implementación de Clean Architecture en módulos legados, reducendo en un 10% el tiempo de integración de nuevos ingenieros.",
           "technologies": [
             "Flutter",
             "Dart",
@@ -195,6 +205,11 @@ class AppLocalizations {
       "system": "Système",
       "portfolioUpdated": "Portfolio mis à jour avec succès.",
       "musicPlaying": "Regina Caeli Jubila",
+      "github": "GitHub",
+      "githubUpdate": "Nouveau commit poussé vers intercepted_http.",
+      "timeNow": "Maintenant",
+      "time2hAgo": "il y a 2h",
+      "time1dAgo": "il y a 1j",
       "experiences": [
         {
           "company": "Zallpy Digital / West Shore Solutions",
@@ -277,6 +292,11 @@ class AppLocalizations {
       "system": "Sistema",
       "portfolioUpdated": "Portfolio aggiornato con successo.",
       "musicPlaying": "Regina Caeli Jubila",
+      "github": "GitHub",
+      "githubUpdate": "Nuovo commit inviato a intercepted_http.",
+      "timeNow": "Adesso",
+      "time2hAgo": "2h fa",
+      "time1dAgo": "1g fa",
       "experiences": [
         {
           "company": "Zallpy Digital / West Shore Solutions",
@@ -360,6 +380,11 @@ class AppLocalizations {
       "system": "Sistema",
       "portfolioUpdated": "Portfólio atualizado com sucesso.",
       "musicPlaying": "Regina Caeli Jubila",
+      "github": "GitHub",
+      "githubUpdate": "Novo commit enviado para intercepted_http.",
+      "timeNow": "Agora",
+      "time2hAgo": "2h atrás",
+      "time1dAgo": "1d atrás",
       "experiences": [
         {
           "company": "Zallpy Digital / West Shore Solutions",
@@ -452,6 +477,14 @@ class AppLocalizations {
       _localizedValues[locale.languageCode]?['portfolioUpdated'] ?? '';
   String get musicPlaying =>
       _localizedValues[locale.languageCode]?['musicPlaying'] ?? '';
+  String get github => _localizedValues[locale.languageCode]?['github'] ?? '';
+  String get githubUpdate =>
+      _localizedValues[locale.languageCode]?['githubUpdate'] ?? '';
+  String get timeNow => _localizedValues[locale.languageCode]?['timeNow'] ?? '';
+  String get time2hAgo =>
+      _localizedValues[locale.languageCode]?['time2hAgo'] ?? '';
+  String get time1dAgo =>
+      _localizedValues[locale.languageCode]?['time1dAgo'] ?? '';
 
   List<Map<String, dynamic>> get experiences {
     final list =
