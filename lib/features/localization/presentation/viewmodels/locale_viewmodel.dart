@@ -8,6 +8,13 @@ class LocaleViewModel extends ChangeNotifier {
   Locale get flutterLocale => _locale.locale;
   String get currentCode => _locale.code;
 
+  void init() {
+    // Detect system/browser language
+    final systemLocale = WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+    _locale = AppLocale.fromCode(systemLocale);
+    notifyListeners();
+  }
+
   void setLocale(AppLocale locale) {
     if (_locale == locale) return;
     _locale = locale;

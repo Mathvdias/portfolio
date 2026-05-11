@@ -52,6 +52,7 @@ class _AppRootState extends State<AppRoot> {
   @override
   void initState() {
     super.initState();
+    _localeViewModel.init();
     _guestbookViewModel = GuestbookViewModel(
       GuestbookRepository(),
       widget.prefs,
