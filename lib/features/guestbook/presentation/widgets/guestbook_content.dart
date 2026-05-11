@@ -247,7 +247,7 @@ class _GuestbookContentState extends State<GuestbookContent> {
                           padding: const EdgeInsets.all(AppSizes.spacingLg),
                           itemCount: widget.viewModel.messages.length,
                           separatorBuilder:
-                              (_, __) =>
+                              (_, _) =>
                                   const SizedBox(height: AppSizes.spacingLg),
                           itemBuilder: (context, index) {
                             final msg = widget.viewModel.messages[index];
