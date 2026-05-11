@@ -34,12 +34,6 @@ jobs:
       - name: Update Project Stats
         run: dart scripts/generate_stats.dart
 
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: coverage/lcov.info
-
   build:
     name: Build WASM
     needs: quality
@@ -58,6 +52,12 @@ jobs:
 
       - name: Build Web WASM
         run: flutter build web --wasm
+
+      - name: Optimize WASM
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y binaryen
+          wasm-opt -O4 build/web/main.dart.wasm -o build/web/main.dart.wasm
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
