@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'window_animation_mixin.dart';
+
 class AppWindow extends StatefulWidget {
   const AppWindow({
     super.key,
@@ -39,7 +41,7 @@ class AppWindow extends StatefulWidget {
   State<AppWindow> createState() => _AppWindowState();
 }
 
-class _AppWindowState extends State<AppWindow> {
+class _AppWindowState extends State<AppWindow> with SingleTickerProviderStateMixin, WindowAnimationMixin {
   late Offset _position;
 
   @override
@@ -56,7 +58,7 @@ class _AppWindowState extends State<AppWindow> {
       child: GestureDetector(
         onTap: widget.onFocus,
         onPanStart: (_) => widget.onFocus(),
-        child: _buildWindow(),
+        child: buildAnimatedWindow(_buildWindow()),
       ),
     );
   }
@@ -90,6 +92,10 @@ class _AppWindowState extends State<AppWindow> {
     );
   }
 
+  void _closeWindow() {
+    closeWithAnimation(widget.onClose);
+  }
+
   Widget _buildTitleBar() {
     return GestureDetector(
       onPanUpdate: (details) {
@@ -103,7 +109,7 @@ class _AppWindowState extends State<AppWindow> {
           children: [
             GestureDetector(
               key: const Key('close_button'),
-              onTap: widget.onClose,
+              onTap: _closeWindow,
               child: Container(
                 width: 12,
                 height: 12,

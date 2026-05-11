@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:portifolio/shared/constants/app_strings.dart' show AppStrings;
 
 import 'core/di/app_dependencies.dart';
 import 'features/desktop/presentation/pages/desktop_page.dart';
@@ -51,7 +52,7 @@ class _AppRootState extends State<AppRoot> {
         listenable: _localeViewModel,
         builder: (context, _) {
           return MaterialApp(
-            title: 'Matheus Dias',
+            title: AppStrings.appName,
             theme: AppTheme.darkTheme,
             debugShowCheckedModeBanner: false,
             locale: _localeViewModel.flutterLocale,

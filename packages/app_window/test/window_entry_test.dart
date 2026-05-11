@@ -41,6 +41,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
       expect(find.text('Hello World'), findsOneWidget);
     });
 
@@ -64,8 +65,13 @@ void main() {
         ),
       );
 
+      // Wait for entrance animation to finish
+      await tester.pumpAndSettle();
+
       await tester.tap(find.byKey(const Key('close_button')));
-      await tester.pump();
+      
+      // Wait for exit animation to finish
+      await tester.pumpAndSettle();
 
       expect(closed, isTrue);
     });
@@ -88,6 +94,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
       expect(find.text('Child Content'), findsOneWidget);
     });
   });

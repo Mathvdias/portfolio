@@ -327,10 +327,13 @@ class _TerminalContentState extends State<TerminalContent> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.black,
-      padding: const EdgeInsets.all(AppSizes.terminalPadding),
-      child: Column(
+    return GestureDetector(
+      onTap: () => _focus.requestFocus(),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        color: Colors.black,
+        padding: const EdgeInsets.all(AppSizes.terminalPadding),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
@@ -384,6 +387,6 @@ class _TerminalContentState extends State<TerminalContent> {
           ),
         ],
       ),
-    );
+    ));
   }
 }

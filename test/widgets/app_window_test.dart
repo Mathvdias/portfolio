@@ -23,6 +23,7 @@ void main() {
         ),
       ),
     );
+    await tester.pumpAndSettle();
     expect(find.text('Test Window'), findsOneWidget);
     expect(closed, isFalse);
     expect(focused, isFalse);
@@ -47,8 +48,9 @@ void main() {
         ),
       ),
     );
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('close_button')));
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(closed, isTrue);
   });
 }
