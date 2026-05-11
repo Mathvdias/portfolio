@@ -42,8 +42,6 @@ dependencies:
   # Internal packages
   app_window:
     path: packages/app_window
-  pixel_art:
-    path: packages/pixel_art
   font_awesome_flutter: ^11.0.0
 
 dev_dependencies:

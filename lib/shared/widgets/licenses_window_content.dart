@@ -26,18 +26,18 @@ class LicensesWindowContent extends StatelessWidget {
                 'traffic-light controls. Built in-house for this portfolio.',
             url: null,
           ),
-          _licenseCard(
-            name: 'pixel_art',
-            version: '1.0.0',
-            license: 'MIT',
-            description:
-                '16×16 pixel-art CustomPainter and 19 hand-crafted icon patterns. '
-                'Built in-house for this portfolio.',
-            url: null,
-          ),
           const SizedBox(height: AppSizes.spacing3xl),
           _sectionHeader(AppStrings.licensesOpenSource),
           const SizedBox(height: AppSizes.spacingLg),
+          _licenseCard(
+            name: 'font_awesome_flutter',
+            version: '^11.0.0',
+            license: 'MIT',
+            description:
+                'The Font Awesome Icon pack available as set of Flutter Icons. '
+                'Provides high quality vector graphics for the UI.',
+            url: 'https://pub.dev/packages/font_awesome_flutter',
+          ),
           _licenseCard(
             name: 'Flutter',
             version: '3.x',
