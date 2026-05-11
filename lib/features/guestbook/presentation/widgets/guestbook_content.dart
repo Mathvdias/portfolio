@@ -68,6 +68,41 @@ class _GuestbookContentState extends State<GuestbookContent> {
           color: AppTheme.background,
           child: Column(
             children: [
+              // CTA Banner
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(AppSizes.spacingLg),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [AppTheme.blue.withOpacity(0.2), AppTheme.blue.withOpacity(0.05)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  border: Border(bottom: BorderSide(color: AppTheme.blue.withOpacity(0.2))),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Leave your mark! ✍️',
+                      style: GoogleFonts.outfit(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.blue,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Your feedback makes this portfolio better. Share a message or just say hi!',
+                      style: GoogleFonts.spaceMono(
+                        fontSize: 12,
+                        color: AppTheme.subtext,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
               // ── Header Form ─────────────────────────────────────────
               Container(
                 padding: const EdgeInsets.all(AppSizes.spacingLg),
