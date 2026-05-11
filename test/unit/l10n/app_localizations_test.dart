@@ -102,6 +102,42 @@ void main() {
       expect(l10n.role, '');
       expect(l10n.guestbook, 'Guestbook');
     });
+
+    test('semantic label getters return values for English', () {
+      expect(enL10n.semNotifications, isNotEmpty);
+      expect(enL10n.semWifi, isNotEmpty);
+      expect(enL10n.semNowPlaying, isNotEmpty);
+      expect(enL10n.semAppMenu, isNotEmpty);
+      expect(enL10n.semSearch, isNotEmpty);
+      expect(enL10n.semDeleteMessage, isNotEmpty);
+    });
+
+    test('semantic label getters fall back for unknown locale', () {
+      final l10n = AppLocalizations(const Locale('zz'));
+      expect(l10n.semNotifications, 'Notifications');
+      expect(l10n.semWifi, 'Wi-Fi connected');
+      expect(l10n.semNowPlaying, 'Now playing');
+      expect(l10n.semAppMenu, 'App menu');
+      expect(l10n.semSearch, 'Search');
+      expect(l10n.semDeleteMessage, 'Delete message');
+    });
+
+    test('semBattery formats percent correctly', () {
+      final l10n = AppLocalizations(const Locale('zz'));
+      expect(l10n.semBattery(82), 'Battery 82%');
+      expect(enL10n.semBattery(50), contains('50'));
+    });
+
+    test('semRateStar uses singular for 1, plural for others', () {
+      final l10n = AppLocalizations(const Locale('zz'));
+      expect(l10n.semRateStar(1), 'Rate 1 star');
+      expect(l10n.semRateStar(3), 'Rate 3 stars');
+    });
+
+    test('semStarsOutOf5 formats rating correctly', () {
+      final l10n = AppLocalizations(const Locale('zz'));
+      expect(l10n.semStarsOutOf5(4), '4 out of 5 stars');
+    });
   });
 
   group('AppLocalizationsDelegate', () {

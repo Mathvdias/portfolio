@@ -73,7 +73,7 @@ class AppLocalizations {
       "semAppMenu": "App menu",
       "semSearch": "Search",
       "semDeleteMessage": "Delete message",
-      "semBattery": "Battery %d%%",
+      "semBattery": "Battery %d%",
       "semRateStar": "Rate %d star",
       "semRateStars": "Rate %d stars",
       "semStarsOutOf5": "%d out of 5 stars",
@@ -201,7 +201,7 @@ class AppLocalizations {
       "semAppMenu": "Menú de la app",
       "semSearch": "Buscar",
       "semDeleteMessage": "Eliminar mensaje",
-      "semBattery": "Batería %d%%",
+      "semBattery": "Batería %d%",
       "semRateStar": "Calificar con %d estrella",
       "semRateStars": "Calificar con %d estrellas",
       "semStarsOutOf5": "%d de 5 estrellas",
@@ -329,7 +329,7 @@ class AppLocalizations {
       "semAppMenu": "Menu de l'app",
       "semSearch": "Rechercher",
       "semDeleteMessage": "Supprimer le message",
-      "semBattery": "Batterie %d%%",
+      "semBattery": "Batterie %d%",
       "semRateStar": "Évaluer %d étoile",
       "semRateStars": "Évaluer %d étoiles",
       "semStarsOutOf5": "%d sur 5 étoiles",
@@ -457,7 +457,7 @@ class AppLocalizations {
       "semAppMenu": "Menu app",
       "semSearch": "Cerca",
       "semDeleteMessage": "Elimina messaggio",
-      "semBattery": "Batteria %d%%",
+      "semBattery": "Batteria %d%",
       "semRateStar": "Valuta %d stella",
       "semRateStars": "Valuta %d stelle",
       "semStarsOutOf5": "%d su 5 stelle",
@@ -586,7 +586,7 @@ class AppLocalizations {
       "semAppMenu": "Menu do app",
       "semSearch": "Pesquisar",
       "semDeleteMessage": "Excluir mensagem",
-      "semBattery": "Bateria %d%%",
+      "semBattery": "Bateria %d%",
       "semRateStar": "Avaliar com %d estrela",
       "semRateStars": "Avaliar com %d estrelas",
       "semStarsOutOf5": "%d de 5 estrelas",
@@ -785,7 +785,7 @@ class AppLocalizations {
       'Delete message';
 
   String semBattery(int percent) =>
-      (_localizedValues[locale.languageCode]?['semBattery'] ?? 'Battery %d%%')
+      (_localizedValues[locale.languageCode]?['semBattery'] ?? 'Battery %d%')
           .replaceFirst('%d', '$percent');
 
   String semRateStar(int n) =>
