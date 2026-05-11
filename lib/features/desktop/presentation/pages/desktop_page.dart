@@ -1,6 +1,7 @@
 import 'package:app_window/app_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_lazy_load_web/flutter_lazy_load_web.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../../../core/di/app_dependencies.dart';
@@ -10,29 +11,44 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/constants/app_sizes.dart';
 import '../../../../shared/constants/app_strings.dart';
 import '../../../../shared/mappers/experience_mapper.dart';
-import '../../../../shared/widgets/about_window_content.dart';
-import '../../../../shared/widgets/calculator_content.dart';
-import '../../../../shared/widgets/contact_form_content.dart';
+// Shell widgets — always visible, kept as eager imports.
 import '../../../../shared/widgets/desktop_context_menu.dart';
 import '../../../../shared/widgets/desktop_icons_grid.dart';
 import '../../../../shared/widgets/dock.dart';
-import '../../../../shared/widgets/finder_content.dart';
-import '../../../../shared/widgets/licenses_window_content.dart';
 import '../../../../shared/widgets/mac_menu_bar.dart';
 import '../../../../shared/widgets/mobile_fallback_page.dart';
 import '../../../../shared/widgets/notification_center.dart';
 import '../../../../shared/widgets/pixel_wallpaper.dart';
 import '../../../../shared/widgets/responsive_layout.dart';
 import '../../../../shared/widgets/rubber_band_selection.dart';
-import '../../../../shared/widgets/skills_window_content.dart';
 import '../../../../shared/widgets/spotlight_overlay.dart';
 import '../../../../shared/widgets/sticky_note.dart';
-import '../../../../shared/widgets/terminal_content.dart';
 import '../../../../theme/app_theme.dart';
-import '../../../../features/guestbook/presentation/widgets/guestbook_content.dart';
-import '../../../../shared/widgets/android_dev_window_content.dart';
-import '../../../../shared/widgets/project_stats_window_content.dart';
-import '../../../../shared/widgets/snake_game_content.dart';
+
+// Window content — deferred so each chunk is downloaded only when the
+// user opens that window for the first time.
+import '../../../../shared/widgets/about_window_content.dart'
+    deferred as about_content;
+import '../../../../shared/widgets/calculator_content.dart'
+    deferred as calculator_content;
+import '../../../../shared/widgets/contact_form_content.dart'
+    deferred as contact_content;
+import '../../../../shared/widgets/finder_content.dart'
+    deferred as finder_content;
+import '../../../../shared/widgets/licenses_window_content.dart'
+    deferred as licenses_content;
+import '../../../../shared/widgets/skills_window_content.dart'
+    deferred as skills_content;
+import '../../../../shared/widgets/terminal_content.dart'
+    deferred as terminal_content;
+import '../../../../shared/widgets/android_dev_window_content.dart'
+    deferred as android_content;
+import '../../../../shared/widgets/project_stats_window_content.dart'
+    deferred as stats_content;
+import '../../../../shared/widgets/snake_game_content.dart'
+    deferred as snake_content;
+import '../../../../features/guestbook/presentation/widgets/guestbook_content.dart'
+    deferred as guestbook_content;
 
 class DesktopPage extends StatefulWidget {
   const DesktopPage({super.key});
@@ -153,28 +169,43 @@ class _DesktopPageState extends State<DesktopPage> {
         _desktopVM.openWindow(
           id,
           l10n.about,
-          AboutWindowContent(bio: l10n.bio, role: l10n.role),
+          DeferredWidget(
+            about_content.loadLibrary,
+            () => about_content.AboutWindowContent(
+              bio: l10n.bio,
+              role: l10n.role,
+            ),
+          ),
           AppTheme.blue,
         );
       case AppStrings.winFinder:
         _desktopVM.openWindow(
           id,
           AppStrings.titleFinder,
-          const FinderContent(),
+          DeferredWidget(
+            finder_content.loadLibrary,
+            () => finder_content.FinderContent(),
+          ),
           AppTheme.red,
         );
       case AppStrings.winSkills:
         _desktopVM.openWindow(
           id,
           AppStrings.titleSkills,
-          const SkillsWindowContent(),
+          DeferredWidget(
+            skills_content.loadLibrary,
+            () => skills_content.SkillsWindowContent(),
+          ),
           AppTheme.blue,
         );
       case AppStrings.winAndroid:
         _desktopVM.openWindow(
           id,
           l10n.androidDev,
-          const AndroidDevWindowContent(),
+          DeferredWidget(
+            android_content.loadLibrary,
+            () => android_content.AndroidDevWindowContent(),
+          ),
           AppTheme.green,
           width: 500,
           height: 700,
@@ -183,28 +214,40 @@ class _DesktopPageState extends State<DesktopPage> {
         _desktopVM.openWindow(
           id,
           AppStrings.titleTerminal,
-          const TerminalContent(),
+          DeferredWidget(
+            terminal_content.loadLibrary,
+            () => terminal_content.TerminalContent(),
+          ),
           AppTheme.green,
         );
       case AppStrings.winCalculator:
         _desktopVM.openWindow(
           id,
           AppStrings.titleCalculator,
-          const CalculatorContent(),
+          DeferredWidget(
+            calculator_content.loadLibrary,
+            () => calculator_content.CalculatorContent(),
+          ),
           AppTheme.peach,
         );
       case AppStrings.winSnake:
         _desktopVM.openWindow(
           id,
           AppStrings.titleSnake,
-          const SnakeGameContent(),
+          DeferredWidget(
+            snake_content.loadLibrary,
+            () => snake_content.SnakeGameContent(),
+          ),
           AppTheme.peach,
         );
       case AppStrings.winContact:
         _desktopVM.openWindow(
           id,
           AppStrings.titleContact,
-          const ContactFormContent(),
+          DeferredWidget(
+            contact_content.loadLibrary,
+            () => contact_content.ContactFormContent(),
+          ),
           AppTheme.teal,
         );
       case AppStrings.winGuestbook:
@@ -212,7 +255,10 @@ class _DesktopPageState extends State<DesktopPage> {
         _desktopVM.openWindow(
           id,
           l10n.guestbook,
-          GuestbookContent(viewModel: vm),
+          DeferredWidget(
+            guestbook_content.loadLibrary,
+            () => guestbook_content.GuestbookContent(viewModel: vm),
+          ),
           AppTheme.mauve,
           width: 800,
           height: 600,
@@ -221,7 +267,10 @@ class _DesktopPageState extends State<DesktopPage> {
         _desktopVM.openWindow(
           id,
           l10n.projectStats,
-          const ProjectStatsWindowContent(),
+          DeferredWidget(
+            stats_content.loadLibrary,
+            () => stats_content.ProjectStatsWindowContent(),
+          ),
           AppTheme.yellow,
         );
     }
@@ -388,7 +437,10 @@ class _DesktopPageState extends State<DesktopPage> {
                               _desktopVM.openWindow(
                                 AppStrings.winLicenses,
                                 AppStrings.titleLicenses,
-                                const LicensesWindowContent(),
+                                DeferredWidget(
+                                  licenses_content.loadLibrary,
+                                  () => licenses_content.LicensesWindowContent(),
+                                ),
                                 AppTheme.teal,
                               );
                             case AppMenuAction.github:
