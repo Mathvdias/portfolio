@@ -22,7 +22,7 @@ class ProjectStatsWindowContent extends StatelessWidget {
             style: GoogleFonts.outfit(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppTheme.foreground,
+              color: AppTheme.text,
             ),
           ),
           const SizedBox(height: AppSizes.spacingLg),
@@ -93,7 +93,7 @@ class ProjectStatsWindowContent extends StatelessWidget {
             style: GoogleFonts.spaceMono(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: AppTheme.foreground,
+              color: AppTheme.text,
             ),
           ),
         ],

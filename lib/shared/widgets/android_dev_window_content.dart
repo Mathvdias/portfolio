@@ -25,7 +25,7 @@ class AndroidDevWindowContent extends StatelessWidget {
                 style: GoogleFonts.outfit(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: AppTheme.foreground,
+                  color: AppTheme.text,
                 ),
               ),
             ],
@@ -88,7 +88,7 @@ class _SkillBadge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: GoogleFonts.spaceMono(fontSize: 12, color: AppTheme.foreground),
+        style: GoogleFonts.spaceMono(fontSize: 12, color: AppTheme.text),
       ),
     );
   }
