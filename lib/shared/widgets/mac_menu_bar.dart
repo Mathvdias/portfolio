@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:pixel_art/pixel_art.dart';
 import '../../l10n/app_localizations.dart';
 import '../../theme/app_theme.dart';
+import '../constants/app_sizes.dart';
+import '../constants/app_strings.dart';
 
 const _kLanguages = [
   ('en', '🇺🇸', 'English'),
@@ -66,7 +68,7 @@ class _MacMenuBarState extends State<MacMenuBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 28,
+      height: AppSizes.menuBarHeight,
       decoration: const BoxDecoration(
         color: AppTheme.surface,
         border: Border(bottom: BorderSide(color: AppTheme.surface0, width: 1)),
@@ -80,11 +82,11 @@ class _MacMenuBarState extends State<MacMenuBar> {
 
           // Right: Music + WiFi + Battery + language picker + clock + notifications
           const _MusicPlayerWidget(),
-          const SizedBox(width: 10),
+          const SizedBox(width: AppSizes.spacingBase),
           const _WifiIndicator(),
-          const SizedBox(width: 10),
+          const SizedBox(width: AppSizes.spacingBase),
           const _BatteryIndicator(level: 0.82),
-          const SizedBox(width: 14),
+          const SizedBox(width: AppSizes.font2xl),
 
           _CompactLanguagePicker(
             currentLanguage: widget.currentLanguage,
@@ -92,28 +94,28 @@ class _MacMenuBarState extends State<MacMenuBar> {
             onLanguageChanged: widget.onLanguageChanged,
           ),
 
-          const SizedBox(width: 16),
+          const SizedBox(width: AppSizes.spacingXl),
 
           Text(
             _time,
             style: GoogleFonts.spaceMono(
-              fontSize: 12,
+              fontSize: AppSizes.fontXl,
               color: AppTheme.subtext,
               fontWeight: FontWeight.bold,
             ),
           ),
 
-          const SizedBox(width: 14),
+          const SizedBox(width: AppSizes.font2xl),
 
           if (widget.onToggleNotifications != null) ...[
             GestureDetector(
               onTap: widget.onToggleNotifications,
               child: const MouseRegion(
                 cursor: SystemMouseCursors.click,
-                child: Icon(Icons.menu_open, size: 16, color: AppTheme.text),
+                child: Icon(Icons.menu_open, size: AppSizes.font3xl, color: AppTheme.text),
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppSizes.spacingBase),
           ],
         ],
       ),
@@ -132,43 +134,43 @@ class _AppNameMenu extends StatelessWidget {
     return PopupMenuButton<AppMenuAction>(
       color: AppTheme.surface,
       tooltip: '',
-      offset: const Offset(0, 28),
+      offset: const Offset(0, AppSizes.menuBarOffset),
       padding: EdgeInsets.zero,
       onSelected: (action) => onAction?.call(action),
       itemBuilder: (_) => [
-        _menuItem(AppMenuAction.about, 'About Matheus Dias', Icons.person_outline),
+        _menuItem(AppMenuAction.about, AppStrings.menuAbout, Icons.person_outline),
         const PopupMenuDivider(),
-        _menuItem(AppMenuAction.licenses, 'Open Source Licenses', Icons.verified_outlined),
+        _menuItem(AppMenuAction.licenses, AppStrings.menuLicenses, Icons.verified_outlined),
         const PopupMenuDivider(),
-        _menuItem(AppMenuAction.github, 'GitHub ↗', Icons.code),
-        _menuItem(AppMenuAction.linkedin, 'LinkedIn ↗', Icons.link),
+        _menuItem(AppMenuAction.github, AppStrings.menuGitHub, Icons.code),
+        _menuItem(AppMenuAction.linkedin, AppStrings.menuLinkedIn, Icons.link),
       ],
       child: Padding(
-        padding: const EdgeInsets.only(left: 14, right: 10),
+        padding: const EdgeInsets.only(left: AppSizes.font2xl, right: AppSizes.spacingBase),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 10,
-              height: 10,
+              width: AppSizes.spacingBase,
+              height: AppSizes.spacingBase,
               decoration: const BoxDecoration(
                 color: AppTheme.blue,
                 shape: BoxShape.circle,
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppSizes.spacingBase),
             Text(
-              'Matheus Dias',
+              AppStrings.appName,
               style: GoogleFonts.spaceMono(
-                fontSize: 13,
+                fontSize: AppSizes.fontXxl,
                 fontWeight: FontWeight.bold,
                 color: AppTheme.text,
               ),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: AppSizes.spacingSm),
             SizedBox(
-              width: 10,
-              height: 10,
+              width: AppSizes.spacingBase,
+              height: AppSizes.spacingBase,
               child: CustomPaint(
                 painter: PixelIconPainter(
                   pixels: kMarianaPixels,
@@ -192,11 +194,11 @@ class _AppNameMenu extends StatelessWidget {
       height: 36,
       child: Row(
         children: [
-          Icon(icon, size: 14, color: AppTheme.subtext),
-          const SizedBox(width: 10),
+          Icon(icon, size: AppSizes.font2xl, color: AppTheme.subtext),
+          const SizedBox(width: AppSizes.spacingBase),
           Text(
             label,
-            style: GoogleFonts.spaceMono(fontSize: 12, color: AppTheme.text),
+            style: GoogleFonts.spaceMono(fontSize: AppSizes.fontXl, color: AppTheme.text),
           ),
         ],
       ),

@@ -32,6 +32,7 @@ abstract final class AppStrings {
   static const String urlGitHubIntercepted =
       'https://github.com/Mathvdias/intercepted_http';
   static const String emailAddress = 'mailto:mattmvc56@gmail.com';
+  static const String emailRaw = 'mattmvc56@gmail.com';
 
   // Desktop icon labels
   static const String iconFinder = 'Finder';
@@ -65,4 +66,57 @@ abstract final class AppStrings {
   static const String mobileTitle = 'MATHEUS DIAS';
   static const String mobileSubtitle = 'Portfolio\ndesigned\nfor desktop';
   static const String mobileGitHubLink = 'github.com/Mathvdias';
+
+  // About window
+  static const String aboutName = 'MATHEUS DIAS';
+  static const String aboutLocation = 'MANAUS, AM — BRAZIL';
+  static const String aboutEducation = 'EDUCATION';
+  static const String aboutInterests = 'INTERESTS';
+
+  // Contact form
+  static const String contactNewMessage = 'New Message';
+  static const String contactSubject = 'Subject';
+  static const String contactMessage = 'Message';
+  static const String contactSend = 'Send';
+
+  // Calculator
+  static const String calculatorClear = 'C';
+  static const String calculatorEquals = '=';
+
+  // App name
+  static const String appName = 'Matheus Dias';
+
+  // Finder
+  static const String finderFavorites = 'Favorites';
+  static const String finderRecents = 'Recents';
+  static const String finderDesktop = 'Desktop';
+  static const String finderDocuments = 'Documents';
+  static const String finderDownloads = 'Downloads';
+
+  // Skills
+  static const String skillsMobile = 'Mobile';
+  static const String skillsBackend = 'Backend & Tools';
+
+  // Snake
+  static const String snakeTitle = 'SNAKE';
+  static const String snakeStart = 'press ENTER or tap to start';
+  static const String snakeControls = 'use WASD or arrow keys';
+  static const String snakePlayAgain = '[ PLAY AGAIN ]';
+
+  // Licenses
+  static const String licensesCopyright = '© 2026 Matheus Dias. MIT License.';
+  static const String licensesCustomPackages = 'CUSTOM PACKAGES';
+  static const String licensesOpenSource = 'OPEN SOURCE DEPENDENCIES';
+
+  // Sticky note
+  static const String visitorsLabel = 'VISITORS';
+
+  // Menu bar
+  static const String menuAbout = 'About Matheus Dias';
+  static const String menuLicenses = 'Open Source Licenses';
+  static const String menuGitHub = 'GitHub ↗';
+  static const String menuLinkedIn = 'LinkedIn ↗';
+
+  // Experience
+  static const String techLabel = 'TECH:';
 }

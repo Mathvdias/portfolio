@@ -8,6 +8,7 @@ abstract final class AppSizes {
   static const double spacingXs = 4.0;
   static const double spacingSm = 6.0;
   static const double spacingMd = 8.0;
+  static const double spacingBase = 10.0;
   static const double spacingLg = 12.0;
   static const double spacingXl = 16.0;
   static const double spacingXxl = 20.0;

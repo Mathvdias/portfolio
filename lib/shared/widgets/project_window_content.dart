@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../theme/app_theme.dart';
+import '../constants/app_sizes.dart';
 
 class ProjectWindowContent extends StatelessWidget {
   const ProjectWindowContent({
@@ -35,14 +36,14 @@ class ProjectWindowContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppSizes.spacing3xl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               name,
               style: GoogleFonts.pressStart2p(
-                fontSize: 10,
+                fontSize: AppSizes.fontBase,
                 color: accentColor,
                 height: 1.8,
               ),
@@ -51,28 +52,28 @@ class ProjectWindowContent extends StatelessWidget {
               Text(
                 'v$version',
                 style: GoogleFonts.spaceMono(
-                  fontSize: 12,
+                  fontSize: AppSizes.fontXl,
                   color: AppTheme.subtext,
                   height: 1.6,
                 ),
               ),
             ],
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSizes.spacingLg),
             const Divider(color: AppTheme.surface0, thickness: 1),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSizes.spacingLg),
             Text(
               description,
               style: GoogleFonts.spaceMono(
-                fontSize: 13,
+                fontSize: AppSizes.fontXxl,
                 color: AppTheme.text,
                 height: 1.6,
               ),
             ),
             if (technologies.isNotEmpty) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSizes.spacingXl),
               Wrap(
-                spacing: 6,
-                runSpacing: 6,
+                spacing: AppSizes.spacingSm,
+                runSpacing: AppSizes.spacingSm,
                 children:
                     technologies.map((tech) {
                       return Container(
@@ -89,7 +90,7 @@ class ProjectWindowContent extends StatelessWidget {
                         child: Text(
                           tech,
                           style: GoogleFonts.pressStart2p(
-                            fontSize: 6,
+                            fontSize: AppSizes.fontXxs,
                             color: AppTheme.blue,
                           ),
                         ),
@@ -97,7 +98,7 @@ class ProjectWindowContent extends StatelessWidget {
                     }).toList(),
               ),
             ],
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSizes.spacingXl),
             Row(
               children: [
                 OutlinedButton(
@@ -106,30 +107,30 @@ class ProjectWindowContent extends StatelessWidget {
                     foregroundColor: accentColor,
                     side: BorderSide(color: accentColor, width: 1),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
+                      horizontal: AppSizes.spacingLg,
+                      vertical: AppSizes.spacingMd,
                     ),
                   ),
                   child: Text(
                     'GitHub',
-                    style: GoogleFonts.pressStart2p(fontSize: 7),
+                    style: GoogleFonts.pressStart2p(fontSize: AppSizes.fontXs),
                   ),
                 ),
                 if (pubDevUrl != null) ...[
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSizes.spacingMd),
                   OutlinedButton(
                     onPressed: () => _launch(pubDevUrl!),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: accentColor,
                       side: BorderSide(color: accentColor, width: 1),
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
+                        horizontal: AppSizes.spacingLg,
+                        vertical: AppSizes.spacingMd,
                       ),
                     ),
                     child: Text(
                       'pub.dev',
-                      style: GoogleFonts.pressStart2p(fontSize: 7),
+                      style: GoogleFonts.pressStart2p(fontSize: AppSizes.fontXs),
                     ),
                   ),
                 ],

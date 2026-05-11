@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../theme/app_theme.dart';
+import '../constants/app_sizes.dart';
+import '../constants/app_strings.dart';
 import 'package:pixel_art/pixel_art.dart';
 
 class SkillsWindowContent extends StatelessWidget {
@@ -11,18 +13,18 @@ class SkillsWindowContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(AppSizes.spacingXxl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _section('Mobile', [
+            _section(AppStrings.skillsMobile, [
               _Skill('Flutter', kFlutterPixels, AppTheme.blue, 0.95),
               _Skill('Android', kAndroidPixels, AppTheme.green, 0.85),
               _Skill('Dart', kDartPixels, AppTheme.teal, 0.95),
               _Skill('Kotlin', kKotlinPixels, AppTheme.mauve, 0.80),
             ]),
-            const SizedBox(height: 20),
-            _section('Backend & Tools', [
+            const SizedBox(height: AppSizes.spacingXxl),
+            _section(AppStrings.skillsBackend, [
               _Skill('REST APIs', kLinkPixels, AppTheme.blue, 0.85),
               _Skill('Firebase', kPackagePixels, AppTheme.yellow, 0.75),
               _Skill('Git / CI', kGithubPixels, AppTheme.subtext, 0.90),
@@ -46,7 +48,7 @@ class SkillsWindowContent extends StatelessWidget {
             letterSpacing: 2,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSizes.spacingLg),
         ...skills.map(_buildRow),
       ],
     );
@@ -54,7 +56,7 @@ class SkillsWindowContent extends StatelessWidget {
 
   Widget _buildRow(_Skill s) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.only(bottom: AppSizes.font2xl),
       child: Row(
         children: [
           SizedBox(
@@ -64,23 +66,23 @@ class SkillsWindowContent extends StatelessWidget {
               painter: PixelIconPainter(pixels: s.pixels, color: s.color),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSizes.spacingLg),
           SizedBox(
             width: 90,
             child: Text(
               s.name,
               style: GoogleFonts.spaceMono(
-                fontSize: 12,
+                fontSize: AppSizes.fontXl,
                 color: AppTheme.text,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
           Expanded(child: _Bar(value: s.level, color: s.color)),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSizes.spacingMd),
           Text(
             '${(s.level * 100).round()}%',
-            style: GoogleFonts.spaceMono(fontSize: 11, color: s.color),
+            style: GoogleFonts.spaceMono(fontSize: AppSizes.fontLg, color: s.color),
           ),
         ],
       ),

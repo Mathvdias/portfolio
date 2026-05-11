@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../theme/app_theme.dart';
+import '../constants/app_sizes.dart';
+import '../constants/app_strings.dart';
 
 class LicensesWindowContent extends StatelessWidget {
   const LicensesWindowContent({super.key});
@@ -9,12 +11,12 @@ class LicensesWindowContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSizes.spacingXxl),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _sectionHeader('CUSTOM PACKAGES'),
-          const SizedBox(height: 12),
+          _sectionHeader(AppStrings.licensesCustomPackages),
+          const SizedBox(height: AppSizes.spacingLg),
           _licenseCard(
             name: 'app_window',
             version: '1.0.0',
@@ -33,9 +35,9 @@ class LicensesWindowContent extends StatelessWidget {
                 'Built in-house for this portfolio.',
             url: null,
           ),
-          const SizedBox(height: 24),
-          _sectionHeader('OPEN SOURCE DEPENDENCIES'),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSizes.spacing3xl),
+          _sectionHeader(AppStrings.licensesOpenSource),
+          const SizedBox(height: AppSizes.spacingLg),
           _licenseCard(
             name: 'Flutter',
             version: '3.x',
@@ -94,17 +96,17 @@ class LicensesWindowContent extends StatelessWidget {
                 'Used to open GitHub, LinkedIn, and the résumé PDF.',
             url: 'https://pub.dev/packages/url_launcher',
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSizes.spacing3xl),
           Center(
             child: Text(
-              '© 2026 Matheus Dias. MIT License.',
+              AppStrings.licensesCopyright,
               style: GoogleFonts.spaceMono(
-                fontSize: 10,
+                fontSize: AppSizes.fontBase,
                 color: AppTheme.subtext,
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSizes.spacingMd),
         ],
       ),
     );
@@ -114,7 +116,7 @@ class LicensesWindowContent extends StatelessWidget {
     return Text(
       title,
       style: GoogleFonts.pressStart2p(
-        fontSize: 7,
+        fontSize: AppSizes.fontXs,
         color: AppTheme.blue,
         letterSpacing: 1,
       ),
@@ -129,13 +131,13 @@ class LicensesWindowContent extends StatelessWidget {
     required String? url,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.only(bottom: AppSizes.spacingBase),
       child: Container(
         decoration: BoxDecoration(
           color: AppTheme.surface,
           border: Border.all(color: AppTheme.surface0),
         ),
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppSizes.spacingLg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -145,7 +147,7 @@ class LicensesWindowContent extends StatelessWidget {
                   child: Text(
                     name,
                     style: GoogleFonts.spaceMono(
-                      fontSize: 12,
+                      fontSize: AppSizes.fontXl,
                       fontWeight: FontWeight.bold,
                       color: AppTheme.text,
                     ),
@@ -154,14 +156,14 @@ class LicensesWindowContent extends StatelessWidget {
                 Text(
                   version,
                   style: GoogleFonts.spaceMono(
-                    fontSize: 10,
+                    fontSize: AppSizes.fontBase,
                     color: AppTheme.subtext,
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSizes.spacingMd),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      const EdgeInsets.symmetric(horizontal: AppSizes.spacingSm, vertical: AppSizes.spacingXxs),
                   color: AppTheme.surface0,
                   child: Text(
                     license,
@@ -173,17 +175,17 @@ class LicensesWindowContent extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: AppSizes.spacingSm),
             Text(
               description,
               style: GoogleFonts.spaceMono(
-                fontSize: 10,
+                fontSize: AppSizes.fontBase,
                 color: AppTheme.subtext,
                 height: 1.6,
               ),
             ),
             if (url != null) ...[
-              const SizedBox(height: 6),
+              const SizedBox(height: AppSizes.spacingSm),
               GestureDetector(
                 onTap: () async {
                   final uri = Uri.parse(url);

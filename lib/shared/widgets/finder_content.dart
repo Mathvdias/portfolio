@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../theme/app_theme.dart';
+import '../constants/app_sizes.dart';
+import '../constants/app_strings.dart';
 
 class FinderContent extends StatelessWidget {
   const FinderContent({super.key});
@@ -27,28 +29,28 @@ class FinderContent extends StatelessWidget {
         children: [
           // Sidebar
           Container(
-            width: 140,
+            width: AppSizes.stickyNoteSize,
             color: AppTheme.surface.withValues(alpha: 0.5),
             child: ListView(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(AppSizes.spacingMd),
               children: [
                 Text(
-                  'Favorites',
+                  AppStrings.finderFavorites,
                   style: GoogleFonts.spaceMono(
-                    fontSize: 10,
+                    fontSize: AppSizes.fontBase,
                     fontWeight: FontWeight.bold,
                     color: AppTheme.subtext,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSizes.spacingMd),
                 const _SidebarItem(
                   icon: Icons.star,
-                  label: 'Recents',
+                  label: AppStrings.finderRecents,
                   selected: true,
                 ),
-                const _SidebarItem(icon: Icons.desktop_mac, label: 'Desktop'),
-                const _SidebarItem(icon: Icons.folder, label: 'Documents'),
-                const _SidebarItem(icon: Icons.download, label: 'Downloads'),
+                const _SidebarItem(icon: Icons.desktop_mac, label: AppStrings.finderDesktop),
+                const _SidebarItem(icon: Icons.folder, label: AppStrings.finderDocuments),
+                const _SidebarItem(icon: Icons.download, label: AppStrings.finderDownloads),
               ],
             ),
           ),
@@ -56,7 +58,7 @@ class FinderContent extends StatelessWidget {
           // Main content
           Expanded(
             child: ListView.separated(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(AppSizes.spacingMd),
               itemCount: items.length,
               separatorBuilder:
                   (_, __) => const Divider(color: AppTheme.surface0),
@@ -68,14 +70,14 @@ class FinderContent extends StatelessWidget {
                     item['name'] as String,
                     style: GoogleFonts.spaceMono(
                       color: AppTheme.text,
-                      fontSize: 13,
+                      fontSize: AppSizes.fontXxl,
                     ),
                   ),
                   subtitle: Text(
                     item['desc'] as String,
                     style: GoogleFonts.spaceMono(
                       color: AppTheme.subtext,
-                      fontSize: 11,
+                      fontSize: AppSizes.fontLg,
                     ),
                   ),
                   onTap: () {},
@@ -103,23 +105,23 @@ class _SidebarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.spacingMd, vertical: AppSizes.spacingSm),
       decoration: BoxDecoration(
         color: selected ? AppTheme.surface0 : Colors.transparent,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
       ),
       child: Row(
         children: [
           Icon(
             icon,
-            size: 14,
+            size: AppSizes.font2xl,
             color: selected ? AppTheme.blue : AppTheme.subtext,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSizes.spacingMd),
           Text(
             label,
             style: GoogleFonts.spaceMono(
-              fontSize: 11,
+              fontSize: AppSizes.fontLg,
               color: selected ? AppTheme.text : AppTheme.subtext,
             ),
           ),

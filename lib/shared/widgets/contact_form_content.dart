@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../theme/app_theme.dart';
+import '../constants/app_sizes.dart';
+import '../constants/app_strings.dart';
 
 class ContactFormContent extends StatefulWidget {
   const ContactFormContent({super.key});
@@ -18,7 +20,7 @@ class _ContactFormContentState extends State<ContactFormContent> {
   Future<void> _sendEmail() async {
     final uri = Uri(
       scheme: 'mailto',
-      path: 'mattmvc56@gmail.com',
+      path: AppStrings.emailRaw,
       queryParameters: {'subject': _subjectCtrl.text, 'body': _bodyCtrl.text},
     );
     if (await canLaunchUrl(uri)) {
@@ -38,29 +40,29 @@ class _ContactFormContentState extends State<ContactFormContent> {
     return Container(
       color: AppTheme.background,
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSizes.spacingXl),
         child: SizedBox(
           height: 300, // Give it a fixed height inside the window
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'New Message',
+                AppStrings.contactNewMessage,
                 style: GoogleFonts.spaceMono(
-                  fontSize: 16,
+                  fontSize: AppSizes.font3xl,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.text,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSizes.spacingXl),
               TextField(
                 controller: _subjectCtrl,
                 style: GoogleFonts.spaceMono(
                   color: AppTheme.text,
-                  fontSize: 13,
+                  fontSize: AppSizes.fontXxl,
                 ),
                 decoration: const InputDecoration(
-                  labelText: 'Subject',
+                  labelText: AppStrings.contactSubject,
                   labelStyle: TextStyle(color: AppTheme.subtext),
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: AppTheme.surface0),
@@ -70,7 +72,7 @@ class _ContactFormContentState extends State<ContactFormContent> {
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSizes.spacingLg),
               Expanded(
                 child: TextField(
                   controller: _bodyCtrl,
@@ -78,10 +80,10 @@ class _ContactFormContentState extends State<ContactFormContent> {
                   expands: true,
                   style: GoogleFonts.spaceMono(
                     color: AppTheme.text,
-                    fontSize: 13,
+                    fontSize: AppSizes.fontXxl,
                   ),
                   decoration: const InputDecoration(
-                    labelText: 'Message',
+                    labelText: AppStrings.contactMessage,
                     labelStyle: TextStyle(color: AppTheme.subtext),
                     alignLabelWithHint: true,
                     enabledBorder: OutlineInputBorder(
@@ -93,13 +95,13 @@ class _ContactFormContentState extends State<ContactFormContent> {
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSizes.spacingLg),
               Align(
                 alignment: Alignment.centerRight,
                 child: ElevatedButton.icon(
                   onPressed: _sendEmail,
-                  icon: const Icon(Icons.send, size: 16),
-                  label: const Text('Send'),
+                  icon: const Icon(Icons.send, size: AppSizes.font3xl),
+                  label: const Text(AppStrings.contactSend),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.blue,
                     foregroundColor: AppTheme.green,

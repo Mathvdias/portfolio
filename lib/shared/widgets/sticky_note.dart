@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../constants/app_sizes.dart';
+import '../constants/app_strings.dart';
 
 class StickyNote extends StatefulWidget {
   const StickyNote({
@@ -40,7 +42,7 @@ class _StickyNoteState extends State<StickyNote> {
           child: Text(
             widget.text,
             style: GoogleFonts.indieFlower(
-              fontSize: 16,
+              fontSize: AppSizes.font3xl,
               color: Colors.black87,
               fontWeight: FontWeight.w600,
             ),
@@ -91,9 +93,9 @@ class _VisitorStickyNoteState extends State<VisitorStickyNote> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'VISITORS',
+                AppStrings.visitorsLabel,
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: AppSizes.fontBase,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
                   color: Colors.black54,
@@ -128,9 +130,9 @@ class _NoteContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 140,
-      height: 140,
-      padding: const EdgeInsets.all(12),
+      width: AppSizes.stickyNoteSize,
+      height: AppSizes.stickyNoteSize,
+      padding: const EdgeInsets.all(AppSizes.spacingLg),
       decoration: BoxDecoration(
         color: color,
         boxShadow: [
@@ -140,15 +142,15 @@ class _NoteContainer extends StatelessWidget {
             offset: const Offset(2, 4),
           ),
         ],
-        borderRadius: const BorderRadius.only(bottomRight: Radius.circular(16)),
+        borderRadius: const BorderRadius.only(bottomRight: Radius.circular(AppSizes.radiusXxl)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            height: 10,
+            height: AppSizes.stickyNoteTapeHeight,
             color: Colors.black.withValues(alpha: 0.05),
-            margin: const EdgeInsets.only(bottom: 8),
+            margin: const EdgeInsets.only(bottom: AppSizes.spacingMd),
           ),
           Expanded(child: child),
         ],

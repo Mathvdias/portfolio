@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../theme/app_theme.dart';
+import '../constants/app_sizes.dart';
 import 'package:pixel_art/pixel_art.dart';
 
 class DesktopIcon extends StatefulWidget {
@@ -32,8 +33,8 @@ class _DesktopIconState extends State<DesktopIcon> {
       child: GestureDetector(
         onTap: widget.onTap,
         child: Container(
-          width: 88,
-          padding: const EdgeInsets.all(8),
+          width: AppSizes.iconWidth,
+          padding: const EdgeInsets.all(AppSizes.spacingMd),
           decoration: BoxDecoration(
             color:
                 _hovered
@@ -43,14 +44,14 @@ class _DesktopIconState extends State<DesktopIcon> {
               color: _hovered ? AppTheme.blue : Colors.transparent,
               width: 1,
             ),
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(AppSizes.radiusSm),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               SizedBox(
-                width: 56,
-                height: 56,
+                width: AppSizes.iconArtSize,
+                height: AppSizes.iconArtSize,
                 child: CustomPaint(
                   painter: PixelIconPainter(
                     pixels: widget.pixels,
@@ -58,13 +59,13 @@ class _DesktopIconState extends State<DesktopIcon> {
                   ),
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSizes.spacingXs),
               SizedBox(
-                width: 72,
+                width: AppSizes.iconLabelWidth,
                 child: Text(
                   widget.label,
                   style: GoogleFonts.pressStart2p(
-                    fontSize: 7,
+                    fontSize: AppSizes.fontXs,
                     color: AppTheme.text,
                     height: 1.6,
                   ),

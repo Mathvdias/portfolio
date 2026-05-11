@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../l10n/app_localizations.dart';
 import '../../theme/app_theme.dart';
+import '../constants/app_sizes.dart';
 
 class NotificationCenter extends StatelessWidget {
   const NotificationCenter({super.key});
@@ -11,7 +12,7 @@ class NotificationCenter extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
 
     return Container(
-      width: 300,
+      width: AppSizes.notificationCenterWidth,
       decoration: BoxDecoration(
         color: AppTheme.surface.withValues(alpha: 0.95),
         border: const Border(left: BorderSide(color: AppTheme.surface0)),
@@ -20,7 +21,7 @@ class NotificationCenter extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(AppSizes.spacingXl),
             child: Text(
               l10n.notificationCenter,
               style: GoogleFonts.spaceMono(
@@ -33,7 +34,7 @@ class NotificationCenter extends StatelessWidget {
           const Divider(height: 1, color: AppTheme.surface0),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppSizes.spacingLg),
               children: [
                 _NotificationItem(
                   title: l10n.dailyVerse,
@@ -42,7 +43,7 @@ class NotificationCenter extends StatelessWidget {
                   icon: Icons.book,
                   color: AppTheme.mauve,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSizes.spacingMd),
                 _NotificationItem(
                   title: l10n.system,
                   message: l10n.portfolioUpdated,
@@ -50,7 +51,7 @@ class NotificationCenter extends StatelessWidget {
                   icon: Icons.system_update_alt,
                   color: AppTheme.green,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSizes.spacingMd),
                 _NotificationItem(
                   title: l10n.github,
                   message: l10n.githubUpdate,
@@ -85,16 +86,16 @@ class _NotificationItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppSizes.spacingLg),
       decoration: BoxDecoration(
         color: AppTheme.surface0.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppSizes.radiusLg),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 16, color: color),
-          const SizedBox(width: 12),
+          Icon(icon, size: AppSizes.font3xl, color: color),
+          const SizedBox(width: AppSizes.spacingLg),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,7 +106,7 @@ class _NotificationItem extends StatelessWidget {
                     Text(
                       title,
                       style: GoogleFonts.spaceMono(
-                        fontSize: 12,
+                        fontSize: AppSizes.fontXl,
                         fontWeight: FontWeight.bold,
                         color: AppTheme.text,
                       ),
@@ -113,17 +114,17 @@ class _NotificationItem extends StatelessWidget {
                     Text(
                       time,
                       style: GoogleFonts.spaceMono(
-                        fontSize: 10,
+                        fontSize: AppSizes.fontBase,
                         color: AppTheme.subtext,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSizes.spacingXs),
                 Text(
                   message,
                   style: GoogleFonts.spaceMono(
-                    fontSize: 11,
+                    fontSize: AppSizes.fontLg,
                     color: AppTheme.subtext,
                   ),
                 ),

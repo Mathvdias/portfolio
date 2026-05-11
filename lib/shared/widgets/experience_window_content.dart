@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../models/experience.dart';
 import '../../theme/app_theme.dart';
+import '../constants/app_sizes.dart';
+import '../constants/app_strings.dart';
 
 class ExperienceWindowContent extends StatelessWidget {
   const ExperienceWindowContent({
@@ -18,23 +20,23 @@ class ExperienceWindowContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppSizes.spacing3xl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               experience.company,
               style: GoogleFonts.pressStart2p(
-                fontSize: 10,
+                fontSize: AppSizes.fontBase,
                 color: accentColor,
                 height: 1.8,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSizes.spacingMd),
             Text(
               experience.role,
               style: GoogleFonts.spaceMono(
-                fontSize: 14,
+                fontSize: AppSizes.font2xl,
                 color: AppTheme.subtext,
                 height: 1.6,
               ),
@@ -42,40 +44,40 @@ class ExperienceWindowContent extends StatelessWidget {
             Text(
               '▶ ${experience.period}',
               style: GoogleFonts.spaceMono(
-                fontSize: 12,
+                fontSize: AppSizes.fontXl,
                 color: AppTheme.overlay,
                 height: 1.6,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSizes.spacingLg),
             const Divider(color: AppTheme.surface0, thickness: 1),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSizes.spacingLg),
             Text(
               experience.description,
               style: GoogleFonts.spaceMono(
-                fontSize: 13,
+                fontSize: AppSizes.fontXxl,
                 color: AppTheme.text,
                 height: 1.6,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSizes.spacingXl),
             Text(
-              'TECH:',
+              AppStrings.techLabel,
               style: GoogleFonts.pressStart2p(
-                fontSize: 7,
+                fontSize: AppSizes.fontXs,
                 color: AppTheme.subtext,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSizes.spacingMd),
             Wrap(
-              spacing: 6,
-              runSpacing: 6,
+              spacing: AppSizes.spacingSm,
+              runSpacing: AppSizes.spacingSm,
               children:
                   experience.technologies.map((tech) {
                     return Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
+                        horizontal: AppSizes.spacingMd,
+                        vertical: AppSizes.spacingXs,
                       ),
                       decoration: BoxDecoration(
                         border: Border.all(

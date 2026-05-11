@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../theme/app_theme.dart';
+import '../constants/app_sizes.dart';
+import '../constants/app_strings.dart';
 
-const _kCols = 22;
-const _kRows = 16;
-const _kTickMs = 140;
+const _kCols = AppSizes.snakeCols;
+const _kRows = AppSizes.snakeRows;
+const _kTickMs = AppSizes.snakeTickMs;
 
 enum _Dir { up, down, left, right }
 
@@ -125,26 +127,26 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
       onKeyEvent: _onKey,
       child: Container(
         color: AppTheme.background,
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppSizes.spacingLg),
         child: Column(
           children: [
             // Score bar
             Padding(
-              padding: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.only(bottom: AppSizes.spacingMd),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'SCORE: $_score',
                     style: GoogleFonts.pressStart2p(
-                      fontSize: 9,
+                      fontSize: AppSizes.fontMd,
                       color: AppTheme.yellow,
                     ),
                   ),
                   Text(
                     _running ? 'WASD / ↑↓←→' : 'PRESS ENTER',
                     style: GoogleFonts.pressStart2p(
-                      fontSize: 7,
+                      fontSize: AppSizes.fontXs,
                       color: AppTheme.subtext,
                     ),
                   ),
@@ -171,23 +173,23 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
             ),
             if (_gameOver)
               Padding(
-                padding: const EdgeInsets.only(top: 12),
+                padding: const EdgeInsets.only(top: AppSizes.spacingLg),
                 child: Column(
                   children: [
                     Text(
                       'GAME OVER  •  SCORE: $_score',
                       style: GoogleFonts.pressStart2p(
-                        fontSize: 9,
+                        fontSize: AppSizes.fontMd,
                         color: AppTheme.red,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSizes.spacingMd),
                     TextButton(
                       onPressed: _start,
                       child: Text(
-                        '[ PLAY AGAIN ]',
+                        AppStrings.snakePlayAgain,
                         style: GoogleFonts.pressStart2p(
-                          fontSize: 8,
+                          fontSize: AppSizes.fontSm,
                           color: AppTheme.green,
                         ),
                       ),
@@ -225,19 +227,19 @@ class _StartScreen extends StatelessWidget {
                   color: AppTheme.green,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSizes.spacingXl),
               Text(
-                'press ENTER or tap to start',
+                AppStrings.snakeStart,
                 style: GoogleFonts.pressStart2p(
-                  fontSize: 7,
+                  fontSize: AppSizes.fontXs,
                   color: AppTheme.subtext,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSizes.spacingMd),
               Text(
-                'use WASD or arrow keys',
+                AppStrings.snakeControls,
                 style: GoogleFonts.pressStart2p(
-                  fontSize: 7,
+                  fontSize: AppSizes.fontXs,
                   color: AppTheme.subtext,
                 ),
               ),

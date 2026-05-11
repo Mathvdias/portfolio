@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../constants/app_sizes.dart';
 
 class ResponsiveLayout extends StatelessWidget {
   final Widget child;
@@ -8,20 +9,20 @@ class ResponsiveLayout extends StatelessWidget {
   const ResponsiveLayout({
     super.key,
     required this.child,
-    this.desktopBreakpoint = 1200,
-    this.tabletBreakpoint = 600,
+    this.desktopBreakpoint = AppSizes.desktopBreakpoint,
+    this.tabletBreakpoint = AppSizes.mobileBreakpoint,
   });
 
   static bool isDesktop(BuildContext context) =>
-      MediaQuery.of(context).size.width > 1200;
+      MediaQuery.of(context).size.width > AppSizes.desktopBreakpoint;
 
   static bool isTablet(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    return width > 600 && width <= 1200;
+    return width > AppSizes.mobileBreakpoint && width <= AppSizes.desktopBreakpoint;
   }
 
   static bool isMobile(BuildContext context) =>
-      MediaQuery.of(context).size.width <= 600;
+      MediaQuery.of(context).size.width <= AppSizes.mobileBreakpoint;
 
   static double getHorizontalPadding(BuildContext context) {
     if (isDesktop(context)) return 120.0;

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../theme/app_theme.dart';
+import '../constants/app_sizes.dart';
 
 class CalculatorContent extends StatefulWidget {
   const CalculatorContent({super.key});
@@ -51,13 +52,13 @@ class _CalculatorContentState extends State<CalculatorContent> {
   Widget _buildBtn(String label, {Color color = AppTheme.surface0}) {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.all(2.0),
+        padding: const EdgeInsets.all(AppSizes.spacingXxs),
         child: InkWell(
           onTap: () => _onPressed(label),
           child: Container(
             decoration: BoxDecoration(
               color: color,
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(AppSizes.radiusSm),
               border: Border.all(color: AppTheme.surface),
             ),
             alignment: Alignment.center,
@@ -79,11 +80,11 @@ class _CalculatorContentState extends State<CalculatorContent> {
   Widget build(BuildContext context) {
     return Container(
       color: AppTheme.surface,
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(AppSizes.spacingMd),
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(AppSizes.spacingMd),
             alignment: Alignment.centerRight,
             decoration: BoxDecoration(
               color: AppTheme.background,
@@ -91,10 +92,10 @@ class _CalculatorContentState extends State<CalculatorContent> {
             ),
             child: Text(
               _display,
-              style: GoogleFonts.spaceMono(fontSize: 24, color: AppTheme.text),
+              style: GoogleFonts.spaceMono(fontSize: AppSizes.calculatorDisplayFontSize, color: AppTheme.text),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSizes.spacingMd),
           Expanded(
             child: Column(
               children: [
