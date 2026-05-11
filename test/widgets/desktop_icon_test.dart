@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pixel_art/pixel_art.dart';
+
 import 'package:portifolio/shared/widgets/desktop_icon.dart';
 
 void main() {
@@ -10,7 +10,7 @@ void main() {
         home: Scaffold(
           body: DesktopIcon(
             label: 'About',
-            pixels: kPersonPixels,
+            iconWidget: Icon(Icons.person),
             color: Colors.blue,
             onTap: null,
           ),
@@ -27,7 +27,7 @@ void main() {
         home: Scaffold(
           body: DesktopIcon(
             label: 'Test',
-            pixels: kPersonPixels,
+            iconWidget: const Icon(Icons.person),
             color: Colors.blue,
             onTap: () => tapped = true,
           ),

@@ -1,7 +1,7 @@
 import 'package:app_window/app_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pixel_art/pixel_art.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../../../core/di/app_dependencies.dart';
 import '../../../../features/desktop/presentation/viewmodels/desktop_viewmodel.dart';
@@ -71,43 +71,43 @@ class _DesktopPageState extends State<DesktopPage> {
       SpotlightItem(
         id: AppStrings.winAbout,
         label: l10n.about,
-        pixels: kPersonPixels,
+        iconWidget: const Icon(Icons.person),
         color: AppTheme.blue,
       ),
       SpotlightItem(
         id: AppStrings.winFinder,
         label: AppStrings.titleFinder,
-        pixels: kFinderPixels,
+        iconWidget: const Icon(Icons.folder),
         color: AppTheme.red,
       ),
       SpotlightItem(
         id: AppStrings.winSkills,
         label: AppStrings.titleSkills,
-        pixels: kSkillsPixels,
+        iconWidget: const Icon(Icons.star),
         color: AppTheme.blue,
       ),
       SpotlightItem(
         id: AppStrings.winTerminal,
         label: AppStrings.titleTerminal,
-        pixels: kTerminalPixels,
+        iconWidget: const Icon(Icons.terminal),
         color: AppTheme.green,
       ),
       SpotlightItem(
         id: AppStrings.winCalculator,
         label: AppStrings.titleCalculator,
-        pixels: kCalculatorPixels,
+        iconWidget: const Icon(Icons.calculate),
         color: AppTheme.peach,
       ),
       SpotlightItem(
         id: AppStrings.winSnake,
         label: AppStrings.titleSnake,
-        pixels: kSnakePixels,
+        iconWidget: const FaIcon(FontAwesomeIcons.gamepad),
         color: AppTheme.peach,
       ),
       SpotlightItem(
         id: AppStrings.winContact,
         label: AppStrings.titleContact,
-        pixels: kMailPixels,
+        iconWidget: const Icon(Icons.mail),
         color: AppTheme.teal,
       ),
     ];

@@ -13,13 +13,26 @@ class PixelIconPainter extends CustomPainter {
     final cols = pixels[0].length;
     final cellW = size.width / cols;
     final cellH = size.height / rows;
-    final paint = Paint()..color = color;
+    final gap = cellW * 0.1; // subtle gap between pixels
+    final radius = Radius.circular(cellW * 0.2);
+    final paint =
+        Paint()
+          ..color = color
+          ..isAntiAlias = true;
 
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
         if (pixels[r][c] == 1) {
-          canvas.drawRect(
-            Rect.fromLTWH(c * cellW, r * cellH, cellW, cellH),
+          canvas.drawRRect(
+            RRect.fromRectAndRadius(
+              Rect.fromLTWH(
+                c * cellW + gap,
+                r * cellH + gap,
+                cellW - gap * 2,
+                cellH - gap * 2,
+              ),
+              radius,
+            ),
             paint,
           );
         }

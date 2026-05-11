@@ -4,38 +4,38 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../theme/app_theme.dart';
 import '../constants/app_strings.dart';
 import '../constants/app_sizes.dart';
-import 'package:pixel_art/pixel_art.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class Dock extends StatelessWidget {
   const Dock({super.key});
 
   static const _items = [
     _DockItemData(
-      pixels: kGithubPixels,
+      iconWidget: FaIcon(FontAwesomeIcons.github),
       label: AppStrings.dockGitHub,
       color: AppTheme.subtext,
       url: AppStrings.urlGitHub,
     ),
     _DockItemData(
-      pixels: kMediumPixels,
+      iconWidget: FaIcon(FontAwesomeIcons.medium),
       label: AppStrings.dockMedium,
       color: AppTheme.yellow,
       url: AppStrings.urlMedium,
     ),
     _DockItemData(
-      pixels: kDartPixels,
+      iconWidget: Icon(Icons.code),
       label: AppStrings.dockPubDev,
       color: AppTheme.teal,
       url: AppStrings.urlPubDev,
     ),
     _DockItemData(
-      pixels: kLinkedInPixels,
+      iconWidget: FaIcon(FontAwesomeIcons.linkedin),
       label: AppStrings.dockLinkedIn,
       color: AppTheme.blue,
       url: AppStrings.urlLinkedIn,
     ),
     _DockItemData(
-      pixels: kMailPixels,
+      iconWidget: Icon(Icons.email),
       label: AppStrings.dockEmail,
       color: AppTheme.peach,
       url: AppStrings.emailAddress,
@@ -68,13 +68,13 @@ class Dock extends StatelessWidget {
 }
 
 class _DockItemData {
-  final List<List<int>> pixels;
+  final Widget iconWidget;
   final String label;
   final Color color;
   final String url;
 
   const _DockItemData({
-    required this.pixels,
+    required this.iconWidget,
     required this.label,
     required this.color,
     required this.url,
@@ -115,11 +115,12 @@ class _DockItemState extends State<_DockItem> {
               SizedBox(
                 width: AppSizes.dockIconSize,
                 height: AppSizes.dockIconSize,
-                child: CustomPaint(
-                  painter: PixelIconPainter(
-                    pixels: widget.data.pixels,
+                child: IconTheme(
+                  data: IconThemeData(
                     color: widget.data.color,
+                    size: AppSizes.dockIconSize * 0.8,
                   ),
+                  child: widget.data.iconWidget,
                 ),
               ),
               const SizedBox(height: AppSizes.spacingXs),

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pixel_art/pixel_art.dart';
+
 import '../../l10n/app_localizations.dart';
 import '../../theme/app_theme.dart';
 import '../constants/app_sizes.dart';
@@ -171,11 +171,10 @@ class _AppNameMenu extends StatelessWidget {
             SizedBox(
               width: AppSizes.spacingBase,
               height: AppSizes.spacingBase,
-              child: CustomPaint(
-                painter: PixelIconPainter(
-                  pixels: kMarianaPixels,
-                  color: AppTheme.blue,
-                ),
+              child: const Icon(
+                Icons.description,
+                color: AppTheme.blue,
+                size: AppSizes.spacingBase,
               ),
             ),
           ],

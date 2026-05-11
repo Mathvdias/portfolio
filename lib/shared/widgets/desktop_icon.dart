@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../theme/app_theme.dart';
 import '../constants/app_sizes.dart';
-import 'package:pixel_art/pixel_art.dart';
+
 
 class DesktopIcon extends StatefulWidget {
   const DesktopIcon({
     super.key,
     required this.label,
-    required this.pixels,
+    required this.iconWidget,
     required this.color,
     required this.onTap,
   });
 
   final String label;
-  final List<List<int>> pixels;
+  final Widget iconWidget;
   final Color color;
   final VoidCallback? onTap;
 
@@ -52,11 +52,12 @@ class _DesktopIconState extends State<DesktopIcon> {
               SizedBox(
                 width: AppSizes.iconArtSize,
                 height: AppSizes.iconArtSize,
-                child: CustomPaint(
-                  painter: PixelIconPainter(
-                    pixels: widget.pixels,
+                child: IconTheme(
+                  data: IconThemeData(
                     color: widget.color,
+                    size: AppSizes.iconArtSize * 0.8,
                   ),
+                  child: widget.iconWidget,
                 ),
               ),
               const SizedBox(height: AppSizes.spacingXs),

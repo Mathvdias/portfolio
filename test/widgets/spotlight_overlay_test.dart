@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pixel_art/pixel_art.dart';
+
 import 'package:portifolio/shared/widgets/spotlight_overlay.dart';
 import 'package:portifolio/shared/constants/app_strings.dart';
 import 'package:portifolio/theme/app_theme.dart';
@@ -10,19 +10,19 @@ void main() {
     SpotlightItem(
       id: 'terminal',
       label: 'Terminal',
-      pixels: kTerminalPixels,
+      iconWidget: const Icon(Icons.terminal),
       color: AppTheme.green,
     ),
     SpotlightItem(
       id: 'calculator',
       label: 'Calculator',
-      pixels: kCalculatorPixels,
+      iconWidget: const Icon(Icons.calculate),
       color: AppTheme.peach,
     ),
     SpotlightItem(
       id: 'contact',
       label: 'Contact',
-      pixels: kMailPixels,
+      iconWidget: const Icon(Icons.mail),
       color: AppTheme.teal,
     ),
   ];
@@ -151,13 +151,13 @@ void main() {
       final item = SpotlightItem(
         id: 'test',
         label: 'Test',
-        pixels: kPersonPixels,
+        iconWidget: const Icon(Icons.person),
         color: Colors.blue,
       );
 
       expect(item.id, 'test');
       expect(item.label, 'Test');
-      expect(item.pixels, kPersonPixels);
+      expect(item.iconWidget, isA<Icon>());
       expect(item.color, Colors.blue);
     });
   });

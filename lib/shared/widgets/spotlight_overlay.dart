@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pixel_art/pixel_art.dart';
+
 
 import '../../theme/app_theme.dart';
 import '../constants/app_strings.dart';
@@ -223,11 +223,12 @@ class _SpotlightRow extends StatelessWidget {
             SizedBox(
               width: 24,
               height: 24,
-              child: CustomPaint(
-                painter: PixelIconPainter(
-                  pixels: item.pixels,
+              child: IconTheme(
+                data: IconThemeData(
                   color: item.color,
+                  size: 20,
                 ),
+                child: item.iconWidget,
               ),
             ),
             const SizedBox(width: AppSizes.spacingLg),
@@ -251,12 +252,12 @@ class SpotlightItem {
   const SpotlightItem({
     required this.id,
     required this.label,
-    required this.pixels,
+    required this.iconWidget,
     required this.color,
   });
 
   final String id;
   final String label;
-  final List<List<int>> pixels;
+  final Widget iconWidget;
   final Color color;
 }

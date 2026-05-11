@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pixel_art/pixel_art.dart';
+
 
 import '../../theme/app_theme.dart';
 import '../models/experience.dart';
@@ -32,13 +32,13 @@ abstract final class ExperienceMapper {
     return AppTheme.peach;
   }
 
-  // ── Resolve 16×16 pixel icon ───────────────────────────────────
-  static List<List<int>> pixelsFor(String company) {
-    if (company.contains('Zallpy')) return kZallpyPixels;
-    if (_isPan(company)) return kBankPixels;
-    if (company.contains('Conecthus')) return kConecthusPixels;
-    if (company.contains('Oi')) return kOiPixels;
-    return kTerminalPixels;
+  // ── Resolve IconData ───────────────────────────────────
+  static Widget iconWidgetFor(String company) {
+    if (company.contains('Zallpy')) return const Icon(Icons.business);
+    if (_isPan(company)) return const Icon(Icons.account_balance);
+    if (company.contains('Conecthus')) return const Icon(Icons.network_wifi);
+    if (company.contains('Oi')) return const Icon(Icons.phone);
+    return const Icon(Icons.work);
   }
 
   // ── Resolve short display name ─────────────────────────────────

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pixel_art/pixel_art.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../theme/app_theme.dart';
@@ -42,7 +42,7 @@ class DesktopIconsGrid extends StatelessWidget {
     final icons = <Widget>[
       DesktopIcon(
         label: l10n.about,
-        pixels: kPersonPixels,
+        iconWidget: const Icon(Icons.person),
         color: AppTheme.blue,
         onTap: () => onOpenWindow(
           AppStrings.winAbout,
@@ -53,7 +53,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconFinder,
-        pixels: kFinderPixels,
+        iconWidget: const Icon(Icons.folder),
         color: AppTheme.red,
         onTap: () => onOpenWindow(
           AppStrings.winFinder,
@@ -66,11 +66,10 @@ class DesktopIconsGrid extends StatelessWidget {
         final i = entry.key;
         final exp = entry.value;
         final color = ExperienceMapper.colorFor(exp.company);
-        final pixels = ExperienceMapper.pixelsFor(exp.company);
         final shortName = ExperienceMapper.shortNameFor(exp.company);
         return DesktopIcon(
           label: shortName,
-          pixels: pixels,
+          iconWidget: ExperienceMapper.iconWidgetFor(exp.company),
           color: color,
           onTap: () => onOpenWindow(
             'exp_$i',
@@ -82,7 +81,7 @@ class DesktopIconsGrid extends StatelessWidget {
       }),
       DesktopIcon(
         label: AppStrings.iconSkills,
-        pixels: kSkillsPixels,
+        iconWidget: const Icon(Icons.star),
         color: AppTheme.blue,
         onTap: () => onOpenWindow(
           AppStrings.winSkills,
@@ -93,7 +92,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconAndroid,
-        pixels: kAndroidPixels,
+        iconWidget: const FaIcon(FontAwesomeIcons.android),
         color: AppTheme.green,
         onTap: () => onOpenWindow(
           AppStrings.winAndroid,
@@ -104,7 +103,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconTerminal,
-        pixels: kTerminalPixels,
+        iconWidget: const Icon(Icons.terminal),
         color: AppTheme.green,
         onTap: () => onOpenWindow(
           AppStrings.winTerminal,
@@ -115,7 +114,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconCalculator,
-        pixels: kCalculatorPixels,
+        iconWidget: const Icon(Icons.calculate),
         color: AppTheme.peach,
         onTap: () => onOpenWindow(
           AppStrings.winCalculator,
@@ -126,7 +125,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconSnake,
-        pixels: kSnakePixels,
+        iconWidget: const FaIcon(FontAwesomeIcons.gamepad),
         color: AppTheme.peach,
         onTap: () => onOpenWindow(
           AppStrings.winSnake,
@@ -137,7 +136,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconContact,
-        pixels: kMailPixels,
+        iconWidget: const Icon(Icons.mail),
         color: AppTheme.teal,
         onTap: () => onOpenWindow(
           AppStrings.winContact,
@@ -148,7 +147,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconWhitepaper,
-        pixels: kMarianaPixels,
+        iconWidget: const Icon(Icons.description),
         color: AppTheme.blue,
         onTap: () async {
           final uri = Uri.parse(AppStrings.urlWhitepaper);
@@ -157,7 +156,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconResume,
-        pixels: kLinkPixels,
+        iconWidget: const Icon(Icons.picture_as_pdf),
         color: AppTheme.red,
         onTap: () async {
           final uri = Uri.parse(AppStrings.urlResume);
@@ -166,7 +165,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconInterceptedHttp,
-        pixels: kShieldPixels,
+        iconWidget: const Icon(Icons.security),
         color: AppTheme.blue,
         onTap: () => onOpenWindow(
           AppStrings.winInterceptedHttp,

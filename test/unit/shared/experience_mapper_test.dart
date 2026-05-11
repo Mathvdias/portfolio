@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:portifolio/shared/mappers/experience_mapper.dart';
 import 'package:portifolio/shared/models/experience.dart';
 import 'package:portifolio/theme/app_theme.dart';
-import 'package:pixel_art/pixel_art.dart';
+import 'package:flutter/material.dart';
 
 void main() {
   group('ExperienceMapper.fromL10n', () {
@@ -70,25 +70,30 @@ void main() {
     });
   });
 
-  group('ExperienceMapper.pixelsFor', () {
-    test('returns kZallpyPixels for Zallpy', () {
-      expect(ExperienceMapper.pixelsFor('Zallpy'), kZallpyPixels);
+  group('ExperienceMapper.iconWidgetFor', () {
+    test('returns Icons.business for Zallpy', () {
+      final widget = ExperienceMapper.iconWidgetFor('Zallpy') as Icon;
+      expect(widget.icon, Icons.business);
     });
 
-    test('returns kBankPixels for Banco Pan', () {
-      expect(ExperienceMapper.pixelsFor('Banco Pan'), kBankPixels);
+    test('returns Icons.account_balance for Banco Pan', () {
+      final widget = ExperienceMapper.iconWidgetFor('Banco Pan') as Icon;
+      expect(widget.icon, Icons.account_balance);
     });
 
-    test('returns kConecthusPixels for Conecthus', () {
-      expect(ExperienceMapper.pixelsFor('Conecthus'), kConecthusPixels);
+    test('returns Icons.network_wifi for Conecthus', () {
+      final widget = ExperienceMapper.iconWidgetFor('Conecthus') as Icon;
+      expect(widget.icon, Icons.network_wifi);
     });
 
-    test('returns kOiPixels for Oi', () {
-      expect(ExperienceMapper.pixelsFor('Oi'), kOiPixels);
+    test('returns Icons.phone for Oi', () {
+      final widget = ExperienceMapper.iconWidgetFor('Oi') as Icon;
+      expect(widget.icon, Icons.phone);
     });
 
-    test('returns kTerminalPixels for unknown', () {
-      expect(ExperienceMapper.pixelsFor('Acme Corp'), kTerminalPixels);
+    test('returns Icons.work for unknown', () {
+      final widget = ExperienceMapper.iconWidgetFor('Acme Corp') as Icon;
+      expect(widget.icon, Icons.work);
     });
   });
 
