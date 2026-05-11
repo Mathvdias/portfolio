@@ -70,7 +70,7 @@ class FinderContent extends StatelessWidget {
               padding: const EdgeInsets.all(AppSizes.spacingMd),
               itemCount: items.length,
               separatorBuilder:
-                  (_, __) => const Divider(color: AppTheme.surface0),
+                  (_, _) => const Divider(color: AppTheme.surface0),
               itemBuilder: (context, i) {
                 final item = items[i];
                 return ListTile(
