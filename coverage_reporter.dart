@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 void main() {
@@ -28,7 +27,9 @@ void main() {
       totalFound += found;
       totalHit += hit;
       final percentage = (hit / found) * 100;
-      print('${percentage.toStringAsFixed(1).padLeft(5)}% | ${sourceFile.split('portifolio/').last}');
+      print(
+        '${percentage.toStringAsFixed(1).padLeft(5)}% | ${sourceFile.split('portifolio/').last}',
+      );
     }
   }
 

@@ -80,14 +80,21 @@ const _kUrls = <String, String>{
 
 /// Known command names for tab-completion.
 const _kCommands = [
-  'help', 'whoami', 'ls', 'cat', 'skills', 'date',
-  'neofetch', 'open', 'clear', 'echo', 'history',
+  'help',
+  'whoami',
+  'ls',
+  'cat',
+  'skills',
+  'date',
+  'neofetch',
+  'open',
+  'clear',
+  'echo',
+  'history',
 ];
 
 /// Known file names for `cat` tab-completion.
-const _kFiles = [
-  'about.txt', 'experience.txt', 'skills.txt', 'contact.txt',
-];
+const _kFiles = ['about.txt', 'experience.txt', 'skills.txt', 'contact.txt'];
 
 /// Known `open` targets for tab-completion.
 const _kOpenTargets = ['github', 'linkedin', 'medium', 'pubdev'];
@@ -344,62 +351,64 @@ class _TerminalContentState extends State<TerminalContent> {
         color: Colors.black,
         padding: const EdgeInsets.all(AppSizes.terminalPadding),
         child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(
-            child: ListView.builder(
-              controller: _scroll,
-              itemCount: _history.length,
-              itemBuilder: (_, i) => Text(
-                _history[i].text,
-                style: GoogleFonts.spaceMono(
-                  fontSize: AppSizes.terminalFontSize,
-                  color: _history[i].color,
-                  height: 1.5,
-                ),
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: ListView.builder(
+                controller: _scroll,
+                itemCount: _history.length,
+                itemBuilder:
+                    (_, i) => Text(
+                      _history[i].text,
+                      style: GoogleFonts.spaceMono(
+                        fontSize: AppSizes.terminalFontSize,
+                        color: _history[i].color,
+                        height: 1.5,
+                      ),
+                    ),
               ),
             ),
-          ),
-          const SizedBox(height: AppSizes.spacingMd),
-          Focus(
-            onKeyEvent: _onKey,
-            child: Row(
-              children: [
-                Text(
-                  _kPrompt,
-                  style: GoogleFonts.spaceMono(
-                    fontSize: AppSizes.terminalFontSize,
-                    color: AppTheme.green,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: _ctrl,
-                    focusNode: _focus,
-                    autofocus: true,
+            const SizedBox(height: AppSizes.spacingMd),
+            Focus(
+              onKeyEvent: _onKey,
+              child: Row(
+                children: [
+                  Text(
+                    _kPrompt,
                     style: GoogleFonts.spaceMono(
                       fontSize: AppSizes.terminalFontSize,
-                      color: AppTheme.text,
+                      color: AppTheme.green,
+                      fontWeight: FontWeight.bold,
                     ),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      isDense: true,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                    cursorColor: AppTheme.green,
-                    cursorWidth: 8.0,
-                    cursorHeight: AppSizes.terminalFontSize + 2,
-                    cursorRadius: Radius.zero,
-                    onSubmitted: _submit,
-                    onTapOutside: (_) => _focus.requestFocus(),
                   ),
-                ),
-              ],
+                  Expanded(
+                    child: TextField(
+                      controller: _ctrl,
+                      focusNode: _focus,
+                      autofocus: true,
+                      style: GoogleFonts.spaceMono(
+                        fontSize: AppSizes.terminalFontSize,
+                        color: AppTheme.text,
+                      ),
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        isDense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      cursorColor: AppTheme.green,
+                      cursorWidth: 8.0,
+                      cursorHeight: AppSizes.terminalFontSize + 2,
+                      cursorRadius: Radius.zero,
+                      onSubmitted: _submit,
+                      onTapOutside: (_) => _focus.requestFocus(),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ));
+    );
   }
 }

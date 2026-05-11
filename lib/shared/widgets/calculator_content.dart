@@ -92,7 +92,10 @@ class _CalculatorContentState extends State<CalculatorContent> {
             ),
             child: Text(
               _display,
-              style: GoogleFonts.spaceMono(fontSize: AppSizes.calculatorDisplayFontSize, color: AppTheme.text),
+              style: GoogleFonts.spaceMono(
+                fontSize: AppSizes.calculatorDisplayFontSize,
+                color: AppTheme.text,
+              ),
             ),
           ),
           const SizedBox(height: AppSizes.spacingMd),

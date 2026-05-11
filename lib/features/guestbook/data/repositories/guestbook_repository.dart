@@ -4,8 +4,8 @@ import '../../domain/models/guestbook_message.dart';
 class GuestbookRepository {
   final FirebaseFirestore _firestore;
 
-  GuestbookRepository([FirebaseFirestore? firestore]) 
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+  GuestbookRepository([FirebaseFirestore? firestore])
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   Stream<List<GuestbookMessage>> watchMessages() {
     return _firestore
@@ -13,9 +13,12 @@ class GuestbookRepository {
         .orderBy('timestamp', descending: true)
         .limit(100)
         .snapshots(includeMetadataChanges: true)
-        .map((snapshot) => snapshot.docs
-            .map((doc) => GuestbookMessage.fromFirestore(doc))
-            .toList());
+        .map(
+          (snapshot) =>
+              snapshot.docs
+                  .map((doc) => GuestbookMessage.fromFirestore(doc))
+                  .toList(),
+        );
   }
 
   Future<void> addMessage(String name, String message, int rating) async {

@@ -142,7 +142,9 @@ class _NoteContainer extends StatelessWidget {
             offset: const Offset(2, 4),
           ),
         ],
-        borderRadius: const BorderRadius.only(bottomRight: Radius.circular(AppSizes.radiusXxl)),
+        borderRadius: const BorderRadius.only(
+          bottomRight: Radius.circular(AppSizes.radiusXxl),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

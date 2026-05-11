@@ -130,7 +130,9 @@ class ProjectWindowContent extends StatelessWidget {
                     ),
                     child: Text(
                       'pub.dev',
-                      style: GoogleFonts.pressStart2p(fontSize: AppSizes.fontXs),
+                      style: GoogleFonts.pressStart2p(
+                        fontSize: AppSizes.fontXs,
+                      ),
                     ),
                   ),
                 ],

@@ -32,7 +32,7 @@ class DesktopIconsGrid extends StatelessWidget {
 
   /// Called with `(id, title, content, accentColor)`.
   final void Function(String id, String title, Widget content, Color accent)
-      onOpenWindow;
+  onOpenWindow;
 
   @override
   Widget build(BuildContext context) {
@@ -43,23 +43,25 @@ class DesktopIconsGrid extends StatelessWidget {
         label: l10n.about,
         iconWidget: const Icon(Icons.person),
         color: AppTheme.blue,
-        onTap: () => onOpenWindow(
-          AppStrings.winAbout,
-          l10n.about,
-          AboutWindowContent(bio: l10n.bio, role: l10n.role),
-          AppTheme.blue,
-        ),
+        onTap:
+            () => onOpenWindow(
+              AppStrings.winAbout,
+              l10n.about,
+              AboutWindowContent(bio: l10n.bio, role: l10n.role),
+              AppTheme.blue,
+            ),
       ),
       DesktopIcon(
         label: AppStrings.iconFinder,
         iconWidget: const Icon(Icons.folder),
         color: AppTheme.red,
-        onTap: () => onOpenWindow(
-          AppStrings.winFinder,
-          AppStrings.titleFinder,
-          const FinderContent(),
-          AppTheme.red,
-        ),
+        onTap:
+            () => onOpenWindow(
+              AppStrings.winFinder,
+              AppStrings.titleFinder,
+              const FinderContent(),
+              AppTheme.red,
+            ),
       ),
       ...experiences.asMap().entries.map((entry) {
         final i = entry.key;
@@ -70,79 +72,86 @@ class DesktopIconsGrid extends StatelessWidget {
           label: shortName,
           iconWidget: ExperienceMapper.iconWidgetFor(exp.company),
           color: color,
-          onTap: () => onOpenWindow(
-            'exp_$i',
-            shortName,
-            ExperienceWindowContent(experience: exp, accentColor: color),
-            color,
-          ),
+          onTap:
+              () => onOpenWindow(
+                'exp_$i',
+                shortName,
+                ExperienceWindowContent(experience: exp, accentColor: color),
+                color,
+              ),
         );
       }),
       DesktopIcon(
         label: AppStrings.iconSkills,
         iconWidget: const Icon(Icons.star),
         color: AppTheme.blue,
-        onTap: () => onOpenWindow(
-          AppStrings.winSkills,
-          AppStrings.titleSkills,
-          const SkillsWindowContent(),
-          AppTheme.blue,
-        ),
+        onTap:
+            () => onOpenWindow(
+              AppStrings.winSkills,
+              AppStrings.titleSkills,
+              const SkillsWindowContent(),
+              AppTheme.blue,
+            ),
       ),
       DesktopIcon(
         label: AppStrings.iconAndroid,
         iconWidget: const FaIcon(FontAwesomeIcons.android),
         color: AppTheme.green,
-        onTap: () => onOpenWindow(
-          AppStrings.winAndroid,
-          AppStrings.titleAndroid,
-          const AndroidDevWindowContent(),
-          AppTheme.green,
-        ),
+        onTap:
+            () => onOpenWindow(
+              AppStrings.winAndroid,
+              AppStrings.titleAndroid,
+              const AndroidDevWindowContent(),
+              AppTheme.green,
+            ),
       ),
       DesktopIcon(
         label: AppStrings.iconTerminal,
         iconWidget: const Icon(Icons.terminal),
         color: AppTheme.green,
-        onTap: () => onOpenWindow(
-          AppStrings.winTerminal,
-          AppStrings.titleTerminal,
-          const TerminalContent(),
-          AppTheme.green,
-        ),
+        onTap:
+            () => onOpenWindow(
+              AppStrings.winTerminal,
+              AppStrings.titleTerminal,
+              const TerminalContent(),
+              AppTheme.green,
+            ),
       ),
       DesktopIcon(
         label: AppStrings.iconCalculator,
         iconWidget: const Icon(Icons.calculate),
         color: AppTheme.peach,
-        onTap: () => onOpenWindow(
-          AppStrings.winCalculator,
-          AppStrings.titleCalculator,
-          const CalculatorContent(),
-          AppTheme.peach,
-        ),
+        onTap:
+            () => onOpenWindow(
+              AppStrings.winCalculator,
+              AppStrings.titleCalculator,
+              const CalculatorContent(),
+              AppTheme.peach,
+            ),
       ),
       DesktopIcon(
         label: AppStrings.iconSnake,
         iconWidget: const FaIcon(FontAwesomeIcons.gamepad),
         color: AppTheme.peach,
-        onTap: () => onOpenWindow(
-          AppStrings.winSnake,
-          AppStrings.titleSnake,
-          const SnakeGameContent(),
-          AppTheme.peach,
-        ),
+        onTap:
+            () => onOpenWindow(
+              AppStrings.winSnake,
+              AppStrings.titleSnake,
+              const SnakeGameContent(),
+              AppTheme.peach,
+            ),
       ),
       DesktopIcon(
         label: AppStrings.iconContact,
         iconWidget: const Icon(Icons.mail),
         color: AppTheme.teal,
-        onTap: () => onOpenWindow(
-          AppStrings.winContact,
-          AppStrings.titleContact,
-          const ContactFormContent(),
-          AppTheme.teal,
-        ),
+        onTap:
+            () => onOpenWindow(
+              AppStrings.winContact,
+              AppStrings.titleContact,
+              const ContactFormContent(),
+              AppTheme.teal,
+            ),
       ),
       DesktopIcon(
         label: AppStrings.iconWhitepaper,
@@ -166,23 +175,24 @@ class DesktopIconsGrid extends StatelessWidget {
         label: AppStrings.iconInterceptedHttp,
         iconWidget: const Icon(Icons.security),
         color: AppTheme.blue,
-        onTap: () => onOpenWindow(
-          AppStrings.winInterceptedHttp,
-          AppStrings.titleInterceptedHttp,
-          const ProjectWindowContent(
-            name: AppStrings.titleInterceptedHttp,
-            description:
-                'A Flutter/Dart package that intercepts HTTP requests and responses, '
-                'allowing you to inspect, mock, and modify network traffic in your app. '
-                'Useful for debugging and testing.',
-            githubUrl: AppStrings.urlGitHubIntercepted,
-            pubDevUrl: AppStrings.urlPubDev,
-            version: '0.2.1',
-            technologies: ['Flutter', 'Dart', 'HTTP', 'Testing'],
-            accentColor: AppTheme.teal,
-          ),
-          AppTheme.teal,
-        ),
+        onTap:
+            () => onOpenWindow(
+              AppStrings.winInterceptedHttp,
+              AppStrings.titleInterceptedHttp,
+              const ProjectWindowContent(
+                name: AppStrings.titleInterceptedHttp,
+                description:
+                    'A Flutter/Dart package that intercepts HTTP requests and responses, '
+                    'allowing you to inspect, mock, and modify network traffic in your app. '
+                    'Useful for debugging and testing.',
+                githubUrl: AppStrings.urlGitHubIntercepted,
+                pubDevUrl: AppStrings.urlPubDev,
+                version: '0.2.1',
+                technologies: ['Flutter', 'Dart', 'HTTP', 'Testing'],
+                accentColor: AppTheme.teal,
+              ),
+              AppTheme.teal,
+            ),
       ),
     ];
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-mixin WindowAnimationMixin<T extends StatefulWidget> on State<T>, TickerProvider {
+mixin WindowAnimationMixin<T extends StatefulWidget>
+    on State<T>, TickerProvider {
   late final AnimationController _animController;
   late final Animation<double> _scaleAnim;
   late final Animation<double> _fadeAnim;
@@ -14,18 +15,13 @@ mixin WindowAnimationMixin<T extends StatefulWidget> on State<T>, TickerProvider
     );
 
     _scaleAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animController,
-        curve: Curves.easeOutBack,
-      ),
+      CurvedAnimation(parent: _animController, curve: Curves.easeOutBack),
     );
 
-    _fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animController,
-        curve: Curves.easeOut,
-      ),
-    );
+    _fadeAnim = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animController, curve: Curves.easeOut));
 
     _animController.forward();
   }
@@ -44,10 +40,7 @@ mixin WindowAnimationMixin<T extends StatefulWidget> on State<T>, TickerProvider
   Widget buildAnimatedWindow(Widget child) {
     return ScaleTransition(
       scale: _scaleAnim,
-      child: FadeTransition(
-        opacity: _fadeAnim,
-        child: child,
-      ),
+      child: FadeTransition(opacity: _fadeAnim, child: child),
     );
   }
 }

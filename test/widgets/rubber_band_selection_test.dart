@@ -24,8 +24,9 @@ void main() {
       expect(find.byType(RubberBandSelection), findsOneWidget);
     });
 
-    testWidgets('handles reversed coordinates (current < origin)',
-        (tester) async {
+    testWidgets('handles reversed coordinates (current < origin)', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(

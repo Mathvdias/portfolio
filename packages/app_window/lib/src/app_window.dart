@@ -41,7 +41,8 @@ class AppWindow extends StatefulWidget {
   State<AppWindow> createState() => _AppWindowState();
 }
 
-class _AppWindowState extends State<AppWindow> with SingleTickerProviderStateMixin, WindowAnimationMixin {
+class _AppWindowState extends State<AppWindow>
+    with SingleTickerProviderStateMixin, WindowAnimationMixin {
   late Offset _position;
 
   @override
@@ -110,24 +111,12 @@ class _AppWindowState extends State<AppWindow> with SingleTickerProviderStateMix
             GestureDetector(
               key: const Key('close_button'),
               onTap: _closeWindow,
-              child: Container(
-                width: 12,
-                height: 12,
-                color: widget.closeColor,
-              ),
+              child: Container(width: 12, height: 12, color: widget.closeColor),
             ),
             const SizedBox(width: 6),
-            Container(
-              width: 12,
-              height: 12,
-              color: widget.minimizeColor,
-            ),
+            Container(width: 12, height: 12, color: widget.minimizeColor),
             const SizedBox(width: 6),
-            Container(
-              width: 12,
-              height: 12,
-              color: widget.maximizeColor,
-            ),
+            Container(width: 12, height: 12, color: widget.maximizeColor),
             Expanded(
               child: Center(
                 child: Text(

@@ -69,7 +69,7 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.tap(find.byKey(const Key('close_button')));
-      
+
       // Wait for exit animation to finish
       await tester.pumpAndSettle();
 

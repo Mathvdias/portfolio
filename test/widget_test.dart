@@ -12,10 +12,11 @@ void main() {
     await tester.pumpWidget(
       ListenableBuilder(
         listenable: vm,
-        builder: (context, _) => MaterialApp(
-          locale: vm.flutterLocale,
-          home: const Scaffold(body: Text('ok')),
-        ),
+        builder:
+            (context, _) => MaterialApp(
+              locale: vm.flutterLocale,
+              home: const Scaffold(body: Text('ok')),
+            ),
       ),
     );
 

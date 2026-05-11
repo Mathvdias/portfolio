@@ -28,11 +28,11 @@ import '../../../../shared/widgets/skills_window_content.dart';
 import '../../../../shared/widgets/spotlight_overlay.dart';
 import '../../../../shared/widgets/sticky_note.dart';
 import '../../../../shared/widgets/terminal_content.dart';
-import '../../../../shared/widgets/guestbook_content.dart';
-import '../../../../shared/widgets/project_stats_window_content.dart';
-import '../../../../shared/widgets/android_dev_window_content.dart';
 import '../../../../theme/app_theme.dart';
-import '../../../guestbook/presentation/widgets/guestbook_content.dart';
+import '../../../../features/guestbook/presentation/widgets/guestbook_content.dart';
+import '../../../../shared/widgets/android_dev_window_content.dart';
+import '../../../../shared/widgets/project_stats_window_content.dart';
+import '../../../../shared/widgets/snake_game_content.dart';
 
 class DesktopPage extends StatefulWidget {
   const DesktopPage({super.key});
@@ -50,6 +50,10 @@ class _DesktopPageState extends State<DesktopPage> {
   void initState() {
     super.initState();
     _desktopVM = DesktopViewModel();
+    _desktopVM.onOpenWindowById = (id, context) {
+      final l10n = AppLocalizations.of(context);
+      _openWindowForId(id, l10n);
+    };
   }
 
   @override
@@ -98,6 +102,12 @@ class _DesktopPageState extends State<DesktopPage> {
         color: AppTheme.blue,
       ),
       SpotlightItem(
+        id: AppStrings.winAndroid,
+        label: l10n.androidDev,
+        iconWidget: const FaIcon(FontAwesomeIcons.android),
+        color: AppTheme.green,
+      ),
+      SpotlightItem(
         id: AppStrings.winTerminal,
         label: AppStrings.titleTerminal,
         iconWidget: const Icon(Icons.terminal),
@@ -120,6 +130,18 @@ class _DesktopPageState extends State<DesktopPage> {
         label: AppStrings.titleContact,
         iconWidget: const Icon(Icons.mail),
         color: AppTheme.teal,
+      ),
+      SpotlightItem(
+        id: AppStrings.winGuestbook,
+        label: l10n.guestbook,
+        iconWidget: const Icon(Icons.book),
+        color: AppTheme.mauve,
+      ),
+      SpotlightItem(
+        id: AppStrings.winProjectStats,
+        label: l10n.projectStats,
+        iconWidget: const Icon(Icons.analytics),
+        color: AppTheme.yellow,
       ),
     ];
   }
@@ -152,6 +174,13 @@ class _DesktopPageState extends State<DesktopPage> {
           const SkillsWindowContent(),
           AppTheme.blue,
         );
+      case AppStrings.winAndroid:
+        _desktopVM.openWindow(
+          id,
+          l10n.androidDev,
+          const AndroidDevWindowContent(),
+          AppTheme.green,
+        );
       case AppStrings.winTerminal:
         _desktopVM.openWindow(
           id,
@@ -170,7 +199,7 @@ class _DesktopPageState extends State<DesktopPage> {
         _desktopVM.openWindow(
           id,
           AppStrings.titleSnake,
-          const TerminalContent(), // snake not through spotlight — fallback
+          const SnakeGameContent(),
           AppTheme.peach,
         );
       case AppStrings.winContact:
@@ -184,14 +213,14 @@ class _DesktopPageState extends State<DesktopPage> {
         final vm = AppDependencies.of(context).guestbookViewModel;
         _desktopVM.openWindow(
           id,
-          AppStrings.titleGuestbook,
+          l10n.guestbook,
           GuestbookContent(viewModel: vm),
           AppTheme.mauve,
         );
       case AppStrings.winProjectStats:
         _desktopVM.openWindow(
           id,
-          AppStrings.titleProjectStats,
+          l10n.projectStats,
           const ProjectStatsWindowContent(),
           AppTheme.yellow,
         );
@@ -203,22 +232,11 @@ class _DesktopPageState extends State<DesktopPage> {
     _desktopVM.closeContextMenu();
     switch (action) {
       case DesktopContextAction.newNote:
-        // no-op for now — could add dynamic sticky notes
         break;
       case DesktopContextAction.openTerminal:
-        _desktopVM.openWindow(
-          AppStrings.winTerminal,
-          AppStrings.titleTerminal,
-          const TerminalContent(),
-          AppTheme.green,
-        );
+        _openWindowForId(AppStrings.winTerminal, l10n);
       case DesktopContextAction.about:
-        _desktopVM.openWindow(
-          AppStrings.winAbout,
-          l10n.about,
-          AboutWindowContent(bio: l10n.bio, role: l10n.role),
-          AppTheme.blue,
-        );
+        _openWindowForId(AppStrings.winAbout, l10n);
       case DesktopContextAction.spotlight:
         _desktopVM.openSpotlight();
     }
@@ -229,21 +247,18 @@ class _DesktopPageState extends State<DesktopPage> {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
     final meta = HardwareKeyboard.instance.isMetaPressed;
 
-    // Cmd+Space → Spotlight
     if (meta && event.logicalKey == LogicalKeyboardKey.space) {
       _desktopVM.showSpotlight
           ? _desktopVM.closeSpotlight()
           : _desktopVM.openSpotlight();
       return KeyEventResult.handled;
     }
-    // Cmd+W → close focused (top) window
     if (meta && event.logicalKey == LogicalKeyboardKey.keyW) {
       if (_desktopVM.windows.isNotEmpty) {
         _desktopVM.closeWindow(_desktopVM.windows.last.id);
       }
       return KeyEventResult.handled;
     }
-    // Escape → dismiss spotlight / context menu / notifications
     if (event.logicalKey == LogicalKeyboardKey.escape) {
       if (_desktopVM.showSpotlight) {
         _desktopVM.closeSpotlight();
@@ -278,11 +293,9 @@ class _DesktopPageState extends State<DesktopPage> {
           return Scaffold(
             backgroundColor: AppTheme.background,
             body: GestureDetector(
-              // Right-click on desktop background
               onSecondaryTapUp: (details) {
                 _desktopVM.openContextMenu(details.localPosition);
               },
-              // Rubber-band selection
               onPanStart: (details) {
                 _desktopVM.closeContextMenu();
                 _desktopVM.startSelection(details.localPosition);
@@ -293,10 +306,8 @@ class _DesktopPageState extends State<DesktopPage> {
               onPanEnd: (_) => _desktopVM.endSelection(),
               child: Stack(
                 children: [
-                  // ── Wallpaper (already has RepaintBoundary) ──
                   const Positioned.fill(child: PixelWallpaper()),
 
-                  // ── Sticky notes ────────────────────────────
                   StickyNote(
                     initialPosition: const Offset(40, 100),
                     text: l10n.stickyNoteTodo,
@@ -313,17 +324,17 @@ class _DesktopPageState extends State<DesktopPage> {
                         ),
                   ),
 
-                  // ── Desktop icons ───────────────────────────
                   Positioned.fill(
                     top: AppSizes.menuBarOffset,
                     bottom: AppSizes.desktopBottom,
                     child: DesktopIconsGrid(
                       experiences: experiences,
-                      onOpenWindow: _desktopVM.openWindow,
+                      onOpenWindow: (id, title, content, accent) {
+                        _desktopVM.openWindow(id, title, content, accent);
+                      },
                     ),
                   ),
 
-                  // ── App windows ──────────────────────────────
                   ..._desktopVM.windows.map(
                     (w) => AppWindow(
                       key: ValueKey(w.id),
@@ -342,7 +353,6 @@ class _DesktopPageState extends State<DesktopPage> {
                     ),
                   ),
 
-                  // ── Notification centre (RepaintBoundary) ───
                   if (_desktopVM.showNotifications)
                     Positioned(
                       top: AppSizes.menuBarOffset,
@@ -353,7 +363,6 @@ class _DesktopPageState extends State<DesktopPage> {
                       ),
                     ),
 
-                  // ── Menu bar (RepaintBoundary) ──────────────
                   Positioned(
                     top: 0,
                     left: 0,
@@ -366,15 +375,7 @@ class _DesktopPageState extends State<DesktopPage> {
                         onAppMenuAction: (action) async {
                           switch (action) {
                             case AppMenuAction.about:
-                              _desktopVM.openWindow(
-                                AppStrings.winAbout,
-                                l10n.about,
-                                AboutWindowContent(
-                                  bio: l10n.bio,
-                                  role: l10n.role,
-                                ),
-                                AppTheme.blue,
-                              );
+                              _openWindowForId(AppStrings.winAbout, l10n);
                             case AppMenuAction.licenses:
                               _desktopVM.openWindow(
                                 AppStrings.winLicenses,
@@ -383,10 +384,8 @@ class _DesktopPageState extends State<DesktopPage> {
                                 AppTheme.teal,
                               );
                             case AppMenuAction.github:
-                              // handled by mac_menu_bar
                               break;
                             case AppMenuAction.linkedin:
-                              // handled by mac_menu_bar
                               break;
                           }
                         },
@@ -394,7 +393,6 @@ class _DesktopPageState extends State<DesktopPage> {
                     ),
                   ),
 
-                  // ── Dock (RepaintBoundary) ──────────────────
                   const Positioned(
                     bottom: AppSizes.dockBottomOffset,
                     left: 0,
@@ -402,14 +400,12 @@ class _DesktopPageState extends State<DesktopPage> {
                     child: Center(child: RepaintBoundary(child: Dock())),
                   ),
 
-                  // ── Rubber-band selection ───────────────────
                   if (_desktopVM.isSelecting)
                     RubberBandSelection(
                       origin: _desktopVM.rubberBandOrigin!,
                       current: _desktopVM.rubberBandCurrent!,
                     ),
 
-                  // ── Context menu ────────────────────────────
                   if (_desktopVM.showContextMenu)
                     DesktopContextMenu(
                       position: _desktopVM.contextMenuPosition!,
@@ -417,7 +413,6 @@ class _DesktopPageState extends State<DesktopPage> {
                       onDismiss: _desktopVM.closeContextMenu,
                     ),
 
-                  // ── Spotlight overlay ───────────────────────
                   if (_desktopVM.showSpotlight)
                     SpotlightOverlay(
                       items: _buildSpotlightItems(l10n),

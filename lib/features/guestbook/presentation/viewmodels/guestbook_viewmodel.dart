@@ -131,13 +131,22 @@ class GuestbookViewModel extends ChangeNotifier {
     }
 
     try {
-      await _repository.addMessage(name, message, rating).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () => throw TimeoutException('Connection timed out. Check your internet or Firebase rules.'),
-      );
+      await _repository
+          .addMessage(name, message, rating)
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout:
+                () =>
+                    throw TimeoutException(
+                      'Connection timed out. Check your internet or Firebase rules.',
+                    ),
+          );
       _success = true;
       if (!_isAdmin) {
-        _prefs.setInt('last_guestbook_post', DateTime.now().millisecondsSinceEpoch);
+        _prefs.setInt(
+          'last_guestbook_post',
+          DateTime.now().millisecondsSinceEpoch,
+        );
       }
     } catch (e) {
       _lastError = '$e';

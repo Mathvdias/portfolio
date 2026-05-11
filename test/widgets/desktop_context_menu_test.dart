@@ -49,9 +49,7 @@ void main() {
 
     testWidgets('tapping background calls onDismiss', (tester) async {
       bool dismissed = false;
-      await tester.pumpWidget(
-        buildMenu(onDismiss: () => dismissed = true),
-      );
+      await tester.pumpWidget(buildMenu(onDismiss: () => dismissed = true));
 
       // Tap outside the menu card in the bottom-right corner
       await tester.tapAt(const Offset(780, 580));

@@ -18,9 +18,15 @@ class MockGuestbookRepository implements GuestbookRepository {
 
   @override
   Future<void> addMessage(String name, String message, int rating) async {
-    messages.add(GuestbookMessage(
-      id: 'mock', name: name, message: message, rating: rating, timestamp: DateTime.now()
-    ));
+    messages.add(
+      GuestbookMessage(
+        id: 'mock',
+        name: name,
+        message: message,
+        rating: rating,
+        timestamp: DateTime.now(),
+      ),
+    );
     _controller.add(messages);
   }
 
@@ -32,36 +38,38 @@ class MockGuestbookRepository implements GuestbookRepository {
 }
 
 void main() {
-  testWidgets('GuestbookContent displays UI and handles submission', (tester) async {
+  testWidgets('GuestbookContent displays UI and handles submission', (
+    tester,
+  ) async {
     SharedPreferences.setMockInitialValues({'isAdmin': false});
     final prefs = await SharedPreferences.getInstance();
     final repo = MockGuestbookRepository();
     final vm = GuestbookViewModel(repo, prefs);
-    
-    await tester.pumpWidget(MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizationsDelegate(),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en'), Locale('pt')],
-      home: Scaffold(
-        body: GuestbookContent(viewModel: vm),
+
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: const [
+          AppLocalizationsDelegate(),
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('en'), Locale('pt')],
+        home: Scaffold(body: GuestbookContent(viewModel: vm)),
       ),
-    ));
-    
+    );
+
     // Load messages
     repo._controller.add([]);
     await tester.pumpAndSettle();
-    
+
     expect(find.text('No messages yet. Be the first!'), findsOneWidget);
-    
+
     // Test input
     await tester.enterText(find.byType(TextField).first, 'John');
     await tester.enterText(find.byType(TextField).last, 'Hello');
     await tester.tap(find.text('Post'));
     await tester.pumpAndSettle();
-    
+
     expect(find.text('John'), findsOneWidget);
     expect(find.text('Hello'), findsOneWidget);
   });

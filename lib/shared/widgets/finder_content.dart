@@ -48,9 +48,18 @@ class FinderContent extends StatelessWidget {
                   label: AppStrings.finderRecents,
                   selected: true,
                 ),
-                const _SidebarItem(icon: Icons.desktop_mac, label: AppStrings.finderDesktop),
-                const _SidebarItem(icon: Icons.folder, label: AppStrings.finderDocuments),
-                const _SidebarItem(icon: Icons.download, label: AppStrings.finderDownloads),
+                const _SidebarItem(
+                  icon: Icons.desktop_mac,
+                  label: AppStrings.finderDesktop,
+                ),
+                const _SidebarItem(
+                  icon: Icons.folder,
+                  label: AppStrings.finderDocuments,
+                ),
+                const _SidebarItem(
+                  icon: Icons.download,
+                  label: AppStrings.finderDownloads,
+                ),
               ],
             ),
           ),
@@ -105,7 +114,10 @@ class _SidebarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSizes.spacingMd, vertical: AppSizes.spacingSm),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSizes.spacingMd,
+        vertical: AppSizes.spacingSm,
+      ),
       decoration: BoxDecoration(
         color: selected ? AppTheme.surface0 : Colors.transparent,
         borderRadius: BorderRadius.circular(AppSizes.radiusMd),

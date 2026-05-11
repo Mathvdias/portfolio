@@ -7,6 +7,13 @@ import '../../domain/models/desktop_notification.dart';
 /// Manages all mutable desktop state: open windows, notifications,
 /// context menu, spotlight visibility, and rubber-band selection.
 class DesktopViewModel extends ChangeNotifier {
+  // ─── Window ID Handler ──────────────────────────────────────────
+  void Function(String id, BuildContext context)? onOpenWindowById;
+
+  void openWindowById(String id, BuildContext context) {
+    onOpenWindowById?.call(id, context);
+  }
+
   // ─── Windows ────────────────────────────────────────────────────
   final List<WindowEntry> _windows = [];
   int _windowCount = 0;
@@ -54,7 +61,8 @@ class DesktopViewModel extends ChangeNotifier {
   bool get showNotifications => _showNotifications;
 
   final List<DesktopNotification> _notifications = [];
-  List<DesktopNotification> get notifications => List.unmodifiable(_notifications);
+  List<DesktopNotification> get notifications =>
+      List.unmodifiable(_notifications);
 
   void toggleNotifications() {
     _showNotifications = !_showNotifications;
@@ -63,8 +71,6 @@ class DesktopViewModel extends ChangeNotifier {
 
   void addNotification(DesktopNotification notification) {
     _notifications.insert(0, notification);
-    // Show the notification centre briefly or just badge it
-    // Or we can just play a sound and show a temporary toast!
     notifyListeners();
   }
 

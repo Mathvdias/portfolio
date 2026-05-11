@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../theme/app_theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../constants/app_strings.dart';
 import '../constants/app_sizes.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -11,48 +12,49 @@ import '../../features/desktop/presentation/viewmodels/desktop_viewmodel.dart';
 class Dock extends StatelessWidget {
   const Dock({super.key});
 
-  static const _items = [
-    _DockItemData(
-      iconWidget: FaIcon(FontAwesomeIcons.github),
-      label: AppStrings.dockGitHub,
-      color: AppTheme.subtext,
-      url: AppStrings.urlGitHub,
-    ),
-    _DockItemData(
-      iconWidget: FaIcon(FontAwesomeIcons.medium),
-      label: AppStrings.dockMedium,
-      color: AppTheme.yellow,
-      url: AppStrings.urlMedium,
-    ),
-    _DockItemData(
-      iconWidget: FaIcon(FontAwesomeIcons.linkedin),
-      label: AppStrings.dockLinkedIn,
-      color: AppTheme.blue,
-      url: AppStrings.urlLinkedIn,
-    ),
-    _DockItemData(
-      iconWidget: Icon(Icons.email),
-      label: AppStrings.dockEmail,
-      color: AppTheme.peach,
-      url: AppStrings.emailAddress,
-    ),
-    // Separator line could go here, but for now just add the apps
-    _DockItemData(
-      iconWidget: Icon(Icons.book),
-      label: AppStrings.dockGuestbook,
-      color: AppTheme.blue,
-      windowId: AppStrings.winGuestbook,
-    ),
-    _DockItemData(
-      iconWidget: Icon(Icons.analytics),
-      label: AppStrings.dockProjectStats,
-      color: AppTheme.yellow,
-      windowId: AppStrings.winProjectStats,
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    final items = [
+      _DockItemData(
+        iconWidget: const FaIcon(FontAwesomeIcons.github),
+        label: AppStrings.dockGitHub,
+        color: AppTheme.subtext,
+        url: AppStrings.urlGitHub,
+      ),
+      _DockItemData(
+        iconWidget: const FaIcon(FontAwesomeIcons.medium),
+        label: AppStrings.dockMedium,
+        color: AppTheme.yellow,
+        url: AppStrings.urlMedium,
+      ),
+      _DockItemData(
+        iconWidget: const FaIcon(FontAwesomeIcons.linkedin),
+        label: AppStrings.dockLinkedIn,
+        color: AppTheme.blue,
+        url: AppStrings.urlLinkedIn,
+      ),
+      _DockItemData(
+        iconWidget: const Icon(Icons.email),
+        label: AppStrings.dockEmail,
+        color: AppTheme.peach,
+        url: AppStrings.emailAddress,
+      ),
+      _DockItemData(
+        iconWidget: const Icon(Icons.book),
+        label: l10n.guestbook,
+        color: AppTheme.blue,
+        windowId: AppStrings.winGuestbook,
+      ),
+      _DockItemData(
+        iconWidget: const Icon(Icons.analytics),
+        label: l10n.projectStats,
+        color: AppTheme.yellow,
+        windowId: AppStrings.winProjectStats,
+      ),
+    ];
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSizes.dockPaddingH,
@@ -66,7 +68,7 @@ class Dock extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          for (int i = 0; i < _items.length; i++) ...[
+          for (int i = 0; i < items.length; i++) ...[
             if (i > 0) const SizedBox(width: AppSizes.dockItemSpacing),
             if (i == 4) ...[
               Container(
@@ -76,7 +78,7 @@ class Dock extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 8),
               ),
             ],
-            _DockItem(data: _items[i]),
+            _DockItem(data: items[i]),
           ],
         ],
       ),
@@ -118,15 +120,20 @@ class _DockItemState extends State<_DockItem> {
         await launchUrl(uri);
       }
     } else if (widget.data.windowId != null) {
-      context.read<DesktopViewModel>().openWindow(widget.data.windowId!);
+      // Logic for opening windows handled via callback or viewmodel
+      context.read<DesktopViewModel>().openWindowById(
+        widget.data.windowId!,
+        context,
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final desktopVM = context.watch<DesktopViewModel>();
-    final isWindowOpen = widget.data.windowId != null && 
-                        desktopVM.windows.any((w) => w.id == widget.data.windowId);
+    final isWindowOpen =
+        widget.data.windowId != null &&
+        desktopVM.windows.any((w) => w.id == widget.data.windowId);
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
@@ -142,17 +149,12 @@ class _DockItemState extends State<_DockItem> {
               SizedBox(
                 width: AppSizes.dockIconSize,
                 height: AppSizes.dockIconSize,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    IconTheme(
-                      data: IconThemeData(
-                        color: widget.data.color,
-                        size: AppSizes.dockIconSize * 0.8,
-                      ),
-                      child: widget.data.iconWidget,
-                    ),
-                  ],
+                child: IconTheme(
+                  data: IconThemeData(
+                    color: widget.data.color,
+                    size: AppSizes.dockIconSize * 0.8,
+                  ),
+                  child: widget.data.iconWidget,
                 ),
               ),
               const SizedBox(height: AppSizes.spacingXs),

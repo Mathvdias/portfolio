@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portifolio/features/guestbook/presentation/viewmodels/guestbook_viewmodel.dart';
@@ -16,7 +15,15 @@ class MockGuestbookRepository implements GuestbookRepository {
 
   @override
   Future<void> addMessage(String name, String message, int rating) async {
-    messages.add(GuestbookMessage(id: 'new', name: name, message: message, rating: rating, timestamp: DateTime.now()));
+    messages.add(
+      GuestbookMessage(
+        id: 'new',
+        name: name,
+        message: message,
+        rating: rating,
+        timestamp: DateTime.now(),
+      ),
+    );
     _controller.add(messages);
   }
 
@@ -50,19 +57,19 @@ void main() {
 
     test('validations and status resets', () async {
       final vm = GuestbookViewModel(repo, prefs);
-      
+
       // Empty check
       await vm.submitMessage('', '', 5);
       expect(vm.lastError, 'nameMessageEmpty');
-      
+
       // Name length
       await vm.submitMessage('a' * 31, 'msg', 5);
       expect(vm.lastError, contains('too long'));
-      
+
       // Message length
       await vm.submitMessage('name', 'a' * 501, 5);
       expect(vm.lastError, contains('too long'));
-      
+
       vm.resetStatus();
       expect(vm.lastError, isNull);
       expect(vm.success, false);
@@ -72,18 +79,36 @@ void main() {
       final vm = GuestbookViewModel(repo, prefs);
       bool notified = false;
       vm.onNotification = (n) => notified = true;
-      
+
       // Initial load (should not notify)
       repo._controller.add([
-        GuestbookMessage(id: '1', name: 'Old', message: 'Hi', rating: 5, timestamp: DateTime.now())
+        GuestbookMessage(
+          id: '1',
+          name: 'Old',
+          message: 'Hi',
+          rating: 5,
+          timestamp: DateTime.now(),
+        ),
       ]);
       await Future.delayed(Duration.zero);
       expect(notified, false);
-      
+
       // New message arrival
       repo._controller.add([
-        GuestbookMessage(id: '1', name: 'Old', message: 'Hi', rating: 5, timestamp: DateTime.now()),
-        GuestbookMessage(id: '2', name: 'New', message: 'Yo', rating: 4, timestamp: DateTime.now().add(const Duration(seconds: 1)))
+        GuestbookMessage(
+          id: '1',
+          name: 'Old',
+          message: 'Hi',
+          rating: 5,
+          timestamp: DateTime.now(),
+        ),
+        GuestbookMessage(
+          id: '2',
+          name: 'New',
+          message: 'Yo',
+          rating: 4,
+          timestamp: DateTime.now().add(const Duration(seconds: 1)),
+        ),
       ]);
       await Future.delayed(Duration.zero);
       expect(notified, true);
@@ -91,11 +116,11 @@ void main() {
 
     test('retry and stream error', () async {
       final vm = GuestbookViewModel(repo, prefs);
-      
+
       repo.emitError();
       await Future.delayed(Duration.zero);
       expect(vm.lastError, contains('Stream Error'));
-      
+
       vm.retry();
       expect(vm.isLoading, true);
     });
@@ -103,14 +128,30 @@ void main() {
     test('admin delete', () async {
       when(() => prefs.getBool('isAdmin')).thenReturn(true);
       final vm = GuestbookViewModel(repo, prefs);
-      
-      repo.messages = [GuestbookMessage(id: 'del', name: 'N', message: 'M', rating: 1, timestamp: DateTime.now())];
+
+      repo.messages = [
+        GuestbookMessage(
+          id: 'del',
+          name: 'N',
+          message: 'M',
+          rating: 1,
+          timestamp: DateTime.now(),
+        ),
+      ];
       await vm.deleteMessage('del');
       expect(repo.messages, isEmpty);
-      
+
       // Non-admin delete should do nothing
       vm.setAdmin(false);
-      repo.messages = [GuestbookMessage(id: 'keep', name: 'N', message: 'M', rating: 1, timestamp: DateTime.now())];
+      repo.messages = [
+        GuestbookMessage(
+          id: 'keep',
+          name: 'N',
+          message: 'M',
+          rating: 1,
+          timestamp: DateTime.now(),
+        ),
+      ];
       await vm.deleteMessage('keep');
       expect(repo.messages.length, 1);
     });
@@ -118,7 +159,7 @@ void main() {
     test('dispose cancels subscription', () {
       final vm = GuestbookViewModel(repo, prefs);
       vm.dispose();
-      // No explicit way to check subscription cancelation without more mocks, 
+      // No explicit way to check subscription cancelation without more mocks,
       // but calling it ensures it doesn't crash and covers the lines.
     });
   });

@@ -36,39 +36,42 @@ class NotificationCenter extends StatelessWidget {
           ),
           const Divider(height: 1, color: AppTheme.surface0),
           Expanded(
-            child: desktopVM.notifications.isEmpty
-                ? Center(
-                    child: Text(
-                      'No new notifications',
-                      style: GoogleFonts.spaceMono(
-                        color: AppTheme.subtext,
-                        fontSize: 14,
+            child:
+                desktopVM.notifications.isEmpty
+                    ? Center(
+                      child: Text(
+                        'No new notifications',
+                        style: GoogleFonts.spaceMono(
+                          color: AppTheme.subtext,
+                          fontSize: 14,
+                        ),
                       ),
-                    ),
-                  )
-                : ListView.separated(
-                    padding: const EdgeInsets.all(AppSizes.spacingLg),
-                    itemCount: desktopVM.notifications.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: AppSizes.spacingMd),
-                    itemBuilder: (context, index) {
-                      final notif = desktopVM.notifications[index];
-                      // Format time dynamically
-                      final diff = DateTime.now().difference(notif.time);
-                      final timeStr = diff.inMinutes < 60
-                          ? '${diff.inMinutes}m ago'
-                          : diff.inHours < 24
-                              ? '${diff.inHours}h ago'
-                              : '${diff.inDays}d ago';
+                    )
+                    : ListView.separated(
+                      padding: const EdgeInsets.all(AppSizes.spacingLg),
+                      itemCount: desktopVM.notifications.length,
+                      separatorBuilder:
+                          (_, __) => const SizedBox(height: AppSizes.spacingMd),
+                      itemBuilder: (context, index) {
+                        final notif = desktopVM.notifications[index];
+                        // Format time dynamically
+                        final diff = DateTime.now().difference(notif.time);
+                        final timeStr =
+                            diff.inMinutes < 60
+                                ? '${diff.inMinutes}m ago'
+                                : diff.inHours < 24
+                                ? '${diff.inHours}h ago'
+                                : '${diff.inDays}d ago';
 
-                      return _NotificationItem(
-                        title: notif.title,
-                        message: notif.message,
-                        time: timeStr,
-                        icon: notif.icon,
-                        color: notif.color,
-                      );
-                    },
-                  ),
+                        return _NotificationItem(
+                          title: notif.title,
+                          message: notif.message,
+                          time: timeStr,
+                          icon: notif.icon,
+                          color: notif.color,
+                        );
+                      },
+                    ),
           ),
         ],
       ),

@@ -18,7 +18,8 @@ class ResponsiveLayout extends StatelessWidget {
 
   static bool isTablet(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    return width > AppSizes.mobileBreakpoint && width <= AppSizes.desktopBreakpoint;
+    return width > AppSizes.mobileBreakpoint &&
+        width <= AppSizes.desktopBreakpoint;
   }
 
   static bool isMobile(BuildContext context) =>

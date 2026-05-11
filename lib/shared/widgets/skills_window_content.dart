@@ -18,17 +18,47 @@ class SkillsWindowContent extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _section(AppStrings.skillsMobile, [
-              _Skill('Flutter', const Icon(Icons.flutter_dash), AppTheme.blue, 0.95),
-              _Skill('Android', const FaIcon(FontAwesomeIcons.android), AppTheme.green, 0.85),
+              _Skill(
+                'Flutter',
+                const Icon(Icons.flutter_dash),
+                AppTheme.blue,
+                0.95,
+              ),
+              _Skill(
+                'Android',
+                const FaIcon(FontAwesomeIcons.android),
+                AppTheme.green,
+                0.85,
+              ),
               _Skill('Dart', const Icon(Icons.code), AppTheme.teal, 0.95),
-              _Skill('Kotlin', const Icon(Icons.integration_instructions), AppTheme.mauve, 0.80),
+              _Skill(
+                'Kotlin',
+                const Icon(Icons.integration_instructions),
+                AppTheme.mauve,
+                0.80,
+              ),
             ]),
             const SizedBox(height: AppSizes.spacingXxl),
             _section(AppStrings.skillsBackend, [
               _Skill('REST APIs', const Icon(Icons.api), AppTheme.blue, 0.85),
-              _Skill('Firebase', const Icon(Icons.local_fire_department), AppTheme.yellow, 0.75),
-              _Skill('Git / CI', const FaIcon(FontAwesomeIcons.github), AppTheme.subtext, 0.90),
-              _Skill('Fastlane', const Icon(Icons.rocket_launch), AppTheme.peach, 0.70),
+              _Skill(
+                'Firebase',
+                const Icon(Icons.local_fire_department),
+                AppTheme.yellow,
+                0.75,
+              ),
+              _Skill(
+                'Git / CI',
+                const FaIcon(FontAwesomeIcons.github),
+                AppTheme.subtext,
+                0.90,
+              ),
+              _Skill(
+                'Fastlane',
+                const Icon(Icons.rocket_launch),
+                AppTheme.peach,
+                0.70,
+              ),
             ]),
           ],
         ),
@@ -83,7 +113,10 @@ class SkillsWindowContent extends StatelessWidget {
           const SizedBox(width: AppSizes.spacingMd),
           Text(
             '${(s.level * 100).round()}%',
-            style: GoogleFonts.spaceMono(fontSize: AppSizes.fontLg, color: s.color),
+            style: GoogleFonts.spaceMono(
+              fontSize: AppSizes.fontLg,
+              color: s.color,
+            ),
           ),
         ],
       ),

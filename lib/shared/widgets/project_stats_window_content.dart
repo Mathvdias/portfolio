@@ -1,7 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../theme/app_theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../constants/app_sizes.dart';
 
 class ProjectStatsWindowContent extends StatelessWidget {
@@ -9,8 +9,12 @@ class ProjectStatsWindowContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     const coverage = 85.68; // Real total project coverage!
-    final color = coverage >= 80 ? AppTheme.green : (coverage >= 60 ? AppTheme.yellow : AppTheme.red);
+    final color =
+        coverage >= 80
+            ? AppTheme.green
+            : (coverage >= 60 ? AppTheme.yellow : AppTheme.red);
 
     return Container(
       color: AppTheme.background,
@@ -18,7 +22,7 @@ class ProjectStatsWindowContent extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'PROJECT METRICS',
+            l10n.projectMetrics,
             style: GoogleFonts.outfit(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -50,7 +54,7 @@ class ProjectStatsWindowContent extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'COVERAGE',
+                    l10n.coverageLabel,
                     style: GoogleFonts.spaceMono(
                       fontSize: 10,
                       color: AppTheme.subtext,
@@ -61,12 +65,13 @@ class ProjectStatsWindowContent extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSizes.spacingLg),
-          _buildStatRow('Unit Tests', '125'),
-          _buildStatRow('Code Quality', 'A+'),
-          _buildStatRow('Build Status', 'Passing'),
+          _buildStatRow(l10n.unitTests, '125'),
+          _buildStatRow(l10n.codeQuality, 'A+'),
+          _buildStatRow(l10n.buildStatus, l10n.passing),
           const Spacer(),
           Text(
-            'Keep building, keep testing.',
+            l10n.keepBuilding,
+            textAlign: TextAlign.center,
             style: GoogleFonts.spaceMono(
               fontSize: 12,
               fontStyle: FontStyle.italic,

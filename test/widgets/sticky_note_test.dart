@@ -10,10 +10,7 @@ void main() {
           home: Scaffold(
             body: Stack(
               children: [
-                StickyNote(
-                  initialPosition: Offset(10, 10),
-                  text: 'Hello Note',
-                ),
+                StickyNote(initialPosition: Offset(10, 10), text: 'Hello Note'),
               ],
             ),
           ),
@@ -29,10 +26,7 @@ void main() {
           home: Scaffold(
             body: Stack(
               children: [
-                StickyNote(
-                  initialPosition: Offset(10, 10),
-                  text: 'Drag me',
-                ),
+                StickyNote(initialPosition: Offset(10, 10), text: 'Drag me'),
               ],
             ),
           ),

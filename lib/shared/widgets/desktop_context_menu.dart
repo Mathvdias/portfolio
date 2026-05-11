@@ -131,7 +131,10 @@ class _MenuItemState extends State<_MenuItem> {
             horizontal: AppSizes.spacingLg,
             vertical: AppSizes.spacingMd,
           ),
-          color: _hovered ? AppTheme.blue.withValues(alpha: 0.15) : Colors.transparent,
+          color:
+              _hovered
+                  ? AppTheme.blue.withValues(alpha: 0.15)
+                  : Colors.transparent,
           child: Row(
             children: [
               Icon(widget.icon, size: 14, color: AppTheme.subtext),

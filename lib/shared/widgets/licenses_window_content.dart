@@ -68,7 +68,8 @@ class LicensesWindowContent extends StatelessWidget {
             name: 'firebase_core',
             version: '^4.7.0',
             license: 'BSD-3-Clause',
-            description: 'Firebase Core Flutter plugin. Required for Firebase initialization.',
+            description:
+                'Firebase Core Flutter plugin. Required for Firebase initialization.',
             url: 'https://pub.dev/packages/firebase_core',
           ),
           _licenseCard(
@@ -92,7 +93,8 @@ class LicensesWindowContent extends StatelessWidget {
             name: 'url_launcher',
             version: '^6.1.14',
             license: 'BSD-3-Clause',
-            description: 'Flutter plugin for launching URLs in the mobile platform. '
+            description:
+                'Flutter plugin for launching URLs in the mobile platform. '
                 'Used to open GitHub, LinkedIn, and the résumé PDF.',
             url: 'https://pub.dev/packages/url_launcher',
           ),
@@ -162,8 +164,10 @@ class LicensesWindowContent extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSizes.spacingMd),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: AppSizes.spacingSm, vertical: AppSizes.spacingXxs),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSizes.spacingSm,
+                    vertical: AppSizes.spacingXxs,
+                  ),
                   color: AppTheme.surface0,
                   child: Text(
                     license,

@@ -30,7 +30,7 @@ class _GuestbookContentState extends State<GuestbookContent> {
 
   Future<void> _submit() async {
     final l10n = AppLocalizations.of(context);
-    
+
     await widget.viewModel.submitMessage(
       _nameCtrl.text,
       _msgCtrl.text,
@@ -44,7 +44,7 @@ class _GuestbookContentState extends State<GuestbookContent> {
       String errorMsg = error;
       if (error == 'nameMessageEmpty') errorMsg = l10n.nameMessageEmpty;
       if (error == 'waitToPost') errorMsg = l10n.waitToPost;
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(errorMsg), backgroundColor: AppTheme.red),
       );
@@ -53,7 +53,10 @@ class _GuestbookContentState extends State<GuestbookContent> {
       _msgCtrl.clear();
       setState(() => _rating = 5);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.messagePosted), backgroundColor: AppTheme.green),
+        SnackBar(
+          content: Text(l10n.messagePosted),
+          backgroundColor: AppTheme.green,
+        ),
       );
     }
   }
@@ -74,11 +77,16 @@ class _GuestbookContentState extends State<GuestbookContent> {
                 padding: const EdgeInsets.all(AppSizes.spacingLg),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [AppTheme.blue.withOpacity(0.2), AppTheme.blue.withOpacity(0.05)],
+                    colors: [
+                      AppTheme.blue.withOpacity(0.2),
+                      AppTheme.blue.withOpacity(0.05),
+                    ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  border: Border(bottom: BorderSide(color: AppTheme.blue.withOpacity(0.2))),
+                  border: Border(
+                    bottom: BorderSide(color: AppTheme.blue.withOpacity(0.2)),
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,7 +110,7 @@ class _GuestbookContentState extends State<GuestbookContent> {
                   ],
                 ),
               ),
-              
+
               // ── Header Form ─────────────────────────────────────────
               Container(
                 padding: const EdgeInsets.all(AppSizes.spacingLg),
@@ -142,23 +150,42 @@ class _GuestbookContentState extends State<GuestbookContent> {
                     const SizedBox(height: AppSizes.spacingMd),
                     Row(
                       children: [
-                        Text(l10n.rating, style: GoogleFonts.spaceMono(color: AppTheme.subtext)),
+                        Text(
+                          l10n.rating,
+                          style: GoogleFonts.spaceMono(color: AppTheme.subtext),
+                        ),
                         ...List.generate(5, (index) {
                           return IconButton(
                             icon: Icon(
                               index < _rating ? Icons.star : Icons.star_border,
                               color: AppTheme.yellow,
                             ),
-                            onPressed: () => setState(() => _rating = index + 1),
+                            onPressed:
+                                () => setState(() => _rating = index + 1),
                           );
                         }),
                         const Spacer(),
                         ElevatedButton(
-                          onPressed: widget.viewModel.isSubmitting ? null : _submit,
-                          style: ElevatedButton.styleFrom(backgroundColor: AppTheme.blue),
-                          child: widget.viewModel.isSubmitting
-                              ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
-                              : Text(l10n.post, style: GoogleFonts.spaceMono(color: AppTheme.background)),
+                          onPressed:
+                              widget.viewModel.isSubmitting ? null : _submit,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.blue,
+                          ),
+                          child:
+                              widget.viewModel.isSubmitting
+                                  ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                  : Text(
+                                    l10n.post,
+                                    style: GoogleFonts.spaceMono(
+                                      color: AppTheme.background,
+                                    ),
+                                  ),
                         ),
                       ],
                     ),
@@ -166,53 +193,70 @@ class _GuestbookContentState extends State<GuestbookContent> {
                 ),
               ),
               const Divider(height: 1, color: AppTheme.surface0),
-              
+
               // ── Messages List ───────────────────────────────────────
               Expanded(
-                child: widget.viewModel.isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : widget.viewModel.lastError != null && widget.viewModel.messages.isEmpty
+                child:
+                    widget.viewModel.isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : widget.viewModel.lastError != null &&
+                            widget.viewModel.messages.isEmpty
                         ? Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(AppSizes.spacingLg),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    widget.viewModel.lastError!,
-                                    style: GoogleFonts.spaceMono(color: AppTheme.red),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  const SizedBox(height: AppSizes.spacingMd),
-                                  TextButton.icon(
-                                    onPressed: widget.viewModel.retry,
-                                    icon: const Icon(Icons.refresh, color: AppTheme.blue),
-                                    label: Text('Retry Connection', style: GoogleFonts.spaceMono(color: AppTheme.blue)),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                        : widget.viewModel.messages.isEmpty
-                            ? Center(
-                                child: Text(
-                                  l10n.noMessages,
-                                  style: GoogleFonts.spaceMono(color: AppTheme.subtext),
-                                ),
-                              )
-                            : ListView.separated(
+                          child: Padding(
                             padding: const EdgeInsets.all(AppSizes.spacingLg),
-                            itemCount: widget.viewModel.messages.length,
-                            separatorBuilder: (_, __) => const SizedBox(height: AppSizes.spacingLg),
-                            itemBuilder: (context, index) {
-                              final msg = widget.viewModel.messages[index];
-                              return _MessageCard(
-                                msg: msg,
-                                isAdmin: widget.viewModel.isAdmin,
-                                onDelete: () => widget.viewModel.deleteMessage(msg.id),
-                              );
-                            },
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  widget.viewModel.lastError!,
+                                  style: GoogleFonts.spaceMono(
+                                    color: AppTheme.red,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: AppSizes.spacingMd),
+                                TextButton.icon(
+                                  onPressed: widget.viewModel.retry,
+                                  icon: const Icon(
+                                    Icons.refresh,
+                                    color: AppTheme.blue,
+                                  ),
+                                  label: Text(
+                                    'Retry Connection',
+                                    style: GoogleFonts.spaceMono(
+                                      color: AppTheme.blue,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
+                        )
+                        : widget.viewModel.messages.isEmpty
+                        ? Center(
+                          child: Text(
+                            l10n.noMessages,
+                            style: GoogleFonts.spaceMono(
+                              color: AppTheme.subtext,
+                            ),
+                          ),
+                        )
+                        : ListView.separated(
+                          padding: const EdgeInsets.all(AppSizes.spacingLg),
+                          itemCount: widget.viewModel.messages.length,
+                          separatorBuilder:
+                              (_, __) =>
+                                  const SizedBox(height: AppSizes.spacingLg),
+                          itemBuilder: (context, index) {
+                            final msg = widget.viewModel.messages[index];
+                            return _MessageCard(
+                              msg: msg,
+                              isAdmin: widget.viewModel.isAdmin,
+                              onDelete:
+                                  () => widget.viewModel.deleteMessage(msg.id),
+                            );
+                          },
+                        ),
               ),
             ],
           ),
@@ -269,7 +313,11 @@ class _MessageCard extends StatelessWidget {
                 const SizedBox(width: AppSizes.spacingMd),
                 GestureDetector(
                   onTap: onDelete,
-                  child: const Icon(Icons.delete, size: 16, color: AppTheme.red),
+                  child: const Icon(
+                    Icons.delete,
+                    size: 16,
+                    color: AppTheme.red,
+                  ),
                 ),
               ],
             ],

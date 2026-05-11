@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../theme/app_theme.dart';
 import '../constants/app_sizes.dart';
 
-
 class DesktopIcon extends StatefulWidget {
   const DesktopIcon({
     super.key,

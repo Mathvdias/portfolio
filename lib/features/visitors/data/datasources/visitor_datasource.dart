@@ -25,10 +25,9 @@ class VisitorDatasource {
       final hasVisited = prefs.getBool(_hasVisitedKey) ?? false;
 
       if (!hasVisited) {
-        await _firestore.collection(_collection).doc(_document).set(
-          {'count': FieldValue.increment(1)},
-          SetOptions(merge: true),
-        );
+        await _firestore.collection(_collection).doc(_document).set({
+          'count': FieldValue.increment(1),
+        }, SetOptions(merge: true));
         await prefs.setBool(_hasVisitedKey, true);
       }
       return const Success(null);
@@ -40,15 +39,13 @@ class VisitorDatasource {
   }
 
   Stream<int> watchCount() {
-    return _firestore
-        .collection(_collection)
-        .doc(_document)
-        .snapshots()
-        .map((doc) {
-          if (doc.exists && doc.data() != null) {
-            return (doc.data()!['count'] as num?)?.toInt() ?? 0;
-          }
-          return 0;
-        });
+    return _firestore.collection(_collection).doc(_document).snapshots().map((
+      doc,
+    ) {
+      if (doc.exists && doc.data() != null) {
+        return (doc.data()!['count'] as num?)?.toInt() ?? 0;
+      }
+      return 0;
+    });
   }
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
 import '../../theme/app_theme.dart';
 import '../constants/app_strings.dart';
 import '../constants/app_sizes.dart';
@@ -49,9 +48,10 @@ class _SpotlightOverlayState extends State<SpotlightOverlay> {
   void _onChanged() {
     final query = _controller.text.toLowerCase();
     setState(() {
-      _filtered = widget.items
-          .where((item) => item.label.toLowerCase().contains(query))
-          .toList();
+      _filtered =
+          widget.items
+              .where((item) => item.label.toLowerCase().contains(query))
+              .toList();
       _selectedIndex = 0;
     });
   }
@@ -91,9 +91,7 @@ class _SpotlightOverlayState extends State<SpotlightOverlay> {
           child: GestureDetector(
             onTap: widget.onDismiss,
             behavior: HitTestBehavior.opaque,
-            child: ColoredBox(
-              color: Colors.black.withValues(alpha: 0.45),
-            ),
+            child: ColoredBox(color: Colors.black.withValues(alpha: 0.45)),
           ),
         ),
         // Spotlight card
@@ -215,19 +213,17 @@ class _SpotlightRow extends StatelessWidget {
           horizontal: AppSizes.spacingXl,
           vertical: AppSizes.spacingMd,
         ),
-        color: selected
-            ? AppTheme.blue.withValues(alpha: 0.15)
-            : Colors.transparent,
+        color:
+            selected
+                ? AppTheme.blue.withValues(alpha: 0.15)
+                : Colors.transparent,
         child: Row(
           children: [
             SizedBox(
               width: 24,
               height: 24,
               child: IconTheme(
-                data: IconThemeData(
-                  color: item.color,
-                  size: 20,
-                ),
+                data: IconThemeData(color: item.color, size: 20),
                 child: item.iconWidget,
               ),
             ),

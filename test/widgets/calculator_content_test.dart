@@ -7,7 +7,9 @@ void main() {
     testWidgets('renders initial display as 0', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(body: SizedBox(width: 300, height: 400, child: CalculatorContent())),
+          home: Scaffold(
+            body: SizedBox(width: 300, height: 400, child: CalculatorContent()),
+          ),
         ),
       );
 
@@ -17,7 +19,9 @@ void main() {
     testWidgets('pressing a digit updates display', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(body: SizedBox(width: 300, height: 400, child: CalculatorContent())),
+          home: Scaffold(
+            body: SizedBox(width: 300, height: 400, child: CalculatorContent()),
+          ),
         ),
       );
 
@@ -30,7 +34,9 @@ void main() {
     testWidgets('addition works correctly', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(body: SizedBox(width: 300, height: 400, child: CalculatorContent())),
+          home: Scaffold(
+            body: SizedBox(width: 300, height: 400, child: CalculatorContent()),
+          ),
         ),
       );
 
@@ -49,7 +55,9 @@ void main() {
     testWidgets('clear resets to 0', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(body: SizedBox(width: 300, height: 400, child: CalculatorContent())),
+          home: Scaffold(
+            body: SizedBox(width: 300, height: 400, child: CalculatorContent()),
+          ),
         ),
       );
 
@@ -64,7 +72,9 @@ void main() {
     testWidgets('subtraction works correctly', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(body: SizedBox(width: 300, height: 400, child: CalculatorContent())),
+          home: Scaffold(
+            body: SizedBox(width: 300, height: 400, child: CalculatorContent()),
+          ),
         ),
       );
 
@@ -83,7 +93,9 @@ void main() {
     testWidgets('multiplication works correctly', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(body: SizedBox(width: 300, height: 400, child: CalculatorContent())),
+          home: Scaffold(
+            body: SizedBox(width: 300, height: 400, child: CalculatorContent()),
+          ),
         ),
       );
 
@@ -102,7 +114,9 @@ void main() {
     testWidgets('division works correctly', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(body: SizedBox(width: 300, height: 400, child: CalculatorContent())),
+          home: Scaffold(
+            body: SizedBox(width: 300, height: 400, child: CalculatorContent()),
+          ),
         ),
       );
 

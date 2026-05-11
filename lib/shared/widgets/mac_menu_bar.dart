@@ -112,7 +112,11 @@ class _MacMenuBarState extends State<MacMenuBar> {
               onTap: widget.onToggleNotifications,
               child: const MouseRegion(
                 cursor: SystemMouseCursors.click,
-                child: Icon(Icons.menu_open, size: AppSizes.font3xl, color: AppTheme.text),
+                child: Icon(
+                  Icons.menu_open,
+                  size: AppSizes.font3xl,
+                  color: AppTheme.text,
+                ),
               ),
             ),
             const SizedBox(width: AppSizes.spacingBase),
@@ -137,16 +141,32 @@ class _AppNameMenu extends StatelessWidget {
       offset: const Offset(0, AppSizes.menuBarOffset),
       padding: EdgeInsets.zero,
       onSelected: (action) => onAction?.call(action),
-      itemBuilder: (_) => [
-        _menuItem(AppMenuAction.about, AppStrings.menuAbout, Icons.person_outline),
-        const PopupMenuDivider(),
-        _menuItem(AppMenuAction.licenses, AppStrings.menuLicenses, Icons.verified_outlined),
-        const PopupMenuDivider(),
-        _menuItem(AppMenuAction.github, AppStrings.menuGitHub, Icons.code),
-        _menuItem(AppMenuAction.linkedin, AppStrings.menuLinkedIn, Icons.link),
-      ],
+      itemBuilder:
+          (_) => [
+            _menuItem(
+              AppMenuAction.about,
+              AppStrings.menuAbout,
+              Icons.person_outline,
+            ),
+            const PopupMenuDivider(),
+            _menuItem(
+              AppMenuAction.licenses,
+              AppStrings.menuLicenses,
+              Icons.verified_outlined,
+            ),
+            const PopupMenuDivider(),
+            _menuItem(AppMenuAction.github, AppStrings.menuGitHub, Icons.code),
+            _menuItem(
+              AppMenuAction.linkedin,
+              AppStrings.menuLinkedIn,
+              Icons.link,
+            ),
+          ],
       child: Padding(
-        padding: const EdgeInsets.only(left: AppSizes.font2xl, right: AppSizes.spacingBase),
+        padding: const EdgeInsets.only(
+          left: AppSizes.font2xl,
+          right: AppSizes.spacingBase,
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -197,7 +217,10 @@ class _AppNameMenu extends StatelessWidget {
           const SizedBox(width: AppSizes.spacingBase),
           Text(
             label,
-            style: GoogleFonts.spaceMono(fontSize: AppSizes.fontXl, color: AppTheme.text),
+            style: GoogleFonts.spaceMono(
+              fontSize: AppSizes.fontXl,
+              color: AppTheme.text,
+            ),
           ),
         ],
       ),
@@ -263,30 +286,31 @@ class _CompactLanguagePicker extends StatelessWidget {
           ],
         ),
       ),
-      itemBuilder: (context) =>
-          _kLanguages
-              .map(
-                (lang) => PopupMenuItem<String>(
-                  value: lang.$1,
-                  child: Row(
-                    children: [
-                      Text(lang.$2, style: const TextStyle(fontSize: 14)),
-                      const SizedBox(width: 10),
-                      Text(
-                        lang.$3,
-                        style: GoogleFonts.spaceMono(
-                          fontSize: 12,
-                          color:
-                              lang.$1 == currentLanguage
-                                  ? AppTheme.blue
-                                  : AppTheme.text,
-                        ),
+      itemBuilder:
+          (context) =>
+              _kLanguages
+                  .map(
+                    (lang) => PopupMenuItem<String>(
+                      value: lang.$1,
+                      child: Row(
+                        children: [
+                          Text(lang.$2, style: const TextStyle(fontSize: 14)),
+                          const SizedBox(width: 10),
+                          Text(
+                            lang.$3,
+                            style: GoogleFonts.spaceMono(
+                              fontSize: 12,
+                              color:
+                                  lang.$1 == currentLanguage
+                                      ? AppTheme.blue
+                                      : AppTheme.text,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-              )
-              .toList(),
+                    ),
+                  )
+                  .toList(),
     );
   }
 }
