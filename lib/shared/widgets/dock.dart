@@ -119,10 +119,9 @@ class _DockItemState extends State<_DockItem> {
         await launchUrl(uri);
       }
     } else if (widget.data.windowId != null) {
-      AppDependencies.of(context).desktopViewModel.openWindowById(
-        widget.data.windowId!,
+      AppDependencies.of(
         context,
-      );
+      ).desktopViewModel.openWindowById(widget.data.windowId!, context);
     }
   }
 

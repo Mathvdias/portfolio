@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/constants/project_stats.dart';
 import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../constants/app_sizes.dart';
@@ -10,7 +11,7 @@ class ProjectStatsWindowContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    const coverage = 85.68; // Real total project coverage!
+    const coverage = ProjectStats.coverage;
     final color =
         coverage >= 80
             ? AppTheme.green
@@ -65,7 +66,7 @@ class ProjectStatsWindowContent extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSizes.spacingLg),
-          _buildStatRow(l10n.unitTests, '125'),
+          _buildStatRow(l10n.unitTests, ProjectStats.totalTests.toString()),
           _buildStatRow(l10n.codeQuality, 'A+'),
           _buildStatRow(l10n.buildStatus, l10n.passing),
           const Spacer(),
@@ -87,6 +88,7 @@ class ProjectStatsWindowContent extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
+        mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
