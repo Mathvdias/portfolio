@@ -20,6 +20,12 @@ class AppWindow extends StatefulWidget {
     this.maximizeColor = const Color(0xFFA6E3A1),
     this.width = 480.0,
     this.height = 360.0,
+    this.titleBarHeight = 32.0,
+    this.trafficLightSize = 12.0,
+    this.trafficLightSpacing = 6.0,
+    this.maximizeTopOffset = 28.0,
+    this.maximizeBottomOffset = 80.0,
+    this.titleFontSize = 7.0,
   });
 
   final String title;
@@ -36,6 +42,12 @@ class AppWindow extends StatefulWidget {
   final VoidCallback onFocus;
   final double width;
   final double height;
+  final double titleBarHeight;
+  final double trafficLightSize;
+  final double trafficLightSpacing;
+  final double maximizeTopOffset;
+  final double maximizeBottomOffset;
+  final double titleFontSize;
 
   @override
   State<AppWindow> createState() => _AppWindowState();
@@ -70,12 +82,9 @@ class _AppWindowState extends State<AppWindow>
         _preMaximizeSize = Size(_width, _height);
 
         final mq = MediaQuery.of(context);
-        const menuBarHeight = 32.0; // Standard in this app
-        const dockAreaHeight = 80.0; // Space for dock
-
-        _position = const Offset(0, menuBarHeight);
+        _position = Offset(0, widget.maximizeTopOffset);
         _width = mq.size.width;
-        _height = mq.size.height - menuBarHeight - dockAreaHeight;
+        _height = mq.size.height - widget.maximizeTopOffset - widget.maximizeBottomOffset;
         _isMaximized = true;
       }
     });
@@ -105,16 +114,20 @@ class _AppWindowState extends State<AppWindow>
       height: _height,
       decoration: BoxDecoration(
         color: widget.titleBarColor,
-        border: Border.all(color: widget.borderColor, width: _isMaximized ? 0 : 2),
-        boxShadow: _isMaximized
-            ? []
-            : const [
-              BoxShadow(
-                color: Colors.black54,
-                blurRadius: 24,
-                offset: Offset(6, 6),
-              ),
-            ],
+        border: Border.all(
+          color: widget.borderColor,
+          width: _isMaximized ? 0 : 2,
+        ),
+        boxShadow:
+            _isMaximized
+                ? []
+                : const [
+                  BoxShadow(
+                    color: Colors.black54,
+                    blurRadius: 24,
+                    offset: Offset(6, 6),
+                  ),
+                ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -143,7 +156,7 @@ class _AppWindowState extends State<AppWindow>
         }
       },
       child: Container(
-        height: 32,
+        height: widget.titleBarHeight,
         color: widget.titleBarColor,
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Row(
@@ -152,29 +165,29 @@ class _AppWindowState extends State<AppWindow>
               key: const Key('close_button'),
               onTap: _closeWindow,
               child: Container(
-                width: 12,
-                height: 12,
+                width: widget.trafficLightSize,
+                height: widget.trafficLightSize,
                 decoration: BoxDecoration(
                   color: widget.closeColor,
                   shape: BoxShape.circle,
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: widget.trafficLightSpacing),
             Container(
-              width: 12,
-              height: 12,
+              width: widget.trafficLightSize,
+              height: widget.trafficLightSize,
               decoration: BoxDecoration(
                 color: widget.minimizeColor,
                 shape: BoxShape.circle,
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: widget.trafficLightSpacing),
             GestureDetector(
               onTap: _toggleMaximize,
               child: Container(
-                width: 12,
-                height: 12,
+                width: widget.trafficLightSize,
+                height: widget.trafficLightSize,
                 decoration: BoxDecoration(
                   color: widget.maximizeColor,
                   shape: BoxShape.circle,
@@ -186,7 +199,7 @@ class _AppWindowState extends State<AppWindow>
                 child: Text(
                   widget.title,
                   style: GoogleFonts.pressStart2p(
-                    fontSize: 7,
+                    fontSize: widget.titleFontSize,
                     color: const Color(0xFF9399B2),
                   ),
                   overflow: TextOverflow.ellipsis,

@@ -39,7 +39,9 @@ void main() {
               AppWindow(
                 title: 'Win',
                 initialPosition: Offset.zero,
-                onClose: () => closed = true,
+                onClose: () {
+                  closed = true;
+                },
                 onFocus: () {},
                 child: const Text('x'),
               ),
@@ -48,9 +50,23 @@ void main() {
         ),
       ),
     );
+
+    // Wait for entry animations
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('close_button')));
+
+    // Find and tap the close button
+    final closeButton = find.byKey(const Key('close_button'));
+    expect(closeButton, findsOneWidget);
+
+    await tester.tap(closeButton);
+
+    // Wait for exit animation (300ms)
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump(const Duration(milliseconds: 100));
     await tester.pumpAndSettle();
+
     expect(closed, isTrue);
   });
 }
