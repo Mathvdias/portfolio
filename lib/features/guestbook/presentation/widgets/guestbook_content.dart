@@ -1,0 +1,236 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../../../../shared/constants/app_sizes.dart';
+import '../../../../theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../viewmodels/guestbook_viewmodel.dart';
+import '../../domain/models/guestbook_message.dart';
+
+class GuestbookContent extends StatefulWidget {
+  final GuestbookViewModel viewModel;
+
+  const GuestbookContent({super.key, required this.viewModel});
+
+  @override
+  State<GuestbookContent> createState() => _GuestbookContentState();
+}
+
+class _GuestbookContentState extends State<GuestbookContent> {
+  final _nameCtrl = TextEditingController();
+  final _msgCtrl = TextEditingController();
+  int _rating = 5;
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _msgCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context);
+    
+    await widget.viewModel.submitMessage(
+      _nameCtrl.text,
+      _msgCtrl.text,
+      _rating,
+    );
+
+    if (!mounted) return;
+
+    if (widget.viewModel.lastError != null) {
+      final error = widget.viewModel.lastError!;
+      String errorMsg = error;
+      if (error == 'nameMessageEmpty') errorMsg = l10n.nameMessageEmpty;
+      if (error == 'waitToPost') errorMsg = l10n.waitToPost;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMsg), backgroundColor: AppTheme.red),
+      );
+    } else if (widget.viewModel.success) {
+      _nameCtrl.clear();
+      _msgCtrl.clear();
+      setState(() => _rating = 5);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.messagePosted), backgroundColor: AppTheme.green),
+      );
+    }
+    
+    widget.viewModel.resetStatus();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return ListenableBuilder(
+      listenable: widget.viewModel,
+      builder: (context, _) {
+        return Container(
+          color: AppTheme.background,
+          child: Column(
+            children: [
+              // ── Header Form ─────────────────────────────────────────
+              Container(
+                padding: const EdgeInsets.all(AppSizes.spacingLg),
+                color: AppTheme.surface0,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      l10n.signGuestbook,
+                      style: GoogleFonts.spaceMono(
+                        fontSize: AppSizes.fontXl,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.text,
+                      ),
+                    ),
+                    const SizedBox(height: AppSizes.spacingMd),
+                    TextField(
+                      controller: _nameCtrl,
+                      decoration: InputDecoration(
+                        labelText: l10n.yourName,
+                        border: const OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      style: GoogleFonts.spaceMono(color: AppTheme.text),
+                    ),
+                    const SizedBox(height: AppSizes.spacingMd),
+                    TextField(
+                      controller: _msgCtrl,
+                      decoration: InputDecoration(
+                        labelText: l10n.yourMessage,
+                        border: const OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      maxLines: 2,
+                      style: GoogleFonts.spaceMono(color: AppTheme.text),
+                    ),
+                    const SizedBox(height: AppSizes.spacingMd),
+                    Row(
+                      children: [
+                        Text(l10n.rating, style: GoogleFonts.spaceMono(color: AppTheme.subtext)),
+                        ...List.generate(5, (index) {
+                          return IconButton(
+                            icon: Icon(
+                              index < _rating ? Icons.star : Icons.star_border,
+                              color: AppTheme.yellow,
+                            ),
+                            onPressed: () => setState(() => _rating = index + 1),
+                          );
+                        }),
+                        const Spacer(),
+                        ElevatedButton(
+                          onPressed: widget.viewModel.isSubmitting ? null : _submit,
+                          style: ElevatedButton.styleFrom(backgroundColor: AppTheme.blue),
+                          child: widget.viewModel.isSubmitting
+                              ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                              : Text(l10n.post, style: GoogleFonts.spaceMono(color: AppTheme.background)),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1, color: AppTheme.surface0),
+              
+              // ── Messages List ───────────────────────────────────────
+              Expanded(
+                child: widget.viewModel.isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : widget.viewModel.messages.isEmpty
+                        ? Center(
+                            child: Text(
+                              l10n.noMessages,
+                              style: GoogleFonts.spaceMono(color: AppTheme.subtext),
+                            ),
+                          )
+                        : ListView.separated(
+                            padding: const EdgeInsets.all(AppSizes.spacingLg),
+                            itemCount: widget.viewModel.messages.length,
+                            separatorBuilder: (_, __) => const SizedBox(height: AppSizes.spacingLg),
+                            itemBuilder: (context, index) {
+                              final msg = widget.viewModel.messages[index];
+                              return _MessageCard(
+                                msg: msg,
+                                isAdmin: widget.viewModel.isAdmin,
+                                onDelete: () => widget.viewModel.deleteMessage(msg.id),
+                              );
+                            },
+                          ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _MessageCard extends StatelessWidget {
+  final GuestbookMessage msg;
+  final bool isAdmin;
+  final VoidCallback onDelete;
+
+  const _MessageCard({
+    required this.msg,
+    required this.isAdmin,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSizes.spacingMd),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+        border: Border.all(color: AppTheme.surface0),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                msg.name,
+                style: GoogleFonts.spaceMono(
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.text,
+                ),
+              ),
+              const Spacer(),
+              Row(
+                children: List.generate(
+                  5,
+                  (i) => Icon(
+                    i < msg.rating ? Icons.star : Icons.star_border,
+                    size: 14,
+                    color: AppTheme.yellow,
+                  ),
+                ),
+              ),
+              if (isAdmin) ...[
+                const SizedBox(width: AppSizes.spacingMd),
+                GestureDetector(
+                  onTap: onDelete,
+                  child: const Icon(Icons.delete, size: 16, color: AppTheme.red),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: AppSizes.spacingSm),
+          Text(
+            msg.message,
+            style: GoogleFonts.spaceMono(color: AppTheme.subtext),
+          ),
+          const SizedBox(height: AppSizes.spacingSm),
+          Text(
+            '${msg.timestamp.day}/${msg.timestamp.month}/${msg.timestamp.year} ${msg.timestamp.hour}:${msg.timestamp.minute.toString().padLeft(2, '0')}',
+            style: GoogleFonts.spaceMono(fontSize: 10, color: AppTheme.overlay),
+          ),
+        ],
+      ),
+    );
+  }
+}

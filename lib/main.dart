@@ -2,12 +2,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:portifolio/shared/constants/app_strings.dart' show AppStrings;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/di/app_dependencies.dart';
 import 'features/desktop/presentation/pages/desktop_page.dart';
 import 'features/localization/presentation/viewmodels/locale_viewmodel.dart';
 import 'features/visitors/data/datasources/visitor_datasource.dart';
 import 'features/visitors/data/repositories/visitor_repository_impl.dart';
+import 'features/guestbook/data/repositories/guestbook_repository.dart';
+import 'features/guestbook/presentation/viewmodels/guestbook_viewmodel.dart';
 import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
 import 'shared/widgets/scroll_behavior.dart';
@@ -15,19 +18,24 @@ import 'theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  late final SharedPreferences prefs;
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    prefs = await SharedPreferences.getInstance();
   } catch (e) {
     debugPrint('Firebase init error: $e');
+    prefs = await SharedPreferences.getInstance();
   }
 
-  runApp(const AppRoot());
+  runApp(AppRoot(prefs: prefs));
 }
 
 class AppRoot extends StatefulWidget {
-  const AppRoot({super.key});
+  final SharedPreferences prefs;
+
+  const AppRoot({super.key, required this.prefs});
 
   @override
   State<AppRoot> createState() => _AppRootState();
@@ -36,10 +44,21 @@ class AppRoot extends StatefulWidget {
 class _AppRootState extends State<AppRoot> {
   final _localeViewModel = LocaleViewModel();
   final _visitorRepository = VisitorRepositoryImpl(VisitorDatasource());
+  late final GuestbookViewModel _guestbookViewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    _guestbookViewModel = GuestbookViewModel(
+      GuestbookRepository(),
+      widget.prefs,
+    );
+  }
 
   @override
   void dispose() {
     _localeViewModel.dispose();
+    _guestbookViewModel.dispose();
     super.dispose();
   }
 
@@ -48,6 +67,7 @@ class _AppRootState extends State<AppRoot> {
     return AppDependencies(
       localeViewModel: _localeViewModel,
       visitorRepository: _visitorRepository,
+      guestbookViewModel: _guestbookViewModel,
       child: ListenableBuilder(
         listenable: _localeViewModel,
         builder: (context, _) {

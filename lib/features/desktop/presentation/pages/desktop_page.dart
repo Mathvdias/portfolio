@@ -7,8 +7,8 @@ import '../../../../core/di/app_dependencies.dart';
 import '../../../../features/desktop/presentation/viewmodels/desktop_viewmodel.dart';
 import '../../../../features/visitors/presentation/viewmodels/visitor_viewmodel.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../../shared/constants/app_strings.dart';
 import '../../../../shared/constants/app_sizes.dart';
+import '../../../../shared/constants/app_strings.dart';
 import '../../../../shared/mappers/experience_mapper.dart';
 import '../../../../shared/widgets/about_window_content.dart';
 import '../../../../shared/widgets/calculator_content.dart';
@@ -51,11 +51,18 @@ class _DesktopPageState extends State<DesktopPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
+    final deps = AppDependencies.of(context);
+
     if (!_initialized) {
       _initialized = true;
-      final deps = AppDependencies.of(context);
       _visitorVM = VisitorViewModel(deps.visitorRepository)..init();
     }
+
+    final guestbookVM = deps.guestbookViewModel;
+    guestbookVM.onNotification ??= (notif) {
+      _desktopVM.addNotification(notif);
+    };
   }
 
   @override
@@ -122,35 +129,52 @@ class _DesktopPageState extends State<DesktopPage> {
     switch (id) {
       case AppStrings.winAbout:
         _desktopVM.openWindow(
-          id, l10n.about,
+          id,
+          l10n.about,
           AboutWindowContent(bio: l10n.bio, role: l10n.role),
           AppTheme.blue,
         );
       case AppStrings.winFinder:
         _desktopVM.openWindow(
-          id, AppStrings.titleFinder, const FinderContent(), AppTheme.red,
+          id,
+          AppStrings.titleFinder,
+          const FinderContent(),
+          AppTheme.red,
         );
       case AppStrings.winSkills:
         _desktopVM.openWindow(
-          id, AppStrings.titleSkills, const SkillsWindowContent(), AppTheme.blue,
+          id,
+          AppStrings.titleSkills,
+          const SkillsWindowContent(),
+          AppTheme.blue,
         );
       case AppStrings.winTerminal:
         _desktopVM.openWindow(
-          id, AppStrings.titleTerminal, const TerminalContent(), AppTheme.green,
+          id,
+          AppStrings.titleTerminal,
+          const TerminalContent(),
+          AppTheme.green,
         );
       case AppStrings.winCalculator:
         _desktopVM.openWindow(
-          id, AppStrings.titleCalculator, const CalculatorContent(), AppTheme.peach,
+          id,
+          AppStrings.titleCalculator,
+          const CalculatorContent(),
+          AppTheme.peach,
         );
       case AppStrings.winSnake:
         _desktopVM.openWindow(
-          id, AppStrings.titleSnake,
+          id,
+          AppStrings.titleSnake,
           const TerminalContent(), // snake not through spotlight — fallback
           AppTheme.peach,
         );
       case AppStrings.winContact:
         _desktopVM.openWindow(
-          id, AppStrings.titleContact, const ContactFormContent(), AppTheme.teal,
+          id,
+          AppStrings.titleContact,
+          const ContactFormContent(),
+          AppTheme.teal,
         );
     }
   }
@@ -262,11 +286,12 @@ class _DesktopPageState extends State<DesktopPage> {
 
                   ListenableBuilder(
                     listenable: _visitorVM,
-                    builder: (context, _) => VisitorStickyNote(
-                      initialPosition: const Offset(40, 260),
-                      color: const Color(0xFFBAE6FD),
-                      visitorCount: _visitorVM.count,
-                    ),
+                    builder:
+                        (context, _) => VisitorStickyNote(
+                          initialPosition: const Offset(40, 260),
+                          color: const Color(0xFFBAE6FD),
+                          visitorCount: _visitorVM.count,
+                        ),
                   ),
 
                   // ── Desktop icons ───────────────────────────
@@ -296,16 +321,17 @@ class _DesktopPageState extends State<DesktopPage> {
                       onFocus: () => _desktopVM.focusWindow(w.id),
                       child: w.content,
                     ),
-
                   ),
 
                   // ── Notification centre (RepaintBoundary) ───
                   if (_desktopVM.showNotifications)
-                    const Positioned(
+                    Positioned(
                       top: AppSizes.menuBarOffset,
                       right: 0,
                       bottom: 0,
-                      child: RepaintBoundary(child: NotificationCenter()),
+                      child: RepaintBoundary(
+                        child: NotificationCenter(desktopVM: _desktopVM),
+                      ),
                     ),
 
                   // ── Menu bar (RepaintBoundary) ──────────────
@@ -324,7 +350,10 @@ class _DesktopPageState extends State<DesktopPage> {
                               _desktopVM.openWindow(
                                 AppStrings.winAbout,
                                 l10n.about,
-                                AboutWindowContent(bio: l10n.bio, role: l10n.role),
+                                AboutWindowContent(
+                                  bio: l10n.bio,
+                                  role: l10n.role,
+                                ),
                                 AppTheme.blue,
                               );
                             case AppMenuAction.licenses:

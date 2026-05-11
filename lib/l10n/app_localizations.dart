@@ -11,6 +11,8 @@ class AppLocalizations {
 
   static final Map<String, Map<String, dynamic>> _localizedValues = {
     "en": {
+      "guestbook": "Guestbook",
+      "signGuestbook": "Sign the Guestbook",
       "hello": "Hello, I'm Matheus Dias",
       "role": "Software Engineer",
       "about": "About Me",
@@ -359,6 +361,8 @@ class AppLocalizations {
       ],
     },
     "pt": {
+      "guestbook": "Livro de Visitas",
+      "signGuestbook": "Assine o Livro",
       "hello": "Olá, eu sou Matheus Dias",
       "role": "Engenheiro de Software",
       "about": "Sobre Mim",
@@ -485,6 +489,38 @@ class AppLocalizations {
       _localizedValues[locale.languageCode]?['time2hAgo'] ?? '';
   String get time1dAgo =>
       _localizedValues[locale.languageCode]?['time1dAgo'] ?? '';
+  String get guestbook =>
+      _localizedValues[locale.languageCode]?['guestbook'] ?? 'Guestbook';
+  String get signGuestbook =>
+      _localizedValues[locale.languageCode]?['signGuestbook'] ?? 'Sign the Guestbook';
+  String get yourName =>
+      _localizedValues[locale.languageCode]?['yourName'] ?? 'Your Name';
+  String get yourMessage =>
+      _localizedValues[locale.languageCode]?['yourMessage'] ?? 'Your Message';
+  String get post =>
+      _localizedValues[locale.languageCode]?['post'] ?? 'Post';
+  String get rating =>
+      _localizedValues[locale.languageCode]?['rating'] ?? 'Rating: ';
+  String get noMessages =>
+      _localizedValues[locale.languageCode]?['noMessages'] ?? 'No messages yet. Be the first!';
+  String get messagePosted =>
+      _localizedValues[locale.languageCode]?['messagePosted'] ?? 'Message posted!';
+  String get nameMessageEmpty =>
+      _localizedValues[locale.languageCode]?['nameMessageEmpty'] ?? 'Name and message cannot be empty';
+  String get waitToPost =>
+      _localizedValues[locale.languageCode]?['waitToPost'] ?? 'Please wait a minute before posting again.';
+  String get accessDenied =>
+      _localizedValues[locale.languageCode]?['accessDenied'] ?? 'Access Denied';
+  String get adminActivated =>
+      _localizedValues[locale.languageCode]?['adminActivated'] ?? 'Admin mode activated.';
+  String get adminDeactivated =>
+      _localizedValues[locale.languageCode]?['adminDeactivated'] ?? 'Admin mode deactivated.';
+  String get noNewNotifications =>
+      _localizedValues[locale.languageCode]?['noNewNotifications'] ?? 'No new notifications';
+  String get newGuestbookMessage =>
+      _localizedValues[locale.languageCode]?['newGuestbookMessage'] ?? 'New Guestbook Message';
+  String get leftReview =>
+      _localizedValues[locale.languageCode]?['leftReview'] ?? 'left a review!';
 
   List<Map<String, dynamic>> get experiences {
     final list =

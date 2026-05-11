@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../features/guestbook/presentation/viewmodels/guestbook_viewmodel.dart';
 import '../../features/localization/presentation/viewmodels/locale_viewmodel.dart';
 import '../../features/visitors/domain/repositories/visitor_repository.dart';
 
@@ -7,17 +9,19 @@ class AppDependencies extends InheritedWidget {
     super.key,
     required this.localeViewModel,
     required this.visitorRepository,
+    required this.guestbookViewModel,
     required super.child,
   });
 
   final LocaleViewModel localeViewModel;
   final VisitorRepository visitorRepository;
+  final GuestbookViewModel guestbookViewModel;
 
   static AppDependencies of(BuildContext context) {
-    final deps =
+    final result =
         context.dependOnInheritedWidgetOfExactType<AppDependencies>();
-    assert(deps != null, 'AppDependencies not found in widget tree');
-    return deps!;
+    assert(result != null, 'No AppDependencies found in context');
+    return result!;
   }
 
   @override

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:app_window/app_window.dart';
 
 import '../../../../shared/constants/app_sizes.dart';
+import '../../domain/models/desktop_notification.dart';
 
 /// Manages all mutable desktop state: open windows, notifications,
 /// context menu, spotlight visibility, and rubber-band selection.
@@ -52,8 +53,18 @@ class DesktopViewModel extends ChangeNotifier {
   bool _showNotifications = false;
   bool get showNotifications => _showNotifications;
 
+  final List<DesktopNotification> _notifications = [];
+  List<DesktopNotification> get notifications => List.unmodifiable(_notifications);
+
   void toggleNotifications() {
     _showNotifications = !_showNotifications;
+    notifyListeners();
+  }
+
+  void addNotification(DesktopNotification notification) {
+    _notifications.insert(0, notification);
+    // Show the notification centre briefly or just badge it
+    // Or we can just play a sound and show a temporary toast!
     notifyListeners();
   }
 

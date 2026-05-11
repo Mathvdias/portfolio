@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../theme/app_theme.dart';
 import '../constants/app_sizes.dart';
 import '../constants/app_strings.dart';
+import '../../core/di/app_dependencies.dart';
 
 const _kPrompt = 'matheus@portfolio:~\$ ';
 
@@ -203,6 +204,15 @@ class _TerminalContentState extends State<TerminalContent> {
         return DateTime.now().toString();
       case 'neofetch':
         return _kNeofetch;
+      case 'admin_login':
+        if (args.isEmpty || args[0] != 'portifolio2026') return 'Access Denied';
+        final vm = AppDependencies.of(context).guestbookViewModel;
+        vm.setAdmin(true);
+        return 'Admin mode activated.';
+      case 'admin_logout':
+        final vm = AppDependencies.of(context).guestbookViewModel;
+        vm.setAdmin(false);
+        return 'Admin mode deactivated.';
       case 'echo':
         return args.join(' ');
       case 'clear':

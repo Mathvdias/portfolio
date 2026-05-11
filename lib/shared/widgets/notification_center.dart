@@ -3,9 +3,12 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../l10n/app_localizations.dart';
 import '../../theme/app_theme.dart';
 import '../constants/app_sizes.dart';
+import '../../features/desktop/presentation/viewmodels/desktop_viewmodel.dart';
 
 class NotificationCenter extends StatelessWidget {
-  const NotificationCenter({super.key});
+  const NotificationCenter({super.key, required this.desktopVM});
+
+  final DesktopViewModel desktopVM;
 
   @override
   Widget build(BuildContext context) {
@@ -33,34 +36,39 @@ class NotificationCenter extends StatelessWidget {
           ),
           const Divider(height: 1, color: AppTheme.surface0),
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(AppSizes.spacingLg),
-              children: [
-                _NotificationItem(
-                  title: l10n.dailyVerse,
-                  message: l10n.dailyVerseText,
-                  time: l10n.timeNow,
-                  icon: Icons.book,
-                  color: AppTheme.mauve,
-                ),
-                const SizedBox(height: AppSizes.spacingMd),
-                _NotificationItem(
-                  title: l10n.system,
-                  message: l10n.portfolioUpdated,
-                  time: l10n.time2hAgo,
-                  icon: Icons.system_update_alt,
-                  color: AppTheme.green,
-                ),
-                const SizedBox(height: AppSizes.spacingMd),
-                _NotificationItem(
-                  title: l10n.github,
-                  message: l10n.githubUpdate,
-                  time: l10n.time1dAgo,
-                  icon: Icons.code,
-                  color: AppTheme.teal,
-                ),
-              ],
-            ),
+            child: desktopVM.notifications.isEmpty
+                ? Center(
+                    child: Text(
+                      'No new notifications',
+                      style: GoogleFonts.spaceMono(
+                        color: AppTheme.subtext,
+                        fontSize: 14,
+                      ),
+                    ),
+                  )
+                : ListView.separated(
+                    padding: const EdgeInsets.all(AppSizes.spacingLg),
+                    itemCount: desktopVM.notifications.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: AppSizes.spacingMd),
+                    itemBuilder: (context, index) {
+                      final notif = desktopVM.notifications[index];
+                      // Format time dynamically
+                      final diff = DateTime.now().difference(notif.time);
+                      final timeStr = diff.inMinutes < 60
+                          ? '${diff.inMinutes}m ago'
+                          : diff.inHours < 24
+                              ? '${diff.inHours}h ago'
+                              : '${diff.inDays}d ago';
+
+                      return _NotificationItem(
+                        title: notif.title,
+                        message: notif.message,
+                        time: timeStr,
+                        icon: notif.icon,
+                        color: notif.color,
+                      );
+                    },
+                  ),
           ),
         ],
       ),
