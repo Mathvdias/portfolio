@@ -5,7 +5,6 @@ import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../constants/app_strings.dart';
 import '../constants/app_sizes.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../core/di/app_dependencies.dart';
 
 class Dock extends StatelessWidget {
@@ -15,39 +14,40 @@ class Dock extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
+    // Using Material Icons for maximum reliability on Flutter Web
     final items = [
       _DockItemData(
-        iconWidget: const FaIcon(FontAwesomeIcons.github),
+        icon: Icons.code,
         label: AppStrings.dockGitHub,
         color: AppTheme.subtext,
         url: AppStrings.urlGitHub,
       ),
       _DockItemData(
-        iconWidget: const FaIcon(FontAwesomeIcons.medium),
+        icon: Icons.article_outlined,
         label: AppStrings.dockMedium,
         color: AppTheme.yellow,
         url: AppStrings.urlMedium,
       ),
       _DockItemData(
-        iconWidget: const FaIcon(FontAwesomeIcons.linkedin),
+        icon: Icons.work_outline,
         label: AppStrings.dockLinkedIn,
         color: AppTheme.blue,
         url: AppStrings.urlLinkedIn,
       ),
       _DockItemData(
-        iconWidget: const Icon(Icons.email),
+        icon: Icons.email_outlined,
         label: AppStrings.dockEmail,
         color: AppTheme.peach,
         url: AppStrings.emailAddress,
       ),
       _DockItemData(
-        iconWidget: const Icon(Icons.book),
+        icon: Icons.book_outlined,
         label: l10n.guestbook,
         color: AppTheme.blue,
         windowId: AppStrings.winGuestbook,
       ),
       _DockItemData(
-        iconWidget: const Icon(Icons.analytics),
+        icon: Icons.analytics_outlined,
         label: l10n.projectStats,
         color: AppTheme.yellow,
         windowId: AppStrings.winProjectStats,
@@ -86,14 +86,14 @@ class Dock extends StatelessWidget {
 }
 
 class _DockItemData {
-  final Widget iconWidget;
+  final IconData icon;
   final String label;
   final Color color;
   final String? url;
   final String? windowId;
 
   const _DockItemData({
-    required this.iconWidget,
+    required this.icon,
     required this.label,
     required this.color,
     this.url,
@@ -151,12 +151,10 @@ class _DockItemState extends State<_DockItem> {
                   SizedBox(
                     width: AppSizes.dockIconSize,
                     height: AppSizes.dockIconSize,
-                    child: IconTheme(
-                      data: IconThemeData(
-                        color: widget.data.color,
-                        size: AppSizes.dockIconSize * 0.8,
-                      ),
-                      child: widget.data.iconWidget,
+                    child: Icon(
+                      widget.data.icon,
+                      color: widget.data.color,
+                      size: AppSizes.dockIconSize * 0.8,
                     ),
                   ),
                   const SizedBox(height: AppSizes.spacingXs),

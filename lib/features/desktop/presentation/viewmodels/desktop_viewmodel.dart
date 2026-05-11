@@ -20,7 +20,14 @@ class DesktopViewModel extends ChangeNotifier {
 
   List<WindowEntry> get windows => List.unmodifiable(_windows);
 
-  void openWindow(String id, String title, Widget content, Color accent) {
+  void openWindow(
+    String id,
+    String title,
+    Widget content,
+    Color accent, {
+    double width = 480.0,
+    double height = 360.0,
+  }) {
     _windows.removeWhere((w) => w.id == id);
     final offset = Offset(
       AppSizes.windowCascadeBase +
@@ -38,6 +45,8 @@ class DesktopViewModel extends ChangeNotifier {
         content: content,
         accentColor: accent,
         position: offset,
+        width: width,
+        height: height,
       ),
     );
     notifyListeners();
