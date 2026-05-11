@@ -44,4 +44,10 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 coverage/
+.env
+*.jks
+*.keystore
+google-services.json
+GoogleService-Info.plist
+.flutterfire/
 
