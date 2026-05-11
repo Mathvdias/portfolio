@@ -51,7 +51,7 @@ class NotificationCenter extends StatelessWidget {
                       padding: const EdgeInsets.all(AppSizes.spacingLg),
                       itemCount: desktopVM.notifications.length,
                       separatorBuilder:
-                          (_, __) => const SizedBox(height: AppSizes.spacingMd),
+                          (_, _) => const SizedBox(height: AppSizes.spacingMd),
                       itemBuilder: (context, index) {
                         final notif = desktopVM.notifications[index];
                         // Format time dynamically
