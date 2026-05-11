@@ -32,6 +32,11 @@ DA:25,1
 LF:10
 LH:10
 end_of_record
+SF:lib/features/desktop/domain/models/desktop_notification.dart
+DA:10,2
+LF:1
+LH:1
+end_of_record
 SF:lib/features/desktop/presentation/viewmodels/desktop_viewmodel.dart
 DA:14,6
 DA:16,2
@@ -95,11 +100,6 @@ DA:123,1
 DA:124,1
 LF:60
 LH:56
-end_of_record
-SF:lib/features/desktop/domain/models/desktop_notification.dart
-DA:10,2
-LF:1
-LH:1
 end_of_record
 SF:lib/features/guestbook/domain/models/guestbook_message.dart
 DA:10,4
