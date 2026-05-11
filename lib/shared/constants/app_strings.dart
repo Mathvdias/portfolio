@@ -69,7 +69,7 @@ abstract final class AppStrings {
 
   // About window
   static const String aboutName = 'MATHEUS DIAS';
-  static const String aboutLocation = 'MANAUS, AM — BRAZIL';
+  static const String aboutLocation = 'SÃO PAULO, SP — BRAZIL';
   static const String aboutEducation = 'EDUCATION';
   static const String aboutInterests = 'INTERESTS';
 

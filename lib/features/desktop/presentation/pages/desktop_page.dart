@@ -279,25 +279,24 @@ class _DesktopPageState extends State<DesktopPage> {
                     ),
                   ),
 
-                  // ── App windows (each wrapped in RepaintBoundary) ──
+                  // ── App windows ──────────────────────────────
                   ..._desktopVM.windows.map(
-                    (w) => RepaintBoundary(
-                      child: AppWindow(
-                        key: ValueKey(w.id),
-                        title: w.title,
-                        initialPosition: w.position,
-                        accentColor: w.accentColor,
-                        titleBarColor: AppTheme.surface,
-                        contentColor: AppTheme.background,
-                        borderColor: AppTheme.surface0,
-                        closeColor: AppTheme.red,
-                        minimizeColor: AppTheme.yellow,
-                        maximizeColor: AppTheme.green,
-                        onClose: () => _desktopVM.closeWindow(w.id),
-                        onFocus: () => _desktopVM.focusWindow(w.id),
-                        child: w.content,
-                      ),
+                    (w) => AppWindow(
+                      key: ValueKey(w.id),
+                      title: w.title,
+                      initialPosition: w.position,
+                      accentColor: w.accentColor,
+                      titleBarColor: AppTheme.surface,
+                      contentColor: AppTheme.background,
+                      borderColor: AppTheme.surface0,
+                      closeColor: AppTheme.red,
+                      minimizeColor: AppTheme.yellow,
+                      maximizeColor: AppTheme.green,
+                      onClose: () => _desktopVM.closeWindow(w.id),
+                      onFocus: () => _desktopVM.focusWindow(w.id),
+                      child: w.content,
                     ),
+
                   ),
 
                   // ── Notification centre (RepaintBoundary) ───

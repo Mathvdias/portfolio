@@ -81,7 +81,9 @@ class _AppWindowState extends State<AppWindow> {
         children: [
           _buildTitleBar(),
           Expanded(
-            child: Container(color: widget.contentColor, child: widget.child),
+            child: RepaintBoundary(
+              child: Container(color: widget.contentColor, child: widget.child),
+            ),
           ),
         ],
       ),
