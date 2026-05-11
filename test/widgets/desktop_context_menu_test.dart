@@ -60,9 +60,7 @@ void main() {
     testWidgets('hovering a menu item highlights it', (tester) async {
       await tester.pumpWidget(buildMenu());
 
-      final gesture = await tester.createGesture(
-        kind: PointerDeviceKind.mouse,
-      );
+      final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
       await gesture.addPointer(location: Offset.zero);
       addTearDown(gesture.removePointer);
 

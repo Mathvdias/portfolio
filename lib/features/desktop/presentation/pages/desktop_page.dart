@@ -439,7 +439,8 @@ class _DesktopPageState extends State<DesktopPage> {
                                 AppStrings.titleLicenses,
                                 DeferredWidget(
                                   licenses_content.loadLibrary,
-                                  () => licenses_content.LicensesWindowContent(),
+                                  () =>
+                                      licenses_content.LicensesWindowContent(),
                                 ),
                                 AppTheme.teal,
                               );

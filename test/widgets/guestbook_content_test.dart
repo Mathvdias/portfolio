@@ -154,9 +154,7 @@ void main() {
     expect(find.byIcon(Icons.star), findsWidgets);
   });
 
-  testWidgets('messages list shows separator between messages', (
-    tester,
-  ) async {
+  testWidgets('messages list shows separator between messages', (tester) async {
     SharedPreferences.setMockInitialValues({'isAdmin': false});
     final prefs = await SharedPreferences.getInstance();
     final repo = MockGuestbookRepository();

@@ -5,8 +5,8 @@ class GuestbookRepository {
   final FirebaseFirestore _firestore;
 
   GuestbookRepository([FirebaseFirestore? firestore])
-      : _firestore =
-            firestore ?? FirebaseFirestore.instance; // coverage:ignore-line
+    : _firestore =
+          firestore ?? FirebaseFirestore.instance; // coverage:ignore-line
 
   Stream<List<GuestbookMessage>> watchMessages() {
     return _firestore

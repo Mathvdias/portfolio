@@ -39,8 +39,9 @@ void main() {
     expect(tapped, isTrue);
   });
 
-  testWidgets('DesktopIcon changes appearance on hover enter and exit',
-      (tester) async {
+  testWidgets('DesktopIcon changes appearance on hover enter and exit', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(

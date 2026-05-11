@@ -40,34 +40,38 @@ void main() {
       expect(find.text('Unit Tests'), findsOneWidget);
     });
 
-    testWidgets('ProjectStatsWindowContent renders yellow for 60-79% coverage',
-        (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          localizationsDelegates: [AppLocalizationsDelegate()],
-          home: Scaffold(
-            body: ProjectStatsWindowContent(coverageOverride: 70.0),
+    testWidgets(
+      'ProjectStatsWindowContent renders yellow for 60-79% coverage',
+      (tester) async {
+        await tester.pumpWidget(
+          const MaterialApp(
+            localizationsDelegates: [AppLocalizationsDelegate()],
+            home: Scaffold(
+              body: ProjectStatsWindowContent(coverageOverride: 70.0),
+            ),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('70.0%'), findsOneWidget);
-    });
+        expect(find.text('70.0%'), findsOneWidget);
+      },
+    );
 
-    testWidgets('ProjectStatsWindowContent renders red for below 60% coverage',
-        (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          localizationsDelegates: [AppLocalizationsDelegate()],
-          home: Scaffold(
-            body: ProjectStatsWindowContent(coverageOverride: 50.0),
+    testWidgets(
+      'ProjectStatsWindowContent renders red for below 60% coverage',
+      (tester) async {
+        await tester.pumpWidget(
+          const MaterialApp(
+            localizationsDelegates: [AppLocalizationsDelegate()],
+            home: Scaffold(
+              body: ProjectStatsWindowContent(coverageOverride: 50.0),
+            ),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('50.0%'), findsOneWidget);
-    });
+        expect(find.text('50.0%'), findsOneWidget);
+      },
+    );
   });
 }

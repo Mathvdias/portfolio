@@ -137,9 +137,10 @@ class GuestbookViewModel extends ChangeNotifier {
             const Duration(seconds: 10),
             // coverage:ignore-start
             onTimeout:
-                () => throw TimeoutException(
-                  'Connection timed out. Check your internet or Firebase rules.',
-                ),
+                () =>
+                    throw TimeoutException(
+                      'Connection timed out. Check your internet or Firebase rules.',
+                    ),
             // coverage:ignore-end
           );
       _success = true;
