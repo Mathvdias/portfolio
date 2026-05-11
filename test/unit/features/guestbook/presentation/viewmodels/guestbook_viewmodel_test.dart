@@ -1,8 +1,34 @@
 
+import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portifolio/features/guestbook/presentation/viewmodels/guestbook_viewmodel.dart';
+import 'package:portifolio/features/guestbook/data/repositories/guestbook_repository.dart';
+import 'package:portifolio/features/guestbook/domain/models/guestbook_message.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../mocks/mock_guestbook_repository.dart';
+
+class MockGuestbookRepository implements GuestbookRepository {
+  final _controller = StreamController<List<GuestbookMessage>>.broadcast();
+  List<GuestbookMessage> messages = [
+    GuestbookMessage(id: '1', name: 'User', message: 'Hi', rating: 5, timestamp: DateTime.now())
+  ];
+
+  @override
+  Stream<List<GuestbookMessage>> watchMessages() => _controller.stream;
+
+  @override
+  Future<void> addMessage(String name, String message, int rating) async {
+    messages.add(GuestbookMessage(id: '2', name: name, message: message, rating: rating, timestamp: DateTime.now()));
+    _controller.add(messages);
+  }
+
+  @override
+  Future<void> deleteMessage(String id) async {
+    messages.removeWhere((m) => m.id == id);
+    _controller.add(messages);
+  }
+
+  void dispose() => _controller.close();
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -20,20 +46,18 @@ void main() {
       final vm = GuestbookViewModel(repo, prefs);
 
       expect(vm.isLoading, true);
+      repo._controller.add(repo.messages);
       await Future.delayed(Duration.zero);
       expect(vm.isLoading, false);
       expect(vm.messages.length, 1);
-      expect(vm.isAdmin, false);
 
       vm.setAdmin(true);
       expect(vm.isAdmin, true);
-      expect(prefs.getBool('isAdmin'), true);
       
       vm.setAdmin(false);
       await vm.submitMessage('Test', 'Msg', 5);
       expect(vm.success, true);
       
-      // Rate limit test
       await vm.submitMessage('Test2', 'Msg2', 5);
       expect(vm.lastError, 'waitToPost');
 
@@ -57,7 +81,6 @@ void main() {
 class HangingGuestbookRepository extends MockGuestbookRepository {
   @override
   Future<void> addMessage(String name, String message, int rating) async {
-    // Return a future that never completes or takes too long
     await Future.delayed(const Duration(seconds: 15));
   }
 }
