@@ -10,6 +10,25 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [2.1.0] — 2026-05-11
+
+### Added
+- **Robust CI/CD Pipeline**: GitHub Actions workflow for automated Lint, Test, Build, and Deploy.
+- **Automated Stats**: `generate_stats.dart` script to dynamically update project metrics on every build.
+- **Dependabot**: Automated dependency management for pub packages and GitHub Actions.
+- **Noto Sans Bundling**: Bundled Noto Sans font to resolve missing character warnings in web renders.
+- **Documentation**: Comprehensive README.md with architecture overview and screenshots.
+
+### Fixed
+- Fixed several lint issues (unnecessary underscores, avoid_print).
+- Resolved viewport meta tag warning in `index.html` for better Flutter Web compatibility.
+
+### Changed
+- Refactored `generate_stats.dart` for better visibility in CI environments.
+- Updated GitHub Actions to use latest versions (v6/v7/v8).
+
+---
+
 ## [2.0.0] — 2026-05-10
 
 ### Architecture
