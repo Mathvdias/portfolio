@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../theme/app_theme.dart';
+import '../constants/app_strings.dart';
+import '../constants/app_sizes.dart';
 import 'package:pixel_art/pixel_art.dart';
 
 class Dock extends StatelessWidget {
@@ -10,50 +12,53 @@ class Dock extends StatelessWidget {
   static const _items = [
     _DockItemData(
       pixels: kGithubPixels,
-      label: 'GitHub',
+      label: AppStrings.dockGitHub,
       color: AppTheme.subtext,
-      url: 'https://github.com/Mathvdias',
+      url: AppStrings.urlGitHub,
     ),
     _DockItemData(
       pixels: kMediumPixels,
-      label: 'Medium',
+      label: AppStrings.dockMedium,
       color: AppTheme.yellow,
-      url: 'https://medium.com/@matheusvdias',
+      url: AppStrings.urlMedium,
     ),
     _DockItemData(
       pixels: kDartPixels,
-      label: 'pub.dev',
+      label: AppStrings.dockPubDev,
       color: AppTheme.teal,
-      url: 'https://pub.dev/packages/intercepted_http',
+      url: AppStrings.urlPubDev,
     ),
     _DockItemData(
       pixels: kLinkedInPixels,
-      label: 'LinkedIn',
+      label: AppStrings.dockLinkedIn,
       color: AppTheme.blue,
-      url: 'https://www.linkedin.com/in/matheusvdias/',
+      url: AppStrings.urlLinkedIn,
     ),
     _DockItemData(
       pixels: kMailPixels,
-      label: 'Email',
+      label: AppStrings.dockEmail,
       color: AppTheme.peach,
-      url: 'mailto:mattmvc56@gmail.com',
+      url: AppStrings.emailAddress,
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSizes.dockPaddingH,
+        vertical: AppSizes.dockPaddingV,
+      ),
       decoration: BoxDecoration(
         color: AppTheme.surface.withValues(alpha: 0.90),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppSizes.radiusDock),
         border: Border.all(color: AppTheme.surface0, width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           for (int i = 0; i < _items.length; i++) ...[
-            if (i > 0) const SizedBox(width: 20),
+            if (i > 0) const SizedBox(width: AppSizes.dockItemSpacing),
             _DockItem(data: _items[i]),
           ],
         ],
@@ -102,14 +107,14 @@ class _DockItemState extends State<_DockItem> {
       child: GestureDetector(
         onTap: _launch,
         child: AnimatedScale(
-          scale: _hovered ? 1.2 : 1.0,
+          scale: _hovered ? AppSizes.dockHoverScale : 1.0,
           duration: const Duration(milliseconds: 150),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               SizedBox(
-                width: 40,
-                height: 40,
+                width: AppSizes.dockIconSize,
+                height: AppSizes.dockIconSize,
                 child: CustomPaint(
                   painter: PixelIconPainter(
                     pixels: widget.data.pixels,
@@ -117,11 +122,11 @@ class _DockItemState extends State<_DockItem> {
                   ),
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSizes.spacingXs),
               Text(
                 widget.data.label,
                 style: GoogleFonts.pressStart2p(
-                  fontSize: 6,
+                  fontSize: AppSizes.fontXxs,
                   color: AppTheme.subtext,
                 ),
               ),

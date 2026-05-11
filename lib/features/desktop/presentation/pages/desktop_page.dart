@@ -1,29 +1,31 @@
 import 'package:app_window/app_window.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/services.dart';
 import 'package:pixel_art/pixel_art.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/di/app_dependencies.dart';
 import '../../../../features/desktop/presentation/viewmodels/desktop_viewmodel.dart';
 import '../../../../features/visitors/presentation/viewmodels/visitor_viewmodel.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../../shared/models/experience.dart';
+import '../../../../shared/constants/app_strings.dart';
+import '../../../../shared/constants/app_sizes.dart';
+import '../../../../shared/mappers/experience_mapper.dart';
 import '../../../../shared/widgets/about_window_content.dart';
-import '../../../../shared/widgets/licenses_window_content.dart';
 import '../../../../shared/widgets/calculator_content.dart';
 import '../../../../shared/widgets/contact_form_content.dart';
-import '../../../../shared/widgets/desktop_icon.dart';
+import '../../../../shared/widgets/desktop_context_menu.dart';
+import '../../../../shared/widgets/desktop_icons_grid.dart';
 import '../../../../shared/widgets/dock.dart';
-import '../../../../shared/widgets/experience_window_content.dart';
 import '../../../../shared/widgets/finder_content.dart';
+import '../../../../shared/widgets/licenses_window_content.dart';
 import '../../../../shared/widgets/mac_menu_bar.dart';
+import '../../../../shared/widgets/mobile_fallback_page.dart';
 import '../../../../shared/widgets/notification_center.dart';
 import '../../../../shared/widgets/pixel_wallpaper.dart';
-import '../../../../shared/widgets/project_window_content.dart';
 import '../../../../shared/widgets/responsive_layout.dart';
+import '../../../../shared/widgets/rubber_band_selection.dart';
 import '../../../../shared/widgets/skills_window_content.dart';
-import '../../../../shared/widgets/snake_game_content.dart';
+import '../../../../shared/widgets/spotlight_overlay.dart';
 import '../../../../shared/widgets/sticky_note.dart';
 import '../../../../shared/widgets/terminal_content.dart';
 import '../../../../theme/app_theme.dart';
@@ -63,372 +65,324 @@ class _DesktopPageState extends State<DesktopPage> {
     super.dispose();
   }
 
-  List<Experience> _buildExperiences(AppLocalizations l10n) {
-    return l10n.experiences.map((e) {
-      return Experience(
-        company: e['company'] as String? ?? '',
-        role: e['role'] as String? ?? '',
-        period: e['period'] as String? ?? '',
-        description: e['description'] as String? ?? '',
-        technologies:
-            (e['technologies'] as List<dynamic>?)?.cast<String>() ?? [],
-      );
-    }).toList();
-  }
-
-  Color _colorForCompany(String company) {
-    if (company.contains('Zallpy')) return AppTheme.teal;
-    if (company.contains('Banco') ||
-        company.contains('PAN') ||
-        company.contains('Pan')) {
-      return AppTheme.blue;
-    }
-    if (company.contains('Conecthus')) return AppTheme.green;
-    return AppTheme.peach;
-  }
-
-  List<List<int>> _pixelsForCompany(String company) {
-    if (company.contains('Zallpy')) return kZallpyPixels;
-    if (company.contains('Banco') ||
-        company.contains('PAN') ||
-        company.contains('Pan')) {
-      return kBankPixels;
-    }
-    if (company.contains('Conecthus')) return kConecthusPixels;
-    if (company.contains('Oi')) return kOiPixels;
-    return kTerminalPixels;
-  }
-
-  String _shortNameFor(String company) {
-    if (company.contains('Zallpy')) return 'Zallpy';
-    if (company.contains('PAN') ||
-        company.contains('Pan') ||
-        company.contains('Banco')) {
-      return 'Banco Pan';
-    }
-    if (company.contains('Conecthus')) return 'Conecthus';
-    return company.split(' ').first;
-  }
-
-  Widget _buildIconsArea(AppLocalizations l10n, List<Experience> experiences) {
-    final icons = <Widget>[
-      DesktopIcon(
+  // ── Spotlight items ──────────────────────────────────────────────
+  List<SpotlightItem> _buildSpotlightItems(AppLocalizations l10n) {
+    return [
+      SpotlightItem(
+        id: AppStrings.winAbout,
         label: l10n.about,
         pixels: kPersonPixels,
         color: AppTheme.blue,
-        onTap: () => _desktopVM.openWindow(
-          'about',
+      ),
+      SpotlightItem(
+        id: AppStrings.winFinder,
+        label: AppStrings.titleFinder,
+        pixels: kFinderPixels,
+        color: AppTheme.red,
+      ),
+      SpotlightItem(
+        id: AppStrings.winSkills,
+        label: AppStrings.titleSkills,
+        pixels: kSkillsPixels,
+        color: AppTheme.blue,
+      ),
+      SpotlightItem(
+        id: AppStrings.winTerminal,
+        label: AppStrings.titleTerminal,
+        pixels: kTerminalPixels,
+        color: AppTheme.green,
+      ),
+      SpotlightItem(
+        id: AppStrings.winCalculator,
+        label: AppStrings.titleCalculator,
+        pixels: kCalculatorPixels,
+        color: AppTheme.peach,
+      ),
+      SpotlightItem(
+        id: AppStrings.winSnake,
+        label: AppStrings.titleSnake,
+        pixels: kSnakePixels,
+        color: AppTheme.peach,
+      ),
+      SpotlightItem(
+        id: AppStrings.winContact,
+        label: AppStrings.titleContact,
+        pixels: kMailPixels,
+        color: AppTheme.teal,
+      ),
+    ];
+  }
+
+  void _onSpotlightSelect(SpotlightItem item, AppLocalizations l10n) {
+    _desktopVM.closeSpotlight();
+    _openWindowForId(item.id, l10n);
+  }
+
+  void _openWindowForId(String id, AppLocalizations l10n) {
+    switch (id) {
+      case AppStrings.winAbout:
+        _desktopVM.openWindow(
+          id, l10n.about,
+          AboutWindowContent(bio: l10n.bio, role: l10n.role),
+          AppTheme.blue,
+        );
+      case AppStrings.winFinder:
+        _desktopVM.openWindow(
+          id, AppStrings.titleFinder, const FinderContent(), AppTheme.red,
+        );
+      case AppStrings.winSkills:
+        _desktopVM.openWindow(
+          id, AppStrings.titleSkills, const SkillsWindowContent(), AppTheme.blue,
+        );
+      case AppStrings.winTerminal:
+        _desktopVM.openWindow(
+          id, AppStrings.titleTerminal, const TerminalContent(), AppTheme.green,
+        );
+      case AppStrings.winCalculator:
+        _desktopVM.openWindow(
+          id, AppStrings.titleCalculator, const CalculatorContent(), AppTheme.peach,
+        );
+      case AppStrings.winSnake:
+        _desktopVM.openWindow(
+          id, AppStrings.titleSnake,
+          const TerminalContent(), // snake not through spotlight — fallback
+          AppTheme.peach,
+        );
+      case AppStrings.winContact:
+        _desktopVM.openWindow(
+          id, AppStrings.titleContact, const ContactFormContent(), AppTheme.teal,
+        );
+    }
+  }
+
+  // ── Context menu handler ─────────────────────────────────────────
+  void _onContextAction(DesktopContextAction action, AppLocalizations l10n) {
+    _desktopVM.closeContextMenu();
+    switch (action) {
+      case DesktopContextAction.newNote:
+        // no-op for now — could add dynamic sticky notes
+        break;
+      case DesktopContextAction.openTerminal:
+        _desktopVM.openWindow(
+          AppStrings.winTerminal,
+          AppStrings.titleTerminal,
+          const TerminalContent(),
+          AppTheme.green,
+        );
+      case DesktopContextAction.about:
+        _desktopVM.openWindow(
+          AppStrings.winAbout,
           l10n.about,
           AboutWindowContent(bio: l10n.bio, role: l10n.role),
           AppTheme.blue,
-        ),
-      ),
-      DesktopIcon(
-        label: 'Finder',
-        pixels: kFinderPixels,
-        color: AppTheme.red,
-        onTap: () => _desktopVM.openWindow(
-          'finder',
-          'Finder',
-          const FinderContent(),
-          AppTheme.red,
-        ),
-      ),
-      ...experiences.asMap().entries.map((entry) {
-        final i = entry.key;
-        final exp = entry.value;
-        final color = _colorForCompany(exp.company);
-        final pixels = _pixelsForCompany(exp.company);
-        final shortName = _shortNameFor(exp.company);
-        return DesktopIcon(
-          label: shortName,
-          pixels: pixels,
-          color: color,
-          onTap: () => _desktopVM.openWindow(
-            'exp_$i',
-            shortName,
-            ExperienceWindowContent(experience: exp, accentColor: color),
-            color,
-          ),
         );
-      }),
-      DesktopIcon(
-        label: 'Skills',
-        pixels: kSkillsPixels,
-        color: AppTheme.blue,
-        onTap: () => _desktopVM.openWindow(
-          'skills',
-          'Skills',
-          const SkillsWindowContent(),
-          AppTheme.blue,
-        ),
-      ),
-      DesktopIcon(
-        label: 'Android',
-        pixels: kAndroidPixels,
-        color: AppTheme.green,
-        onTap: () => _desktopVM.openWindow(
-          'android',
-          'Android Dev',
-          const SkillsWindowContent(),
-          AppTheme.green,
-        ),
-      ),
-      DesktopIcon(
-        label: 'Terminal',
-        pixels: kTerminalPixels,
-        color: AppTheme.green,
-        onTap: () => _desktopVM.openWindow(
-          'terminal',
-          'Terminal',
-          const TerminalContent(),
-          AppTheme.green,
-        ),
-      ),
-      DesktopIcon(
-        label: 'Calculator',
-        pixels: kCalculatorPixels,
-        color: AppTheme.peach,
-        onTap: () => _desktopVM.openWindow(
-          'calculator',
-          'Calculator',
-          const CalculatorContent(),
-          AppTheme.peach,
-        ),
-      ),
-      DesktopIcon(
-        label: 'Snake',
-        pixels: kSnakePixels,
-        color: AppTheme.peach,
-        onTap: () => _desktopVM.openWindow(
-          'snake',
-          'Snake',
-          const SnakeGameContent(),
-          AppTheme.peach,
-        ),
-      ),
-      DesktopIcon(
-        label: 'Contact',
-        pixels: kMailPixels,
-        color: AppTheme.teal,
-        onTap: () => _desktopVM.openWindow(
-          'contact',
-          'Contact',
-          const ContactFormContent(),
-          AppTheme.teal,
-        ),
-      ),
-      DesktopIcon(
-        label: 'Whitepaper',
-        pixels: kMarianaPixels,
-        color: AppTheme.blue,
-        onTap: () async {
-          final uri = Uri.parse('https://matheusdias.gitbook.io/tesouro');
-          if (await canLaunchUrl(uri)) await launchUrl(uri);
-        },
-      ),
-      DesktopIcon(
-        label: 'Resume',
-        pixels: kLinkPixels,
-        color: AppTheme.red,
-        onTap: () async {
-          final uri = Uri.parse('/resume.pdf');
-          await launchUrl(uri, mode: LaunchMode.externalApplication);
-        },
-      ),
-      DesktopIcon(
-        label: 'intercepted\n_http',
-        pixels: kShieldPixels,
-        color: AppTheme.blue,
-        onTap: () => _desktopVM.openWindow(
-          'intercepted_http',
-          'intercepted_http',
-          const ProjectWindowContent(
-            name: 'intercepted_http',
-            description:
-                'A Flutter/Dart package that intercepts HTTP requests and responses, '
-                'allowing you to inspect, mock, and modify network traffic in your app. '
-                'Useful for debugging and testing.',
-            githubUrl: 'https://github.com/Mathvdias/intercepted_http',
-            pubDevUrl: 'https://pub.dev/packages/intercepted_http',
-            version: '0.2.1',
-            technologies: ['Flutter', 'Dart', 'HTTP', 'Testing'],
-            accentColor: AppTheme.teal,
-          ),
-          AppTheme.teal,
-        ),
-      ),
-    ];
-
-    return Container(
-      alignment: Alignment.topRight,
-      padding: const EdgeInsets.only(top: 8, right: 8, bottom: 8, left: 8),
-      child: Wrap(
-        direction: Axis.vertical,
-        alignment: WrapAlignment.start,
-        runAlignment: WrapAlignment.end,
-        verticalDirection: VerticalDirection.down,
-        textDirection: TextDirection.rtl,
-        spacing: 6.0,
-        runSpacing: 6.0,
-        children: icons,
-      ),
-    );
+      case DesktopContextAction.spotlight:
+        _desktopVM.openSpotlight();
+    }
   }
 
-  Widget _buildMobileView() {
-    return Scaffold(
-      backgroundColor: AppTheme.background,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'MATHEUS DIAS',
-              style: GoogleFonts.pressStart2p(
-                fontSize: 14,
-                color: AppTheme.blue,
-                height: 1.8,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Portfolio\ndesigned\nfor desktop',
-              style: GoogleFonts.pressStart2p(
-                fontSize: 8,
-                color: AppTheme.subtext,
-                height: 1.8,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-            TextButton(
-              onPressed: () async {
-                final uri = Uri.parse('https://github.com/Mathvdias');
-                if (await canLaunchUrl(uri)) await launchUrl(uri);
-              },
-              child: Text(
-                'github.com/Mathvdias',
-                style: GoogleFonts.spaceMono(fontSize: 13, color: AppTheme.teal),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  // ── Keyboard shortcut handler ────────────────────────────────────
+  KeyEventResult _onKey(FocusNode _, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+    final meta = HardwareKeyboard.instance.isMetaPressed;
+
+    // Cmd+Space → Spotlight
+    if (meta && event.logicalKey == LogicalKeyboardKey.space) {
+      _desktopVM.showSpotlight
+          ? _desktopVM.closeSpotlight()
+          : _desktopVM.openSpotlight();
+      return KeyEventResult.handled;
+    }
+    // Cmd+W → close focused (top) window
+    if (meta && event.logicalKey == LogicalKeyboardKey.keyW) {
+      if (_desktopVM.windows.isNotEmpty) {
+        _desktopVM.closeWindow(_desktopVM.windows.last.id);
+      }
+      return KeyEventResult.handled;
+    }
+    // Escape → dismiss spotlight / context menu / notifications
+    if (event.logicalKey == LogicalKeyboardKey.escape) {
+      if (_desktopVM.showSpotlight) {
+        _desktopVM.closeSpotlight();
+        return KeyEventResult.handled;
+      }
+      if (_desktopVM.showContextMenu) {
+        _desktopVM.closeContextMenu();
+        return KeyEventResult.handled;
+      }
+      if (_desktopVM.showNotifications) {
+        _desktopVM.toggleNotifications();
+        return KeyEventResult.handled;
+      }
+    }
+    return KeyEventResult.ignored;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (ResponsiveLayout.isMobile(context)) return _buildMobileView();
+    if (ResponsiveLayout.isMobile(context)) return const MobileFallbackPage();
 
     final l10n = AppLocalizations.of(context);
     final localeVM = AppDependencies.of(context).localeViewModel;
-    final experiences = _buildExperiences(l10n);
+    final experiences = ExperienceMapper.fromL10n(l10n.experiences);
 
-    return ListenableBuilder(
-      listenable: _desktopVM,
-      builder: (context, _) {
-        return Scaffold(
-          backgroundColor: AppTheme.background,
-          body: Stack(
-            children: [
-              const Positioned.fill(child: PixelWallpaper()),
+    return Focus(
+      autofocus: true,
+      onKeyEvent: _onKey,
+      child: ListenableBuilder(
+        listenable: _desktopVM,
+        builder: (context, _) {
+          return Scaffold(
+            backgroundColor: AppTheme.background,
+            body: GestureDetector(
+              // Right-click on desktop background
+              onSecondaryTapUp: (details) {
+                _desktopVM.openContextMenu(details.localPosition);
+              },
+              // Rubber-band selection
+              onPanStart: (details) {
+                _desktopVM.closeContextMenu();
+                _desktopVM.startSelection(details.localPosition);
+              },
+              onPanUpdate: (details) {
+                _desktopVM.updateSelection(details.localPosition);
+              },
+              onPanEnd: (_) => _desktopVM.endSelection(),
+              child: Stack(
+                children: [
+                  // ── Wallpaper (already has RepaintBoundary) ──
+                  const Positioned.fill(child: PixelWallpaper()),
 
-              StickyNote(
-                initialPosition: const Offset(40, 100),
-                text: l10n.stickyNoteTodo,
-                color: const Color(0xFFFDE68A),
+                  // ── Sticky notes ────────────────────────────
+                  StickyNote(
+                    initialPosition: const Offset(40, 100),
+                    text: l10n.stickyNoteTodo,
+                    color: const Color(0xFFFDE68A),
+                  ),
+
+                  ListenableBuilder(
+                    listenable: _visitorVM,
+                    builder: (context, _) => VisitorStickyNote(
+                      initialPosition: const Offset(40, 260),
+                      color: const Color(0xFFBAE6FD),
+                      visitorCount: _visitorVM.count,
+                    ),
+                  ),
+
+                  // ── Desktop icons ───────────────────────────
+                  Positioned.fill(
+                    top: AppSizes.menuBarOffset,
+                    bottom: AppSizes.desktopBottom,
+                    child: DesktopIconsGrid(
+                      experiences: experiences,
+                      onOpenWindow: _desktopVM.openWindow,
+                    ),
+                  ),
+
+                  // ── App windows (each wrapped in RepaintBoundary) ──
+                  ..._desktopVM.windows.map(
+                    (w) => RepaintBoundary(
+                      child: AppWindow(
+                        key: ValueKey(w.id),
+                        title: w.title,
+                        initialPosition: w.position,
+                        accentColor: w.accentColor,
+                        titleBarColor: AppTheme.surface,
+                        contentColor: AppTheme.background,
+                        borderColor: AppTheme.surface0,
+                        closeColor: AppTheme.red,
+                        minimizeColor: AppTheme.yellow,
+                        maximizeColor: AppTheme.green,
+                        onClose: () => _desktopVM.closeWindow(w.id),
+                        onFocus: () => _desktopVM.focusWindow(w.id),
+                        child: w.content,
+                      ),
+                    ),
+                  ),
+
+                  // ── Notification centre (RepaintBoundary) ───
+                  if (_desktopVM.showNotifications)
+                    const Positioned(
+                      top: AppSizes.menuBarOffset,
+                      right: 0,
+                      bottom: 0,
+                      child: RepaintBoundary(child: NotificationCenter()),
+                    ),
+
+                  // ── Menu bar (RepaintBoundary) ──────────────
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: RepaintBoundary(
+                      child: MacMenuBar(
+                        currentLanguage: localeVM.currentCode,
+                        onLanguageChanged: localeVM.setLocaleByCode,
+                        onToggleNotifications: _desktopVM.toggleNotifications,
+                        onAppMenuAction: (action) async {
+                          switch (action) {
+                            case AppMenuAction.about:
+                              _desktopVM.openWindow(
+                                AppStrings.winAbout,
+                                l10n.about,
+                                AboutWindowContent(bio: l10n.bio, role: l10n.role),
+                                AppTheme.blue,
+                              );
+                            case AppMenuAction.licenses:
+                              _desktopVM.openWindow(
+                                AppStrings.winLicenses,
+                                AppStrings.titleLicenses,
+                                const LicensesWindowContent(),
+                                AppTheme.teal,
+                              );
+                            case AppMenuAction.github:
+                              // handled by mac_menu_bar
+                              break;
+                            case AppMenuAction.linkedin:
+                              // handled by mac_menu_bar
+                              break;
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+
+                  // ── Dock (RepaintBoundary) ──────────────────
+                  const Positioned(
+                    bottom: AppSizes.dockBottomOffset,
+                    left: 0,
+                    right: 0,
+                    child: Center(child: RepaintBoundary(child: Dock())),
+                  ),
+
+                  // ── Rubber-band selection ───────────────────
+                  if (_desktopVM.isSelecting)
+                    RubberBandSelection(
+                      origin: _desktopVM.rubberBandOrigin!,
+                      current: _desktopVM.rubberBandCurrent!,
+                    ),
+
+                  // ── Context menu ────────────────────────────
+                  if (_desktopVM.showContextMenu)
+                    DesktopContextMenu(
+                      position: _desktopVM.contextMenuPosition!,
+                      onAction: (action) => _onContextAction(action, l10n),
+                      onDismiss: _desktopVM.closeContextMenu,
+                    ),
+
+                  // ── Spotlight overlay ───────────────────────
+                  if (_desktopVM.showSpotlight)
+                    SpotlightOverlay(
+                      items: _buildSpotlightItems(l10n),
+                      onSelect: (item) => _onSpotlightSelect(item, l10n),
+                      onDismiss: _desktopVM.closeSpotlight,
+                    ),
+                ],
               ),
-
-              ListenableBuilder(
-                listenable: _visitorVM,
-                builder: (context, _) => VisitorStickyNote(
-                  initialPosition: const Offset(40, 260),
-                  color: const Color(0xFFBAE6FD),
-                  visitorCount: _visitorVM.count,
-                ),
-              ),
-
-              Positioned.fill(
-                top: 28,
-                bottom: 80,
-                child: _buildIconsArea(l10n, experiences),
-              ),
-
-              ..._desktopVM.windows.map(
-                (w) => AppWindow(
-                  key: ValueKey(w.id),
-                  title: w.title,
-                  initialPosition: w.position,
-                  accentColor: w.accentColor,
-                  titleBarColor: AppTheme.surface,
-                  contentColor: AppTheme.background,
-                  borderColor: AppTheme.surface0,
-                  closeColor: AppTheme.red,
-                  minimizeColor: AppTheme.yellow,
-                  maximizeColor: AppTheme.green,
-                  onClose: () => _desktopVM.closeWindow(w.id),
-                  onFocus: () => _desktopVM.focusWindow(w.id),
-                  child: w.content,
-                ),
-              ),
-
-              if (_desktopVM.showNotifications)
-                const Positioned(
-                  top: 28,
-                  right: 0,
-                  bottom: 0,
-                  child: NotificationCenter(),
-                ),
-
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: MacMenuBar(
-                  currentLanguage: localeVM.currentCode,
-                  onLanguageChanged: localeVM.setLocaleByCode,
-                  onToggleNotifications: _desktopVM.toggleNotifications,
-                  onAppMenuAction: (action) async {
-                    switch (action) {
-                      case AppMenuAction.about:
-                        _desktopVM.openWindow(
-                          'about',
-                          l10n.about,
-                          AboutWindowContent(bio: l10n.bio, role: l10n.role),
-                          AppTheme.blue,
-                        );
-                      case AppMenuAction.licenses:
-                        _desktopVM.openWindow(
-                          'licenses',
-                          'Open Source Licenses',
-                          const LicensesWindowContent(),
-                          AppTheme.teal,
-                        );
-                      case AppMenuAction.github:
-                        final uri = Uri.parse('https://github.com/Mathvdias');
-                        if (await canLaunchUrl(uri)) await launchUrl(uri);
-                      case AppMenuAction.linkedin:
-                        final uri = Uri.parse(
-                          'https://linkedin.com/in/matheusvdias',
-                        );
-                        if (await canLaunchUrl(uri)) await launchUrl(uri);
-                    }
-                  },
-                ),
-              ),
-
-              const Positioned(
-                bottom: 10,
-                left: 0,
-                right: 0,
-                child: Center(child: Dock()),
-              ),
-            ],
-          ),
-        );
-      },
+            ),
+          );
+        },
+      ),
     );
   }
 }
