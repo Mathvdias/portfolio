@@ -78,14 +78,16 @@ class _GuestbookContentState extends State<GuestbookContent> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      AppTheme.blue.withOpacity(0.2),
-                      AppTheme.blue.withOpacity(0.05),
+                      AppTheme.blue.withValues(alpha: 0.2),
+                      AppTheme.blue.withValues(alpha: 0.05),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   border: Border(
-                    bottom: BorderSide(color: AppTheme.blue.withOpacity(0.2)),
+                    bottom: BorderSide(
+                      color: AppTheme.blue.withValues(alpha: 0.2),
+                    ),
                   ),
                 ),
                 child: Column(

@@ -1,3 +1,4 @@
+import 'dart:developer' as dev;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -26,7 +27,7 @@ void main() async {
     );
     prefs = await SharedPreferences.getInstance();
   } catch (e) {
-    debugPrint('Firebase init error: $e');
+    dev.log('Firebase init error: $e', name: 'Main', level: 1000);
     prefs = await SharedPreferences.getInstance();
   }
 

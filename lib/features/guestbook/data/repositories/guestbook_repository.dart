@@ -16,7 +16,9 @@ class GuestbookRepository {
         .map(
           (snapshot) =>
               snapshot.docs
-                  .map((doc) => GuestbookMessage.fromFirestore(doc))
+                  .map(
+                    (doc) => GuestbookMessage.fromFirestore(doc.id, doc.data()),
+                  )
                   .toList(),
         );
   }

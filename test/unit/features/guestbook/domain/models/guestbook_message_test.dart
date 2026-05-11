@@ -1,26 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portifolio/features/guestbook/domain/models/guestbook_message.dart';
-import 'package:mocktail/mocktail.dart';
-
-class MockDocumentSnapshot extends Mock implements DocumentSnapshot {}
 
 void main() {
   group('GuestbookMessage', () {
     test('fromFirestore creates correct object', () {
-      final mockDoc = MockDocumentSnapshot();
       final now = DateTime.now();
       final timestamp = Timestamp.fromDate(now);
-
-      when(() => mockDoc.id).thenReturn('123');
-      when(() => mockDoc.data()).thenReturn({
+      final id = '123';
+      final data = {
         'name': 'John',
         'message': 'Hello',
         'rating': 4,
         'timestamp': timestamp,
-      });
+      };
 
-      final msg = GuestbookMessage.fromFirestore(mockDoc);
+      final msg = GuestbookMessage.fromFirestore(id, data);
 
       expect(msg.id, '123');
       expect(msg.name, 'John');
@@ -30,13 +25,12 @@ void main() {
     });
 
     test('fromFirestore handles null values', () {
-      final mockDoc = MockDocumentSnapshot();
+      final id = '123';
+      final Map<String, dynamic>? data = null;
 
-      when(() => mockDoc.id).thenReturn('123');
-      when(() => mockDoc.data()).thenReturn(null);
+      final msg = GuestbookMessage.fromFirestore(id, data);
 
-      final msg = GuestbookMessage.fromFirestore(mockDoc);
-
+      expect(msg.id, '123');
       expect(msg.name, 'Anonymous');
       expect(msg.message, '');
       expect(msg.rating, 5);

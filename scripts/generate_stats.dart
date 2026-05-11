@@ -1,10 +1,13 @@
 import 'dart:io';
+import 'dart:developer' as dev;
 
 void main() {
   final lcovFile = File('coverage/lcov.info');
   if (!lcovFile.existsSync()) {
-    print(
+    dev.log(
       'Error: coverage/lcov.info not found. Run flutter test --coverage first.',
+      name: 'StatsGenerator',
+      level: 1000,
     );
     exit(1);
   }
@@ -38,5 +41,8 @@ class ProjectStats {
   outputFile.parent.createSync(recursive: true);
   outputFile.writeAsStringSync(content);
 
-  print('Project stats updated: ${coverage.toStringAsFixed(2)}% coverage');
+  dev.log(
+    'Project stats updated: ${coverage.toStringAsFixed(2)}% coverage',
+    name: 'StatsGenerator',
+  );
 }

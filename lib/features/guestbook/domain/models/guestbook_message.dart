@@ -15,10 +15,12 @@ class GuestbookMessage {
     required this.timestamp,
   });
 
-  factory GuestbookMessage.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>?;
+  factory GuestbookMessage.fromFirestore(
+    String id,
+    Map<String, dynamic>? data,
+  ) {
     return GuestbookMessage(
-      id: doc.id,
+      id: id,
       name: data?['name'] ?? 'Anonymous',
       message: data?['message'] ?? '',
       rating: data?['rating'] ?? 5,
