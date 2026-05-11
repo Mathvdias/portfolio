@@ -158,6 +158,7 @@ class _GuestbookContentState extends State<GuestbookContent> {
                         ),
                         ...List.generate(5, (index) {
                           return IconButton(
+                            tooltip: l10n.semRateStar(index + 1),
                             icon: Icon(
                               index < _rating ? Icons.star : Icons.star_border,
                               color: AppTheme.yellow,
@@ -281,6 +282,7 @@ class _MessageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(AppSizes.spacingMd),
       decoration: BoxDecoration(
@@ -301,13 +303,18 @@ class _MessageCard extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              Row(
-                children: List.generate(
-                  5,
-                  (i) => Icon(
-                    i < msg.rating ? Icons.star : Icons.star_border,
-                    size: 14,
-                    color: AppTheme.yellow,
+              Semantics(
+                label: l10n.semStarsOutOf5(msg.rating),
+                child: Row(
+                  children: List.generate(
+                    5,
+                    (i) => ExcludeSemantics(
+                      child: Icon(
+                        i < msg.rating ? Icons.star : Icons.star_border,
+                        size: 14,
+                        color: AppTheme.yellow,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -315,10 +322,11 @@ class _MessageCard extends StatelessWidget {
                 const SizedBox(width: AppSizes.spacingMd),
                 GestureDetector(
                   onTap: onDelete,
-                  child: const Icon(
+                  child: Icon(
                     Icons.delete,
                     size: 16,
                     color: AppTheme.red,
+                    semanticLabel: l10n.semDeleteMessage,
                   ),
                 ),
               ],

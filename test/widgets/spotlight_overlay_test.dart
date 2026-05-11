@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:portifolio/l10n/app_localizations.dart';
 import 'package:portifolio/shared/widgets/spotlight_overlay.dart';
 import 'package:portifolio/shared/constants/app_strings.dart';
 import 'package:portifolio/theme/app_theme.dart';
+
+Widget buildSpotlight(SpotlightOverlay overlay) => MaterialApp(
+  localizationsDelegates: const [AppLocalizationsDelegate()],
+  home: Scaffold(body: Stack(children: [overlay])),
+);
 
 void main() {
   final items = [
@@ -31,18 +37,8 @@ void main() {
   group('SpotlightOverlay', () {
     testWidgets('renders search hint', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Stack(
-              children: [
-                SpotlightOverlay(
-                  items: items,
-                  onSelect: (_) {},
-                  onDismiss: () {},
-                ),
-              ],
-            ),
-          ),
+        buildSpotlight(
+          SpotlightOverlay(items: items, onSelect: (_) {}, onDismiss: () {}),
         ),
       );
       await tester.pump();
@@ -52,18 +48,8 @@ void main() {
 
     testWidgets('shows all items initially', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Stack(
-              children: [
-                SpotlightOverlay(
-                  items: items,
-                  onSelect: (_) {},
-                  onDismiss: () {},
-                ),
-              ],
-            ),
-          ),
+        buildSpotlight(
+          SpotlightOverlay(items: items, onSelect: (_) {}, onDismiss: () {}),
         ),
       );
       await tester.pump();
@@ -75,18 +61,8 @@ void main() {
 
     testWidgets('filters items by search text', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Stack(
-              children: [
-                SpotlightOverlay(
-                  items: items,
-                  onSelect: (_) {},
-                  onDismiss: () {},
-                ),
-              ],
-            ),
-          ),
+        buildSpotlight(
+          SpotlightOverlay(items: items, onSelect: (_) {}, onDismiss: () {}),
         ),
       );
       await tester.pump();
@@ -102,17 +78,11 @@ void main() {
     testWidgets('tapping an item calls onSelect', (tester) async {
       SpotlightItem? selected;
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Stack(
-              children: [
-                SpotlightOverlay(
-                  items: items,
-                  onSelect: (item) => selected = item,
-                  onDismiss: () {},
-                ),
-              ],
-            ),
+        buildSpotlight(
+          SpotlightOverlay(
+            items: items,
+            onSelect: (item) => selected = item,
+            onDismiss: () {},
           ),
         ),
       );
@@ -125,23 +95,16 @@ void main() {
     testWidgets('tapping background dismisses', (tester) async {
       bool dismissed = false;
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Stack(
-              children: [
-                SpotlightOverlay(
-                  items: items,
-                  onSelect: (_) {},
-                  onDismiss: () => dismissed = true,
-                ),
-              ],
-            ),
+        buildSpotlight(
+          SpotlightOverlay(
+            items: items,
+            onSelect: (_) {},
+            onDismiss: () => dismissed = true,
           ),
         ),
       );
       await tester.pump();
 
-      // Tap outside the spotlight card
       await tester.tapAt(const Offset(10, 10));
       expect(dismissed, isTrue);
     });
@@ -149,17 +112,11 @@ void main() {
     testWidgets('escape key calls onDismiss', (tester) async {
       bool dismissed = false;
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Stack(
-              children: [
-                SpotlightOverlay(
-                  items: items,
-                  onSelect: (_) {},
-                  onDismiss: () => dismissed = true,
-                ),
-              ],
-            ),
+        buildSpotlight(
+          SpotlightOverlay(
+            items: items,
+            onSelect: (_) {},
+            onDismiss: () => dismissed = true,
           ),
         ),
       );
@@ -174,17 +131,11 @@ void main() {
     testWidgets('enter key calls onSelect for current item', (tester) async {
       SpotlightItem? selected;
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Stack(
-              children: [
-                SpotlightOverlay(
-                  items: items,
-                  onSelect: (item) => selected = item,
-                  onDismiss: () {},
-                ),
-              ],
-            ),
+        buildSpotlight(
+          SpotlightOverlay(
+            items: items,
+            onSelect: (item) => selected = item,
+            onDismiss: () {},
           ),
         ),
       );
@@ -199,17 +150,11 @@ void main() {
     testWidgets('arrow down moves selection down', (tester) async {
       SpotlightItem? selected;
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Stack(
-              children: [
-                SpotlightOverlay(
-                  items: items,
-                  onSelect: (item) => selected = item,
-                  onDismiss: () {},
-                ),
-              ],
-            ),
+        buildSpotlight(
+          SpotlightOverlay(
+            items: items,
+            onSelect: (item) => selected = item,
+            onDismiss: () {},
           ),
         ),
       );
@@ -226,17 +171,11 @@ void main() {
     testWidgets('arrow up moves selection up', (tester) async {
       SpotlightItem? selected;
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Stack(
-              children: [
-                SpotlightOverlay(
-                  items: items,
-                  onSelect: (item) => selected = item,
-                  onDismiss: () {},
-                ),
-              ],
-            ),
+        buildSpotlight(
+          SpotlightOverlay(
+            items: items,
+            onSelect: (item) => selected = item,
+            onDismiss: () {},
           ),
         ),
       );

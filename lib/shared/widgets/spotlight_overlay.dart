@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../theme/app_theme.dart';
 import '../constants/app_strings.dart';
 import '../constants/app_sizes.dart';
@@ -130,10 +131,12 @@ class _SpotlightOverlayState extends State<SpotlightOverlay> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.search,
                             color: AppTheme.subtext,
                             size: 20,
+                            semanticLabel:
+                                AppLocalizations.of(context).semSearch,
                           ),
                           const SizedBox(width: AppSizes.spacingLg),
                           Expanded(

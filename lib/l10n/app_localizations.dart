@@ -67,6 +67,16 @@ class AppLocalizations {
       "timeNow": "Now",
       "time2hAgo": "2h ago",
       "time1dAgo": "1d ago",
+      "semNotifications": "Notifications",
+      "semWifi": "Wi-Fi connected",
+      "semNowPlaying": "Now playing",
+      "semAppMenu": "App menu",
+      "semSearch": "Search",
+      "semDeleteMessage": "Delete message",
+      "semBattery": "Battery %d%%",
+      "semRateStar": "Rate %d star",
+      "semRateStars": "Rate %d stars",
+      "semStarsOutOf5": "%d out of 5 stars",
       "experiences": [
         {
           "company": "Zallpy Digital / West Shore Solutions",
@@ -185,6 +195,16 @@ class AppLocalizations {
       "timeNow": "Ahora",
       "time2hAgo": "hace 2h",
       "time1dAgo": "hace 1d",
+      "semNotifications": "Notificaciones",
+      "semWifi": "Wi-Fi conectado",
+      "semNowPlaying": "Reproduciendo ahora",
+      "semAppMenu": "Menú de la app",
+      "semSearch": "Buscar",
+      "semDeleteMessage": "Eliminar mensaje",
+      "semBattery": "Batería %d%%",
+      "semRateStar": "Calificar con %d estrella",
+      "semRateStars": "Calificar con %d estrellas",
+      "semStarsOutOf5": "%d de 5 estrellas",
       "experiences": [
         {
           "company": "Zallpy Digital / West Shore Solutions",
@@ -303,6 +323,16 @@ class AppLocalizations {
       "timeNow": "Maintenant",
       "time2hAgo": "il y a 2h",
       "time1dAgo": "il y a 1j",
+      "semNotifications": "Notifications",
+      "semWifi": "Wi-Fi connecté",
+      "semNowPlaying": "En cours de lecture",
+      "semAppMenu": "Menu de l'app",
+      "semSearch": "Rechercher",
+      "semDeleteMessage": "Supprimer le message",
+      "semBattery": "Batterie %d%%",
+      "semRateStar": "Évaluer %d étoile",
+      "semRateStars": "Évaluer %d étoiles",
+      "semStarsOutOf5": "%d sur 5 étoiles",
       "experiences": [
         {
           "company": "Zallpy Digital / West Shore Solutions",
@@ -421,6 +451,16 @@ class AppLocalizations {
       "timeNow": "Adesso",
       "time2hAgo": "2h fa",
       "time1dAgo": "1g fa",
+      "semNotifications": "Notifiche",
+      "semWifi": "Wi-Fi connesso",
+      "semNowPlaying": "In riproduzione",
+      "semAppMenu": "Menu app",
+      "semSearch": "Cerca",
+      "semDeleteMessage": "Elimina messaggio",
+      "semBattery": "Batteria %d%%",
+      "semRateStar": "Valuta %d stella",
+      "semRateStars": "Valuta %d stelle",
+      "semStarsOutOf5": "%d su 5 stelle",
       "experiences": [
         {
           "company": "Zallpy Digital / West Shore Solutions",
@@ -540,6 +580,16 @@ class AppLocalizations {
       "timeNow": "Agora",
       "time2hAgo": "2h atrás",
       "time1dAgo": "1d atrás",
+      "semNotifications": "Notificações",
+      "semWifi": "Wi-Fi conectado",
+      "semNowPlaying": "Tocando agora",
+      "semAppMenu": "Menu do app",
+      "semSearch": "Pesquisar",
+      "semDeleteMessage": "Excluir mensagem",
+      "semBattery": "Bateria %d%%",
+      "semRateStar": "Avaliar com %d estrela",
+      "semRateStars": "Avaliar com %d estrelas",
+      "semStarsOutOf5": "%d de 5 estrelas",
       "experiences": [
         {
           "company": "Zallpy Digital / West Shore Solutions",
@@ -718,6 +768,39 @@ class AppLocalizations {
     if (list == null) return [];
     return list.map((e) => e as Map<String, dynamic>).toList();
   }
+
+  String get semNotifications =>
+      _localizedValues[locale.languageCode]?['semNotifications'] ??
+      'Notifications';
+  String get semWifi =>
+      _localizedValues[locale.languageCode]?['semWifi'] ?? 'Wi-Fi connected';
+  String get semNowPlaying =>
+      _localizedValues[locale.languageCode]?['semNowPlaying'] ?? 'Now playing';
+  String get semAppMenu =>
+      _localizedValues[locale.languageCode]?['semAppMenu'] ?? 'App menu';
+  String get semSearch =>
+      _localizedValues[locale.languageCode]?['semSearch'] ?? 'Search';
+  String get semDeleteMessage =>
+      _localizedValues[locale.languageCode]?['semDeleteMessage'] ??
+      'Delete message';
+
+  String semBattery(int percent) =>
+      (_localizedValues[locale.languageCode]?['semBattery'] ?? 'Battery %d%%')
+          .replaceFirst('%d', '$percent');
+
+  String semRateStar(int n) =>
+      n == 1
+          ? (_localizedValues[locale.languageCode]?['semRateStar'] ??
+                  'Rate %d star')
+              .replaceFirst('%d', '$n')
+          : (_localizedValues[locale.languageCode]?['semRateStars'] ??
+                  'Rate %d stars')
+              .replaceFirst('%d', '$n');
+
+  String semStarsOutOf5(int n) =>
+      (_localizedValues[locale.languageCode]?['semStarsOutOf5'] ??
+              '%d out of 5 stars')
+          .replaceFirst('%d', '$n');
 
   String getSection(String section) {
     switch (section) {

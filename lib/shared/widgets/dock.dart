@@ -154,6 +154,7 @@ class _DockItemState extends State<_DockItem> {
                       widget.data.icon,
                       color: widget.data.color,
                       size: AppSizes.dockIconSize * 0.8,
+                      semanticLabel: widget.data.label,
                     ),
                   ),
                   const SizedBox(height: AppSizes.spacingXs),

@@ -106,7 +106,9 @@ class _NotificationItem extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: AppSizes.font3xl, color: color),
+          ExcludeSemantics(
+            child: Icon(icon, size: AppSizes.font3xl, color: color),
+          ),
           const SizedBox(width: AppSizes.spacingLg),
           Expanded(
             child: Column(

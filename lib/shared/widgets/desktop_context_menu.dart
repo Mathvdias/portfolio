@@ -137,7 +137,9 @@ class _MenuItemState extends State<_MenuItem> {
                   : Colors.transparent,
           child: Row(
             children: [
-              Icon(widget.icon, size: 14, color: AppTheme.subtext),
+              ExcludeSemantics(
+                child: Icon(widget.icon, size: 14, color: AppTheme.subtext),
+              ),
               const SizedBox(width: AppSizes.spacingMd),
               Expanded(
                 child: Text(

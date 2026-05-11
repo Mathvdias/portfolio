@@ -19,10 +19,13 @@ class AndroidDevWindowContent extends StatelessWidget {
         children: [
           Row(
             children: [
-              const FaIcon(
-                FontAwesomeIcons.android,
-                color: AppTheme.green,
-                size: 48,
+              Semantics(
+                label: 'Android',
+                child: const FaIcon(
+                  FontAwesomeIcons.android,
+                  color: AppTheme.green,
+                  size: 48,
+                ),
               ),
               const SizedBox(width: AppSizes.spacingMd),
               Expanded(

@@ -124,10 +124,12 @@ class _SidebarItem extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(
-            icon,
-            size: AppSizes.font2xl,
-            color: selected ? AppTheme.blue : AppTheme.subtext,
+          ExcludeSemantics(
+            child: Icon(
+              icon,
+              size: AppSizes.font2xl,
+              color: selected ? AppTheme.blue : AppTheme.subtext,
+            ),
           ),
           const SizedBox(width: AppSizes.spacingMd),
           Text(

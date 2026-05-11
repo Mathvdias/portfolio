@@ -110,12 +110,13 @@ class _MacMenuBarState extends State<MacMenuBar> {
           if (widget.onToggleNotifications != null) ...[
             GestureDetector(
               onTap: widget.onToggleNotifications,
-              child: const MouseRegion(
+              child: MouseRegion(
                 cursor: SystemMouseCursors.click,
                 child: Icon(
                   Icons.menu_open,
                   size: AppSizes.font3xl,
                   color: AppTheme.text,
+                  semanticLabel: AppLocalizations.of(context).semNotifications,
                 ),
               ),
             ),
@@ -191,10 +192,11 @@ class _AppNameMenu extends StatelessWidget {
             SizedBox(
               width: AppSizes.spacingBase,
               height: AppSizes.spacingBase,
-              child: const Icon(
+              child: Icon(
                 Icons.description,
                 color: AppTheme.blue,
                 size: AppSizes.spacingBase,
+                semanticLabel: AppLocalizations.of(context).semAppMenu,
               ),
             ),
           ],
@@ -213,7 +215,9 @@ class _AppNameMenu extends StatelessWidget {
       height: 36,
       child: Row(
         children: [
-          Icon(icon, size: AppSizes.font2xl, color: AppTheme.subtext),
+          ExcludeSemantics(
+            child: Icon(icon, size: AppSizes.font2xl, color: AppTheme.subtext),
+          ),
           const SizedBox(width: AppSizes.spacingBase),
           Text(
             label,
@@ -239,7 +243,12 @@ class _MusicPlayerWidget extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Icon(Icons.music_note, size: 14, color: AppTheme.green),
+        Icon(
+          Icons.music_note,
+          size: 14,
+          color: AppTheme.green,
+          semanticLabel: l10n.semNowPlaying,
+        ),
         const SizedBox(width: 6),
         Text(
           l10n.musicPlaying,
@@ -320,7 +329,13 @@ class _WifiIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Icon(Icons.wifi, size: 16, color: AppTheme.text);
+    final l10n = AppLocalizations.of(context);
+    return Icon(
+      Icons.wifi,
+      size: 16,
+      color: AppTheme.text,
+      semanticLabel: l10n.semWifi,
+    );
   }
 }
 
@@ -330,10 +345,14 @@ class _BatteryIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 24,
-      height: 12,
-      child: CustomPaint(painter: _BatteryPainter(level: level)),
+    final l10n = AppLocalizations.of(context);
+    return Semantics(
+      label: l10n.semBattery((level * 100).round()),
+      child: SizedBox(
+        width: 24,
+        height: 12,
+        child: CustomPaint(painter: _BatteryPainter(level: level)),
+      ),
     );
   }
 }
