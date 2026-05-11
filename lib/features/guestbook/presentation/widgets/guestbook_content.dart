@@ -56,8 +56,6 @@ class _GuestbookContentState extends State<GuestbookContent> {
         SnackBar(content: Text(l10n.messagePosted), backgroundColor: AppTheme.green),
       );
     }
-    
-    widget.viewModel.resetStatus();
   }
 
   @override
@@ -138,14 +136,25 @@ class _GuestbookContentState extends State<GuestbookContent> {
               Expanded(
                 child: widget.viewModel.isLoading
                     ? const Center(child: CircularProgressIndicator())
-                    : widget.viewModel.messages.isEmpty
+                    : widget.viewModel.lastError != null && widget.viewModel.messages.isEmpty
                         ? Center(
-                            child: Text(
-                              l10n.noMessages,
-                              style: GoogleFonts.spaceMono(color: AppTheme.subtext),
+                            child: Padding(
+                              padding: const EdgeInsets.all(AppSizes.spacingLg),
+                              child: Text(
+                                widget.viewModel.lastError!,
+                                style: GoogleFonts.spaceMono(color: AppTheme.red),
+                                textAlign: TextAlign.center,
+                              ),
                             ),
                           )
-                        : ListView.separated(
+                        : widget.viewModel.messages.isEmpty
+                            ? Center(
+                                child: Text(
+                                  l10n.noMessages,
+                                  style: GoogleFonts.spaceMono(color: AppTheme.subtext),
+                                ),
+                              )
+                            : ListView.separated(
                             padding: const EdgeInsets.all(AppSizes.spacingLg),
                             itemCount: widget.viewModel.messages.length,
                             separatorBuilder: (_, __) => const SizedBox(height: AppSizes.spacingLg),

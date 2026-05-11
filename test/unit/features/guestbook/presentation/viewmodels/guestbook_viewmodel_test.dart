@@ -55,6 +55,12 @@ void main() {
     expect(vm.isAdmin, true);
     expect(prefs.getBool('isAdmin'), true);
     
+    // Test submitMessage
+    await vm.submitMessage('Test', 'Msg', 5);
+    expect(vm.success, true);
+    expect(vm.isSubmitting, false);
+    expect(repo.messages.any((m) => m.name == 'Test'), true);
+
     repo.dispose();
   });
 }

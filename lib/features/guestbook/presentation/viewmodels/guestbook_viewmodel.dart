@@ -46,32 +46,39 @@ class GuestbookViewModel extends ChangeNotifier {
   }
 
   void _subscribe() {
-    _subscription = _repository.watchMessages().listen((messages) {
-      // Find new messages to notify
-      if (!_isLoading) {
-        final newMsgs = messages.where(
-          (m) =>
-              m.timestamp.isAfter(_initTime) &&
-              !_messages.any((old) => old.id == m.id),
-        );
-
-        for (final msg in newMsgs) {
-          onNotification?.call(
-            DesktopNotification(
-              title: 'New Guestbook Message',
-              message: '${msg.name} left a ${msg.rating}-star review!',
-              icon: Icons.book,
-              color: AppTheme.blue,
-              time: DateTime.now(),
-            ),
+    _subscription = _repository.watchMessages().listen(
+      (messages) {
+        // Find new messages to notify
+        if (!_isLoading) {
+          final newMsgs = messages.where(
+            (m) =>
+                m.timestamp.isAfter(_initTime) &&
+                !_messages.any((old) => old.id == m.id),
           );
-        }
-      }
 
-      _messages = messages;
-      _isLoading = false;
-      notifyListeners();
-    });
+          for (final msg in newMsgs) {
+            onNotification?.call(
+              DesktopNotification(
+                title: 'New Guestbook Message',
+                message: '${msg.name} left a ${msg.rating}-star review!',
+                icon: Icons.book,
+                color: AppTheme.blue,
+                time: DateTime.now(),
+              ),
+            );
+          }
+        }
+
+        _messages = messages;
+        _isLoading = false;
+        notifyListeners();
+      },
+      onError: (e) {
+        _isLoading = false;
+        _lastError = 'Error loading messages: $e';
+        notifyListeners();
+      },
+    );
   }
 
   Future<void> submitMessage(String name, String message, int rating) async {
