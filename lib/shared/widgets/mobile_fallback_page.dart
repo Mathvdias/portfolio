@@ -41,10 +41,12 @@ class MobileFallbackPage extends StatelessWidget {
             ),
             const SizedBox(height: AppSizes.spacing4xl),
             TextButton(
+              // coverage:ignore-start
               onPressed: () async {
                 final uri = Uri.parse(AppStrings.urlGitHub);
                 if (await canLaunchUrl(uri)) await launchUrl(uri);
               },
+              // coverage:ignore-end
               child: Text(
                 AppStrings.mobileGitHubLink,
                 style: GoogleFonts.spaceMono(

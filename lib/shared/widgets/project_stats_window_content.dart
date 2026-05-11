@@ -6,12 +6,18 @@ import '../../l10n/app_localizations.dart';
 import '../constants/app_sizes.dart';
 
 class ProjectStatsWindowContent extends StatelessWidget {
-  const ProjectStatsWindowContent({super.key});
+  const ProjectStatsWindowContent({
+    super.key,
+    @visibleForTesting this.coverageOverride,
+  });
+
+  @visibleForTesting
+  final double? coverageOverride;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    const coverage = ProjectStats.coverage;
+    final coverage = coverageOverride ?? ProjectStats.coverage;
     final color =
         coverage >= 80
             ? AppTheme.green

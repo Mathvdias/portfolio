@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:portifolio/features/desktop/domain/models/desktop_notification.dart';
 import 'package:portifolio/features/desktop/presentation/viewmodels/desktop_viewmodel.dart';
+
+class MockBuildContext extends Fake implements BuildContext {}
 
 void main() {
   late DesktopViewModel vm;
@@ -90,6 +93,20 @@ void main() {
     });
   });
 
+  // ── Window by ID handler ──────────────────────────────────────
+  group('openWindowById', () {
+    test('calls onOpenWindowById when set', () {
+      String? receivedId;
+      vm.onOpenWindowById = (id, _) => receivedId = id;
+      vm.openWindowById('myWindow', MockBuildContext());
+      expect(receivedId, 'myWindow');
+    });
+
+    test('does nothing when onOpenWindowById is null', () {
+      expect(() => vm.openWindowById('x', MockBuildContext()), returnsNormally);
+    });
+  });
+
   // ── Notifications ──────────────────────────────────────────────
   group('notifications', () {
     test('starts hidden', () {
@@ -107,6 +124,46 @@ void main() {
       int notified = 0;
       vm.addListener(() => notified++);
       vm.toggleNotifications();
+      expect(notified, 1);
+    });
+
+    test('notifications list starts empty', () {
+      expect(vm.notifications, isEmpty);
+    });
+
+    test('addNotification prepends to list and notifies', () {
+      final n1 = DesktopNotification(
+        title: 'T1',
+        message: 'M1',
+        icon: Icons.info,
+        color: Colors.blue,
+        time: DateTime.now(),
+      );
+      final n2 = DesktopNotification(
+        title: 'T2',
+        message: 'M2',
+        icon: Icons.info,
+        color: Colors.blue,
+        time: DateTime.now(),
+      );
+      vm.addNotification(n1);
+      vm.addNotification(n2);
+      expect(vm.notifications.first, n2);
+      expect(vm.notifications.length, 2);
+    });
+
+    test('addNotification notifies listeners', () {
+      int notified = 0;
+      vm.addListener(() => notified++);
+      vm.addNotification(
+        DesktopNotification(
+          title: 'T',
+          message: 'M',
+          icon: Icons.info,
+          color: Colors.blue,
+          time: DateTime.now(),
+        ),
+      );
       expect(notified, 1);
     });
   });

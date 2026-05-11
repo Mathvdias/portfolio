@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:portifolio/shared/widgets/spotlight_overlay.dart';
@@ -143,6 +144,112 @@ void main() {
       // Tap outside the spotlight card
       await tester.tapAt(const Offset(10, 10));
       expect(dismissed, isTrue);
+    });
+
+    testWidgets('escape key calls onDismiss', (tester) async {
+      bool dismissed = false;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Stack(
+              children: [
+                SpotlightOverlay(
+                  items: items,
+                  onSelect: (_) {},
+                  onDismiss: () => dismissed = true,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.escape);
+      await tester.pump();
+
+      expect(dismissed, isTrue);
+    });
+
+    testWidgets('enter key calls onSelect for current item', (tester) async {
+      SpotlightItem? selected;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Stack(
+              children: [
+                SpotlightOverlay(
+                  items: items,
+                  onSelect: (item) => selected = item,
+                  onDismiss: () {},
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+
+      expect(selected?.id, items.first.id);
+    });
+
+    testWidgets('arrow down moves selection down', (tester) async {
+      SpotlightItem? selected;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Stack(
+              children: [
+                SpotlightOverlay(
+                  items: items,
+                  onSelect: (item) => selected = item,
+                  onDismiss: () {},
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump();
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+
+      expect(selected?.id, items[1].id);
+    });
+
+    testWidgets('arrow up moves selection up', (tester) async {
+      SpotlightItem? selected;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Stack(
+              children: [
+                SpotlightOverlay(
+                  items: items,
+                  onSelect: (item) => selected = item,
+                  onDismiss: () {},
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump();
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowUp);
+      await tester.pump();
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+
+      expect(selected?.id, items.first.id);
     });
   });
 

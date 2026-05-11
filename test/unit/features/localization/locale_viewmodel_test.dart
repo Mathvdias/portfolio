@@ -4,6 +4,8 @@ import 'package:portifolio/features/localization/domain/app_locale.dart';
 import 'package:portifolio/features/localization/presentation/viewmodels/locale_viewmodel.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('LocaleViewModel', () {
     late LocaleViewModel vm;
 
@@ -52,6 +54,21 @@ void main() {
         expect(vm.locale, locale);
         expect(vm.flutterLocale, locale.locale);
       }
+    });
+
+    test('init() reads system locale and notifies listeners', () {
+      var notified = false;
+      vm.addListener(() => notified = true);
+      vm.init();
+      // Locale is updated to whatever the test platform reports
+      expect(vm.locale, isA<AppLocale>());
+      expect(notified, isTrue);
+    });
+
+    test('init() sets a valid locale code', () {
+      vm.init();
+      expect(vm.currentCode, isNotEmpty);
+      expect(AppLocale.values.map((l) => l.code), contains(vm.currentCode));
     });
   });
 }

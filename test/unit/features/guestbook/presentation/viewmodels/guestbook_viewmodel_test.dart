@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'dart:async' show StreamController, TimeoutException, unawaited;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portifolio/features/guestbook/presentation/viewmodels/guestbook_viewmodel.dart';
 import 'package:portifolio/features/guestbook/data/repositories/guestbook_repository.dart';
@@ -162,6 +162,52 @@ void main() {
       // No explicit way to check subscription cancelation without more mocks,
       // but calling it ensures it doesn't crash and covers the lines.
     });
+
+    test('anti-spam blocks posting within 60 seconds', () async {
+      when(() => prefs.getBool('isAdmin')).thenReturn(false);
+      when(
+        () => prefs.getInt('last_guestbook_post'),
+      ).thenReturn(DateTime.now().millisecondsSinceEpoch);
+      final vm = GuestbookViewModel(repo, prefs);
+
+      await vm.submitMessage('Name', 'Message', 5);
+
+      expect(vm.lastError, 'waitToPost');
+      expect(vm.isSubmitting, false);
+      vm.dispose();
+    });
+
+    test('submitMessage catches generic exceptions', () async {
+      when(() => prefs.getBool('isAdmin')).thenReturn(false);
+      when(() => prefs.getInt(any())).thenReturn(null);
+      when(() => prefs.setInt(any(), any())).thenAnswer((_) async => true);
+
+      final failing = _FailingGuestbookRepository();
+      final vm = GuestbookViewModel(failing, prefs);
+
+      await vm.submitMessage('Name', 'Message', 5);
+
+      expect(vm.lastError, contains('Network error'));
+      expect(vm.isSubmitting, false);
+      vm.dispose();
+      failing.dispose();
+    });
+
+    test('submitMessage catches TimeoutException', () async {
+      when(() => prefs.getBool('isAdmin')).thenReturn(false);
+      when(() => prefs.getInt(any())).thenReturn(null);
+      when(() => prefs.setInt(any(), any())).thenAnswer((_) async => true);
+
+      final timeout = _TimeoutGuestbookRepository();
+      final vm = GuestbookViewModel(timeout, prefs);
+
+      await vm.submitMessage('Name', 'Message', 5);
+
+      expect(vm.lastError, contains('timed out'));
+      expect(vm.isSubmitting, false);
+      vm.dispose();
+      timeout.dispose();
+    });
   });
 }
 
@@ -169,5 +215,21 @@ class HangingGuestbookRepository extends MockGuestbookRepository {
   @override
   Future<void> addMessage(String name, String message, int rating) async {
     await Future.delayed(const Duration(seconds: 15));
+  }
+}
+
+class _FailingGuestbookRepository extends MockGuestbookRepository {
+  @override
+  Future<void> addMessage(String name, String message, int rating) async {
+    throw Exception('Network error');
+  }
+}
+
+class _TimeoutGuestbookRepository extends MockGuestbookRepository {
+  @override
+  Future<void> addMessage(String name, String message, int rating) async {
+    throw TimeoutException(
+      'Connection timed out. Check your internet or Firebase rules.',
+    );
   }
 }

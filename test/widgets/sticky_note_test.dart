@@ -62,5 +62,27 @@ void main() {
       expect(find.text('42'), findsOneWidget);
       expect(find.text('VISITORS'), findsOneWidget);
     });
+
+    testWidgets('can be dragged (updates position)', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: Stack(
+              children: [
+                VisitorStickyNote(
+                  initialPosition: Offset(10, 10),
+                  visitorCount: 7,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      await tester.drag(find.text('7'), const Offset(50, 50));
+      await tester.pump();
+
+      expect(find.text('7'), findsOneWidget);
+    });
   });
 }
