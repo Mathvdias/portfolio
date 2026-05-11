@@ -44,16 +44,49 @@ class AppWindow extends StatefulWidget {
 class _AppWindowState extends State<AppWindow>
     with SingleTickerProviderStateMixin, WindowAnimationMixin {
   late Offset _position;
+  late double _width;
+  late double _height;
+  bool _isMaximized = false;
+  Offset? _preMaximizePosition;
+  Size? _preMaximizeSize;
 
   @override
   void initState() {
     super.initState();
     _position = widget.initialPosition;
+    _width = widget.width;
+    _height = widget.height;
+  }
+
+  void _toggleMaximize() {
+    setState(() {
+      if (_isMaximized) {
+        _position = _preMaximizePosition ?? widget.initialPosition;
+        _width = _preMaximizeSize?.width ?? widget.width;
+        _height = _preMaximizeSize?.height ?? widget.height;
+        _isMaximized = false;
+      } else {
+        _preMaximizePosition = _position;
+        _preMaximizeSize = Size(_width, _height);
+
+        final mq = MediaQuery.of(context);
+        const menuBarHeight = 32.0; // Standard in this app
+        const dockAreaHeight = 80.0; // Space for dock
+
+        _position = const Offset(0, menuBarHeight);
+        _width = mq.size.width;
+        _height = mq.size.height - menuBarHeight - dockAreaHeight;
+        _isMaximized = true;
+      }
+    });
+    widget.onFocus();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeInOut,
       left: _position.dx,
       top: _position.dy,
       child: GestureDetector(
@@ -65,19 +98,23 @@ class _AppWindowState extends State<AppWindow>
   }
 
   Widget _buildWindow() {
-    return Container(
-      width: widget.width,
-      height: widget.height,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeInOut,
+      width: _width,
+      height: _height,
       decoration: BoxDecoration(
         color: widget.titleBarColor,
-        border: Border.all(color: widget.borderColor, width: 2),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black54,
-            blurRadius: 24,
-            offset: Offset(6, 6),
-          ),
-        ],
+        border: Border.all(color: widget.borderColor, width: _isMaximized ? 0 : 2),
+        boxShadow: _isMaximized
+            ? []
+            : const [
+              BoxShadow(
+                color: Colors.black54,
+                blurRadius: 24,
+                offset: Offset(6, 6),
+              ),
+            ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -99,8 +136,11 @@ class _AppWindowState extends State<AppWindow>
 
   Widget _buildTitleBar() {
     return GestureDetector(
+      onDoubleTap: _toggleMaximize,
       onPanUpdate: (details) {
-        setState(() => _position += details.delta);
+        if (!_isMaximized) {
+          setState(() => _position += details.delta);
+        }
       },
       child: Container(
         height: 32,
@@ -111,12 +151,36 @@ class _AppWindowState extends State<AppWindow>
             GestureDetector(
               key: const Key('close_button'),
               onTap: _closeWindow,
-              child: Container(width: 12, height: 12, color: widget.closeColor),
+              child: Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: widget.closeColor,
+                  shape: BoxShape.circle,
+                ),
+              ),
             ),
-            const SizedBox(width: 6),
-            Container(width: 12, height: 12, color: widget.minimizeColor),
-            const SizedBox(width: 6),
-            Container(width: 12, height: 12, color: widget.maximizeColor),
+            const SizedBox(width: 8),
+            Container(
+              width: 12,
+              height: 12,
+              decoration: BoxDecoration(
+                color: widget.minimizeColor,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: _toggleMaximize,
+              child: Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: widget.maximizeColor,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
             Expanded(
               child: Center(
                 child: Text(
