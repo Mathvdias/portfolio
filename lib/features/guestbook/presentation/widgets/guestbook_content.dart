@@ -140,10 +140,21 @@ class _GuestbookContentState extends State<GuestbookContent> {
                         ? Center(
                             child: Padding(
                               padding: const EdgeInsets.all(AppSizes.spacingLg),
-                              child: Text(
-                                widget.viewModel.lastError!,
-                                style: GoogleFonts.spaceMono(color: AppTheme.red),
-                                textAlign: TextAlign.center,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    widget.viewModel.lastError!,
+                                    style: GoogleFonts.spaceMono(color: AppTheme.red),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: AppSizes.spacingMd),
+                                  TextButton.icon(
+                                    onPressed: widget.viewModel.retry,
+                                    icon: const Icon(Icons.refresh, color: AppTheme.blue),
+                                    label: Text('Retry Connection', style: GoogleFonts.spaceMono(color: AppTheme.blue)),
+                                  ),
+                                ],
                               ),
                             ),
                           )

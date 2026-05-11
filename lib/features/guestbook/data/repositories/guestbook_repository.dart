@@ -8,7 +8,8 @@ class GuestbookRepository {
     return _firestore
         .collection('guestbook')
         .orderBy('timestamp', descending: true)
-        .snapshots()
+        .limit(100)
+        .snapshots(includeMetadataChanges: true)
         .map((snapshot) => snapshot.docs
             .map((doc) => GuestbookMessage.fromFirestore(doc))
             .toList());

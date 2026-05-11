@@ -32,6 +32,7 @@ class GuestbookViewModel extends ChangeNotifier {
   bool get success => _success;
 
   StreamSubscription? _subscription;
+  Timer? _loadingTimer;
   final DateTime _initTime = DateTime.now();
 
   GuestbookViewModel(this._repository, this._prefs) {
@@ -45,9 +46,18 @@ class GuestbookViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void retry() {
+    _isLoading = true;
+    _lastError = null;
+    _subscription?.cancel();
+    notifyListeners();
+    _subscribe();
+  }
+
   void _subscribe() {
     _subscription = _repository.watchMessages().listen(
       (messages) {
+        _loadingTimer?.cancel();
         // Find new messages to notify
         if (!_isLoading) {
           final newMsgs = messages.where(
@@ -118,14 +128,19 @@ class GuestbookViewModel extends ChangeNotifier {
         notifyListeners();
         return;
       }
-      _prefs.setInt('last_guestbook_post', now);
     }
 
     try {
-      await _repository.addMessage(name, message, rating);
+      await _repository.addMessage(name, message, rating).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => throw TimeoutException('Connection timed out. Check your internet or Firebase rules.'),
+      );
       _success = true;
+      if (!_isAdmin) {
+        _prefs.setInt('last_guestbook_post', DateTime.now().millisecondsSinceEpoch);
+      }
     } catch (e) {
-      _lastError = 'Error posting message: $e';
+      _lastError = '$e';
     } finally {
       _isSubmitting = false;
       notifyListeners();
@@ -146,6 +161,7 @@ class GuestbookViewModel extends ChangeNotifier {
   @override
   void dispose() {
     _subscription?.cancel();
+    _loadingTimer?.cancel();
     super.dispose();
   }
 }
