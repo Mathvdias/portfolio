@@ -8,6 +8,9 @@ void main() {
   final content = file.readAsStringSync();
   final sections = content.split('end_of_record');
 
+  int totalFound = 0;
+  int totalHit = 0;
+
   for (final section in sections) {
     if (section.trim().isEmpty) continue;
     final lines = section.split('\n');
@@ -22,8 +25,17 @@ void main() {
     }
 
     if (found > 0) {
+      totalFound += found;
+      totalHit += hit;
       final percentage = (hit / found) * 100;
-      print('${percentage.toStringAsFixed(1)}% | ${sourceFile.split('portifolio/').last}');
+      print('${percentage.toStringAsFixed(1).padLeft(5)}% | ${sourceFile.split('portifolio/').last}');
     }
+  }
+
+  if (totalFound > 0) {
+    final overall = (totalHit / totalFound) * 100;
+    print('-' * 40);
+    print('OVERALL COVERAGE: ${overall.toStringAsFixed(2)}%');
+    print('-' * 40);
   }
 }

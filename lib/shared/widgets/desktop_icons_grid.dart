@@ -18,14 +18,9 @@ import 'calculator_content.dart';
 import 'snake_game_content.dart';
 import 'contact_form_content.dart';
 import 'project_window_content.dart';
-import '../../core/di/app_dependencies.dart';
-import '../../features/guestbook/presentation/widgets/guestbook_content.dart';
 import 'android_dev_window_content.dart';
-import 'project_stats_window_content.dart';
 
 /// The right-aligned, vertically-wrapping grid of desktop icons.
-///
-/// Extracted from `_buildIconsArea()` in [DesktopPage].
 class DesktopIconsGrid extends StatelessWidget {
   const DesktopIconsGrid({
     super.key,
@@ -54,20 +49,6 @@ class DesktopIconsGrid extends StatelessWidget {
           AboutWindowContent(bio: l10n.bio, role: l10n.role),
           AppTheme.blue,
         ),
-      ),
-      DesktopIcon(
-        label: l10n.guestbook,
-        iconWidget: const Icon(Icons.book),
-        color: AppTheme.mauve,
-        onTap: () {
-          final vm = AppDependencies.of(context).guestbookViewModel;
-          onOpenWindow(
-            'guestbook',
-            l10n.guestbook,
-            GuestbookContent(viewModel: vm),
-            AppTheme.mauve,
-          );
-        },
       ),
       DesktopIcon(
         label: AppStrings.iconFinder,
@@ -117,17 +98,6 @@ class DesktopIconsGrid extends StatelessWidget {
           AppStrings.titleAndroid,
           const AndroidDevWindowContent(),
           AppTheme.green,
-        ),
-      ),
-      DesktopIcon(
-        label: 'Project\nStats',
-        iconWidget: const Icon(Icons.analytics),
-        color: AppTheme.yellow,
-        onTap: () => onOpenWindow(
-          'stats',
-          'Project Stats',
-          const ProjectStatsWindowContent(),
-          AppTheme.yellow,
         ),
       ),
       DesktopIcon(

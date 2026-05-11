@@ -28,7 +28,11 @@ import '../../../../shared/widgets/skills_window_content.dart';
 import '../../../../shared/widgets/spotlight_overlay.dart';
 import '../../../../shared/widgets/sticky_note.dart';
 import '../../../../shared/widgets/terminal_content.dart';
+import '../../../../shared/widgets/guestbook_content.dart';
+import '../../../../shared/widgets/project_stats_window_content.dart';
+import '../../../../shared/widgets/android_dev_window_content.dart';
 import '../../../../theme/app_theme.dart';
+import '../../../guestbook/presentation/widgets/guestbook_content.dart';
 
 class DesktopPage extends StatefulWidget {
   const DesktopPage({super.key});
@@ -175,6 +179,21 @@ class _DesktopPageState extends State<DesktopPage> {
           AppStrings.titleContact,
           const ContactFormContent(),
           AppTheme.teal,
+        );
+      case AppStrings.winGuestbook:
+        final vm = AppDependencies.of(context).guestbookViewModel;
+        _desktopVM.openWindow(
+          id,
+          AppStrings.titleGuestbook,
+          GuestbookContent(viewModel: vm),
+          AppTheme.mauve,
+        );
+      case AppStrings.winProjectStats:
+        _desktopVM.openWindow(
+          id,
+          AppStrings.titleProjectStats,
+          const ProjectStatsWindowContent(),
+          AppTheme.yellow,
         );
     }
   }

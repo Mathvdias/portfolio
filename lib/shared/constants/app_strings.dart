@@ -10,6 +10,8 @@ abstract final class AppStrings {
   static const String winContact = 'contact';
   static const String winLicenses = 'licenses';
   static const String winInterceptedHttp = 'intercepted_http';
+  static const String winGuestbook = 'guestbook';
+  static const String winProjectStats = 'project_stats';
 
   // Window titles
   static const String titleFinder = 'Finder';
@@ -21,6 +23,8 @@ abstract final class AppStrings {
   static const String titleContact = 'Contact';
   static const String titleLicenses = 'Open Source Licenses';
   static const String titleInterceptedHttp = 'intercepted_http';
+  static const String titleGuestbook = 'Guestbook';
+  static const String titleProjectStats = 'Project Stats';
 
   // URLs
   static const String urlGitHub = 'https://github.com/Mathvdias';
@@ -52,6 +56,8 @@ abstract final class AppStrings {
   static const String dockPubDev = 'pub.dev';
   static const String dockLinkedIn = 'LinkedIn';
   static const String dockEmail = 'Email';
+  static const String dockGuestbook = 'Guestbook';
+  static const String dockProjectStats = 'Stats';
 
   // Context menu
   static const String ctxNewNote = 'New Sticky Note';

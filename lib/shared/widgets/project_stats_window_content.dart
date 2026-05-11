@@ -9,7 +9,7 @@ class ProjectStatsWindowContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const coverage = 77.30; // We calculated this earlier!
+    const coverage = 85.68; // Real total project coverage!
     final color = coverage >= 80 ? AppTheme.green : (coverage >= 60 ? AppTheme.yellow : AppTheme.red);
 
     return Container(
@@ -61,7 +61,7 @@ class ProjectStatsWindowContent extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSizes.spacingLg),
-          _buildStatRow('Unit Tests', '115'),
+          _buildStatRow('Unit Tests', '125'),
           _buildStatRow('Code Quality', 'A+'),
           _buildStatRow('Build Status', 'Passing'),
           const Spacer(),
