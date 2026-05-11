@@ -1,0 +1,4 @@
+00:00 +0: loading /Users/matheusdias/Developer/portifolio/test/unit/features/guestbook/presentation/viewmodels/guestbook_viewmodel_test.dart
+00:00 +0: GuestbookViewModel loads messages and handles admin
+00:00 +1: GuestbookViewModel handles timeout
+00:10 +2: All tests passed!

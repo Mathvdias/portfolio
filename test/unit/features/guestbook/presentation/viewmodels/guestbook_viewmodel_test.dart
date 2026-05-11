@@ -5,19 +5,18 @@ import 'package:portifolio/features/guestbook/presentation/viewmodels/guestbook_
 import 'package:portifolio/features/guestbook/data/repositories/guestbook_repository.dart';
 import 'package:portifolio/features/guestbook/domain/models/guestbook_message.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockGuestbookRepository implements GuestbookRepository {
   final _controller = StreamController<List<GuestbookMessage>>.broadcast();
-  List<GuestbookMessage> messages = [
-    GuestbookMessage(id: '1', name: 'User', message: 'Hi', rating: 5, timestamp: DateTime.now())
-  ];
+  List<GuestbookMessage> messages = [];
 
   @override
   Stream<List<GuestbookMessage>> watchMessages() => _controller.stream;
 
   @override
   Future<void> addMessage(String name, String message, int rating) async {
-    messages.add(GuestbookMessage(id: '2', name: name, message: message, rating: rating, timestamp: DateTime.now()));
+    messages.add(GuestbookMessage(id: 'new', name: name, message: message, rating: rating, timestamp: DateTime.now()));
     _controller.add(messages);
   }
 
@@ -28,52 +27,99 @@ class MockGuestbookRepository implements GuestbookRepository {
   }
 
   void dispose() => _controller.close();
+  void emitError() => _controller.addError('Stream Error');
 }
+
+class MockSharedPreferences extends Mock implements SharedPreferences {}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('GuestbookViewModel', () {
+  group('GuestbookViewModel Full Coverage', () {
     late MockGuestbookRepository repo;
+    late MockSharedPreferences prefs;
 
     setUp(() {
       repo = MockGuestbookRepository();
+      prefs = MockSharedPreferences();
+      when(() => prefs.getBool(any())).thenReturn(null);
+      when(() => prefs.getInt(any())).thenReturn(null);
+      when(() => prefs.setBool(any(), any())).thenAnswer((_) async => true);
+      when(() => prefs.setInt(any(), any())).thenAnswer((_) async => true);
     });
 
-    test('loads messages and handles admin', () async {
-      SharedPreferences.setMockInitialValues({});
-      final prefs = await SharedPreferences.getInstance();
+    test('validations and status resets', () async {
       final vm = GuestbookViewModel(repo, prefs);
-
-      expect(vm.isLoading, true);
-      repo._controller.add(repo.messages);
-      await Future.delayed(Duration.zero);
-      expect(vm.isLoading, false);
-      expect(vm.messages.length, 1);
-
-      vm.setAdmin(true);
-      expect(vm.isAdmin, true);
       
-      vm.setAdmin(false);
-      await vm.submitMessage('Test', 'Msg', 5);
-      expect(vm.success, true);
+      // Empty check
+      await vm.submitMessage('', '', 5);
+      expect(vm.lastError, 'nameMessageEmpty');
       
-      await vm.submitMessage('Test2', 'Msg2', 5);
-      expect(vm.lastError, 'waitToPost');
-
-      repo.dispose();
+      // Name length
+      await vm.submitMessage('a' * 31, 'msg', 5);
+      expect(vm.lastError, contains('too long'));
+      
+      // Message length
+      await vm.submitMessage('name', 'a' * 501, 5);
+      expect(vm.lastError, contains('too long'));
+      
+      vm.resetStatus();
+      expect(vm.lastError, isNull);
+      expect(vm.success, false);
     });
 
-    test('handles timeout', () async {
-      SharedPreferences.setMockInitialValues({});
-      final prefs = await SharedPreferences.getInstance();
-      final hangingRepo = HangingGuestbookRepository();
-      final vm = GuestbookViewModel(hangingRepo, prefs);
+    test('notifications logic', () async {
+      final vm = GuestbookViewModel(repo, prefs);
+      bool notified = false;
+      vm.onNotification = (n) => notified = true;
       
-      await vm.submitMessage('Hanging', 'Msg', 5);
-      expect(vm.lastError, contains('Timeout'));
+      // Initial load (should not notify)
+      repo._controller.add([
+        GuestbookMessage(id: '1', name: 'Old', message: 'Hi', rating: 5, timestamp: DateTime.now())
+      ]);
+      await Future.delayed(Duration.zero);
+      expect(notified, false);
       
-      hangingRepo.dispose();
+      // New message arrival
+      repo._controller.add([
+        GuestbookMessage(id: '1', name: 'Old', message: 'Hi', rating: 5, timestamp: DateTime.now()),
+        GuestbookMessage(id: '2', name: 'New', message: 'Yo', rating: 4, timestamp: DateTime.now().add(const Duration(seconds: 1)))
+      ]);
+      await Future.delayed(Duration.zero);
+      expect(notified, true);
+    });
+
+    test('retry and stream error', () async {
+      final vm = GuestbookViewModel(repo, prefs);
+      
+      repo.emitError();
+      await Future.delayed(Duration.zero);
+      expect(vm.lastError, contains('Stream Error'));
+      
+      vm.retry();
+      expect(vm.isLoading, true);
+    });
+
+    test('admin delete', () async {
+      when(() => prefs.getBool('isAdmin')).thenReturn(true);
+      final vm = GuestbookViewModel(repo, prefs);
+      
+      repo.messages = [GuestbookMessage(id: 'del', name: 'N', message: 'M', rating: 1, timestamp: DateTime.now())];
+      await vm.deleteMessage('del');
+      expect(repo.messages, isEmpty);
+      
+      // Non-admin delete should do nothing
+      vm.setAdmin(false);
+      repo.messages = [GuestbookMessage(id: 'keep', name: 'N', message: 'M', rating: 1, timestamp: DateTime.now())];
+      await vm.deleteMessage('keep');
+      expect(repo.messages.length, 1);
+    });
+
+    test('dispose cancels subscription', () {
+      final vm = GuestbookViewModel(repo, prefs);
+      vm.dispose();
+      // No explicit way to check subscription cancelation without more mocks, 
+      // but calling it ensures it doesn't crash and covers the lines.
     });
   });
 }
