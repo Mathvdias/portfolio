@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../features/desktop/presentation/viewmodels/desktop_viewmodel.dart';
 import '../../features/guestbook/presentation/viewmodels/guestbook_viewmodel.dart';
 import '../../features/localization/presentation/viewmodels/locale_viewmodel.dart';
 import '../../features/visitors/domain/repositories/visitor_repository.dart';
@@ -10,12 +11,14 @@ class AppDependencies extends InheritedWidget {
     required this.localeViewModel,
     required this.visitorRepository,
     required this.guestbookViewModel,
+    required this.desktopViewModel,
     required super.child,
   });
 
   final LocaleViewModel localeViewModel;
   final VisitorRepository visitorRepository;
   final GuestbookViewModel guestbookViewModel;
+  final DesktopViewModel desktopViewModel;
 
   static AppDependencies of(BuildContext context) {
     final result =

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../constants/app_strings.dart';
 import '../constants/app_sizes.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../features/desktop/presentation/viewmodels/desktop_viewmodel.dart';
+import '../../core/di/app_dependencies.dart';
 
 class Dock extends StatelessWidget {
   const Dock({super.key});
@@ -120,8 +119,7 @@ class _DockItemState extends State<_DockItem> {
         await launchUrl(uri);
       }
     } else if (widget.data.windowId != null) {
-      // Logic for opening windows handled via callback or viewmodel
-      context.read<DesktopViewModel>().openWindowById(
+      AppDependencies.of(context).desktopViewModel.openWindowById(
         widget.data.windowId!,
         context,
       );
@@ -130,10 +128,7 @@ class _DockItemState extends State<_DockItem> {
 
   @override
   Widget build(BuildContext context) {
-    final desktopVM = context.watch<DesktopViewModel>();
-    final isWindowOpen =
-        widget.data.windowId != null &&
-        desktopVM.windows.any((w) => w.id == widget.data.windowId);
+    final desktopVM = AppDependencies.of(context).desktopViewModel;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
@@ -143,39 +138,48 @@ class _DockItemState extends State<_DockItem> {
         child: AnimatedScale(
           scale: _hovered ? AppSizes.dockHoverScale : 1.0,
           duration: const Duration(milliseconds: 150),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                width: AppSizes.dockIconSize,
-                height: AppSizes.dockIconSize,
-                child: IconTheme(
-                  data: IconThemeData(
-                    color: widget.data.color,
-                    size: AppSizes.dockIconSize * 0.8,
+          child: ListenableBuilder(
+            listenable: desktopVM,
+            builder: (context, _) {
+              final isWindowOpen =
+                  widget.data.windowId != null &&
+                  desktopVM.windows.any((w) => w.id == widget.data.windowId);
+
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: AppSizes.dockIconSize,
+                    height: AppSizes.dockIconSize,
+                    child: IconTheme(
+                      data: IconThemeData(
+                        color: widget.data.color,
+                        size: AppSizes.dockIconSize * 0.8,
+                      ),
+                      child: widget.data.iconWidget,
+                    ),
                   ),
-                  child: widget.data.iconWidget,
-                ),
-              ),
-              const SizedBox(height: AppSizes.spacingXs),
-              if (isWindowOpen)
-                Container(
-                  width: 4,
-                  height: 4,
-                  decoration: const BoxDecoration(
-                    color: AppTheme.text,
-                    shape: BoxShape.circle,
-                  ),
-                )
-              else
-                Text(
-                  widget.data.label,
-                  style: GoogleFonts.pressStart2p(
-                    fontSize: AppSizes.fontXxs,
-                    color: AppTheme.subtext,
-                  ),
-                ),
-            ],
+                  const SizedBox(height: AppSizes.spacingXs),
+                  if (isWindowOpen)
+                    Container(
+                      width: 4,
+                      height: 4,
+                      decoration: const BoxDecoration(
+                        color: AppTheme.text,
+                        shape: BoxShape.circle,
+                      ),
+                    )
+                  else
+                    Text(
+                      widget.data.label,
+                      style: GoogleFonts.pressStart2p(
+                        fontSize: AppSizes.fontXxs,
+                        color: AppTheme.subtext,
+                      ),
+                    ),
+                ],
+              );
+            },
           ),
         ),
       ),

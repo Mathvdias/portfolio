@@ -42,25 +42,22 @@ class DesktopPage extends StatefulWidget {
 }
 
 class _DesktopPageState extends State<DesktopPage> {
-  late final DesktopViewModel _desktopVM;
+  late DesktopViewModel _desktopVM;
   late VisitorViewModel _visitorVM;
   bool _initialized = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _desktopVM = DesktopViewModel();
-    _desktopVM.onOpenWindowById = (id, context) {
-      final l10n = AppLocalizations.of(context);
-      _openWindowForId(id, l10n);
-    };
-  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
     final deps = AppDependencies.of(context);
+    _desktopVM = deps.desktopViewModel;
+
+    // Register window handler
+    _desktopVM.onOpenWindowById ??= (id, ctx) {
+      final l10n = AppLocalizations.of(ctx);
+      _openWindowForId(id, l10n);
+    };
 
     if (!_initialized) {
       _initialized = true;
@@ -75,7 +72,6 @@ class _DesktopPageState extends State<DesktopPage> {
 
   @override
   void dispose() {
-    _desktopVM.dispose();
     _visitorVM.dispose();
     super.dispose();
   }

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/di/app_dependencies.dart';
 import 'features/desktop/presentation/pages/desktop_page.dart';
+import 'features/desktop/presentation/viewmodels/desktop_viewmodel.dart';
 import 'features/localization/presentation/viewmodels/locale_viewmodel.dart';
 import 'features/visitors/data/datasources/visitor_datasource.dart';
 import 'features/visitors/data/repositories/visitor_repository_impl.dart';
@@ -44,6 +45,7 @@ class AppRoot extends StatefulWidget {
 class _AppRootState extends State<AppRoot> {
   final _localeViewModel = LocaleViewModel();
   final _visitorRepository = VisitorRepositoryImpl(VisitorDatasource());
+  final _desktopViewModel = DesktopViewModel();
   late final GuestbookViewModel _guestbookViewModel;
 
   @override
@@ -59,6 +61,7 @@ class _AppRootState extends State<AppRoot> {
   void dispose() {
     _localeViewModel.dispose();
     _guestbookViewModel.dispose();
+    _desktopViewModel.dispose();
     super.dispose();
   }
 
@@ -68,6 +71,7 @@ class _AppRootState extends State<AppRoot> {
       localeViewModel: _localeViewModel,
       visitorRepository: _visitorRepository,
       guestbookViewModel: _guestbookViewModel,
+      desktopViewModel: _desktopViewModel,
       child: ListenableBuilder(
         listenable: _localeViewModel,
         builder: (context, _) {

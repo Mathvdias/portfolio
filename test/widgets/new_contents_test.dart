@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:portifolio/l10n/app_localizations.dart';
 import 'package:portifolio/shared/widgets/android_dev_window_content.dart';
 import 'package:portifolio/shared/widgets/project_stats_window_content.dart';
 
@@ -9,11 +10,15 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: AndroidDevWindowContent())),
+        const MaterialApp(
+          localizationsDelegates: [AppLocalizationsDelegate()],
+          home: Scaffold(body: AndroidDevWindowContent()),
+        ),
       );
+      await tester.pumpAndSettle();
 
       expect(find.text('Android Development'), findsOneWidget);
-      expect(find.text('Core Technologies'), findsOneWidget);
+      expect(find.text('Core'), findsOneWidget);
       expect(find.text('Kotlin'), findsOneWidget);
       expect(find.text('Jetpack Compose'), findsOneWidget);
     });
@@ -22,8 +27,12 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: ProjectStatsWindowContent())),
+        const MaterialApp(
+          localizationsDelegates: [AppLocalizationsDelegate()],
+          home: Scaffold(body: ProjectStatsWindowContent()),
+        ),
       );
+      await tester.pumpAndSettle();
 
       expect(find.text('PROJECT METRICS'), findsOneWidget);
       expect(find.textContaining('%'), findsOneWidget);
