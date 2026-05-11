@@ -84,7 +84,10 @@ class _AppWindowState extends State<AppWindow>
         final mq = MediaQuery.of(context);
         _position = Offset(0, widget.maximizeTopOffset);
         _width = mq.size.width;
-        _height = mq.size.height - widget.maximizeTopOffset - widget.maximizeBottomOffset;
+        _height =
+            mq.size.height -
+            widget.maximizeTopOffset -
+            widget.maximizeBottomOffset;
         _isMaximized = true;
       }
     });

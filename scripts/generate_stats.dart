@@ -1,10 +1,11 @@
 import 'dart:io';
 
-
 void main() {
   final lcovFile = File('coverage/lcov.info');
   if (!lcovFile.existsSync()) {
-    print('Error: coverage/lcov.info not found. Run flutter test --coverage first.');
+    print(
+      'Error: coverage/lcov.info not found. Run flutter test --coverage first.',
+    );
     exit(1);
   }
 

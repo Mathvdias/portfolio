@@ -10,7 +10,8 @@ class LocaleViewModel extends ChangeNotifier {
 
   void init() {
     // Detect system/browser language
-    final systemLocale = WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+    final systemLocale =
+        WidgetsBinding.instance.platformDispatcher.locale.languageCode;
     _locale = AppLocale.fromCode(systemLocale);
     notifyListeners();
   }
