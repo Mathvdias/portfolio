@@ -94,30 +94,6 @@ class LicensesWindowContent extends StatelessWidget {
                 'Used to open GitHub, LinkedIn, and the résumé PDF.',
             url: 'https://pub.dev/packages/url_launcher',
           ),
-          _licenseCard(
-            name: 'animated_text_kit',
-            version: '^4.2.2',
-            license: 'MIT',
-            description:
-                'A Flutter package containing a collection of cool and beautiful text animations.',
-            url: 'https://pub.dev/packages/animated_text_kit',
-          ),
-          _licenseCard(
-            name: 'flutter_animate',
-            version: '^4.2.0',
-            license: 'MIT',
-            description:
-                'A library that makes it simple to add almost any kind of animated effect in Flutter.',
-            url: 'https://pub.dev/packages/flutter_animate',
-          ),
-          _licenseCard(
-            name: 'cached_network_image',
-            version: '^3.3.0',
-            license: 'MIT',
-            description:
-                'A flutter library to show images from the internet and keep them in the cache directory.',
-            url: 'https://pub.dev/packages/cached_network_image',
-          ),
           const SizedBox(height: 24),
           Center(
             child: Text(
