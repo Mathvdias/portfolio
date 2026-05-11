@@ -20,6 +20,8 @@ import 'contact_form_content.dart';
 import 'project_window_content.dart';
 import '../../core/di/app_dependencies.dart';
 import '../../features/guestbook/presentation/widgets/guestbook_content.dart';
+import 'android_dev_window_content.dart';
+import 'project_stats_window_content.dart';
 
 /// The right-aligned, vertically-wrapping grid of desktop icons.
 ///
@@ -113,8 +115,19 @@ class DesktopIconsGrid extends StatelessWidget {
         onTap: () => onOpenWindow(
           AppStrings.winAndroid,
           AppStrings.titleAndroid,
-          const SkillsWindowContent(),
+          const AndroidDevWindowContent(),
           AppTheme.green,
+        ),
+      ),
+      DesktopIcon(
+        label: 'Project\nStats',
+        iconWidget: const Icon(Icons.analytics),
+        color: AppTheme.yellow,
+        onTap: () => onOpenWindow(
+          'stats',
+          'Project Stats',
+          const ProjectStatsWindowContent(),
+          AppTheme.yellow,
         ),
       ),
       DesktopIcon(
