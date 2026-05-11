@@ -43,7 +43,6 @@ dependencies:
   app_window:
     path: packages/app_window
   font_awesome_flutter: ^11.0.0
-  provider: ^6.1.5+1
 
 dev_dependencies:
   flutter_test:

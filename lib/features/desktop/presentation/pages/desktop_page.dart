@@ -5,12 +5,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../../../core/di/app_dependencies.dart';
 import '../../../../features/desktop/presentation/viewmodels/desktop_viewmodel.dart';
+import '../../../../features/guestbook/presentation/widgets/guestbook_content.dart';
 import '../../../../features/visitors/presentation/viewmodels/visitor_viewmodel.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/constants/app_sizes.dart';
 import '../../../../shared/constants/app_strings.dart';
 import '../../../../shared/mappers/experience_mapper.dart';
 import '../../../../shared/widgets/about_window_content.dart';
+import '../../../../shared/widgets/android_dev_window_content.dart';
 import '../../../../shared/widgets/calculator_content.dart';
 import '../../../../shared/widgets/contact_form_content.dart';
 import '../../../../shared/widgets/desktop_context_menu.dart';
@@ -22,17 +24,15 @@ import '../../../../shared/widgets/mac_menu_bar.dart';
 import '../../../../shared/widgets/mobile_fallback_page.dart';
 import '../../../../shared/widgets/notification_center.dart';
 import '../../../../shared/widgets/pixel_wallpaper.dart';
+import '../../../../shared/widgets/project_stats_window_content.dart';
 import '../../../../shared/widgets/responsive_layout.dart';
 import '../../../../shared/widgets/rubber_band_selection.dart';
 import '../../../../shared/widgets/skills_window_content.dart';
+import '../../../../shared/widgets/snake_game_content.dart';
 import '../../../../shared/widgets/spotlight_overlay.dart';
 import '../../../../shared/widgets/sticky_note.dart';
 import '../../../../shared/widgets/terminal_content.dart';
 import '../../../../theme/app_theme.dart';
-import '../../../../features/guestbook/presentation/widgets/guestbook_content.dart';
-import '../../../../shared/widgets/android_dev_window_content.dart';
-import '../../../../shared/widgets/project_stats_window_content.dart';
-import '../../../../shared/widgets/snake_game_content.dart';
 
 class DesktopPage extends StatefulWidget {
   const DesktopPage({super.key});
@@ -53,7 +53,6 @@ class _DesktopPageState extends State<DesktopPage> {
     final deps = AppDependencies.of(context);
     _desktopVM = deps.desktopViewModel;
 
-    // Register window handler
     _desktopVM.onOpenWindowById ??= (id, ctx) {
       final l10n = AppLocalizations.of(ctx);
       _openWindowForId(id, l10n);
