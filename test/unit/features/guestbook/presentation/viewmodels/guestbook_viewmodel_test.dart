@@ -1,4 +1,4 @@
-import 'dart:async' show StreamController, TimeoutException, unawaited;
+import 'dart:async' show StreamController, TimeoutException;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portifolio/features/guestbook/presentation/viewmodels/guestbook_viewmodel.dart';
 import 'package:portifolio/features/guestbook/data/repositories/guestbook_repository.dart';
