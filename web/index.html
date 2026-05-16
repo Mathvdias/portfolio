@@ -164,6 +164,96 @@
 </head>
 <body>
 
+  <!-- Portfolio content: rendered as real HTML for search engine indexing.
+       Covered by Flutter's canvas after first frame — users see Flutter.
+       Crawlers see this content immediately, no JavaScript required. -->
+  <main id="portfolio-content" style="position:fixed;inset:0;overflow:auto;z-index:0;background:#1e1e2e;color:#cdd6f4;font-family:'Courier New',Courier,monospace;padding:40px 48px;line-height:1.75;font-size:15px;">
+
+    <header style="margin-bottom:40px;">
+      <h1 style="color:#89b4fa;font-size:2.2em;font-weight:bold;margin:0 0 6px;">Matheus Dias</h1>
+      <p style="color:#cba6f7;font-size:1.1em;margin:0 0 4px;">Mobile Software Engineer</p>
+      <p style="color:#a6adc8;margin:0;">São Paulo, SP — Brazil &nbsp;·&nbsp; <a href="mailto:mattmvc56@gmail.com" style="color:#89b4fa;">mattmvc56@gmail.com</a></p>
+    </header>
+
+    <section style="margin-bottom:36px;">
+      <h2 style="color:#cba6f7;font-size:1em;letter-spacing:3px;text-transform:uppercase;margin-bottom:14px;">About Me</h2>
+      <p style="max-width:760px;color:#cdd6f4;">I am a Mobile Software Engineer specializing in Kotlin for Android development, with strong expertise in Flutter for cross-platform applications. I have solid experience in medium-sized mobile projects, contributing from conception to deployment and maintenance.</p>
+      <p style="max-width:760px;color:#cdd6f4;margin-top:10px;">My focus is on solving complex problems in mobile development and software engineering, applying data structures and algorithms to optimize performance and scalability. I have experience designing and implementing modular architectures, ensuring code maintainability and efficiency.</p>
+    </section>
+
+    <section style="margin-bottom:36px;">
+      <h2 style="color:#cba6f7;font-size:1em;letter-spacing:3px;text-transform:uppercase;margin-bottom:20px;">Experience</h2>
+
+      <article style="margin-bottom:28px;">
+        <h3 style="color:#89b4fa;margin:0 0 2px;">Mobile Software Engineer</h3>
+        <p style="color:#a6e3a1;margin:0 0 2px;">Zallpy Digital / West Shore Solutions</p>
+        <time style="color:#6c7086;font-size:0.9em;">Sep 2024 – Present</time>
+        <p style="color:#cdd6f4;margin:8px 0 6px;">Led the development and refactoring of mobile solutions for global B2B clients, ensuring compliance with WCAG accessibility standards and full i18n support. Implemented Clean Architecture in legacy modules, reducing new engineer onboarding time by 10%. Defined development standards for distributed squads, focusing on long-term performance and maintainability.</p>
+        <p style="color:#6c7086;font-size:0.9em;">Flutter · Dart · Kotlin · Clean Architecture · WCAG · i18n</p>
+      </article>
+
+      <article style="margin-bottom:28px;">
+        <h3 style="color:#89b4fa;margin:0 0 2px;">Mobile Software Engineer</h3>
+        <p style="color:#a6e3a1;margin:0 0 2px;">Banco Pan</p>
+        <time style="color:#6c7086;font-size:0.9em;">Jan 2024 – Aug 2024</time>
+        <p style="color:#cdd6f4;margin:8px 0 6px;">Led the modularization of DSKit components to enhance efficiency and maintainability. Analyzed Crashlytics data to identify and resolve performance and stability issues. Managed versioning and incident tracking in production to ensure high product quality.</p>
+        <p style="color:#6c7086;font-size:0.9em;">Flutter · Kotlin · Android · iOS · Crashlytics · Testing</p>
+      </article>
+
+      <article style="margin-bottom:28px;">
+        <h3 style="color:#89b4fa;margin:0 0 2px;">Mobile Developer PL</h3>
+        <p style="color:#a6e3a1;margin:0 0 2px;">Instituto Conecthus — Tecnologia e Biotecnologia do Amazonas</p>
+        <time style="color:#6c7086;font-size:0.9em;">Aug 2021 – Nov 2023</time>
+        <p style="color:#cdd6f4;margin:8px 0 6px;">Developed cross-platform mobile applications using Flutter with modern UI/UX. Integrated native Android features with Kotlin and Java for performance optimization. Designed POS and self-service kiosk solutions, integrating AI and machine learning for automated processes.</p>
+        <p style="color:#6c7086;font-size:0.9em;">Flutter · Kotlin · Java · Android · POS · TensorFlow Lite · ML Kit</p>
+      </article>
+
+      <article style="margin-bottom:28px;">
+        <h3 style="color:#89b4fa;margin:0 0 2px;">Maintenance Technician</h3>
+        <p style="color:#a6e3a1;margin:0 0 2px;">Oi</p>
+        <time style="color:#6c7086;font-size:0.9em;">Aug 2019 – Jul 2021</time>
+        <p style="color:#cdd6f4;margin:8px 0 6px;">Managed fiber optic network maintenance at a national scale to ensure service stability. Developed Java-based applications for Huawei router configuration. Conducted SQL database maintenance and troubleshooting.</p>
+        <p style="color:#6c7086;font-size:0.9em;">Java · SQL · Networking · Huawei Routers</p>
+      </article>
+    </section>
+
+    <section style="margin-bottom:36px;">
+      <h2 style="color:#cba6f7;font-size:1em;letter-spacing:3px;text-transform:uppercase;margin-bottom:14px;">Skills</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;">
+        <span style="background:#313244;color:#89b4fa;padding:4px 12px;border-radius:4px;">Flutter</span>
+        <span style="background:#313244;color:#89b4fa;padding:4px 12px;border-radius:4px;">Dart</span>
+        <span style="background:#313244;color:#a6e3a1;padding:4px 12px;border-radius:4px;">Android</span>
+        <span style="background:#313244;color:#cba6f7;padding:4px 12px;border-radius:4px;">Kotlin</span>
+        <span style="background:#313244;color:#89b4fa;padding:4px 12px;border-radius:4px;">REST APIs</span>
+        <span style="background:#313244;color:#f9e2af;padding:4px 12px;border-radius:4px;">Firebase</span>
+        <span style="background:#313244;color:#a6adc8;padding:4px 12px;border-radius:4px;">Git / CI</span>
+        <span style="background:#313244;color:#fab387;padding:4px 12px;border-radius:4px;">Fastlane</span>
+        <span style="background:#313244;color:#cba6f7;padding:4px 12px;border-radius:4px;">Clean Architecture</span>
+        <span style="background:#313244;color:#cba6f7;padding:4px 12px;border-radius:4px;">MVVM</span>
+        <span style="background:#313244;color:#a6e3a1;padding:4px 12px;border-radius:4px;">Jetpack Compose</span>
+        <span style="background:#313244;color:#f9e2af;padding:4px 12px;border-radius:4px;">TensorFlow Lite</span>
+      </div>
+    </section>
+
+    <section style="margin-bottom:36px;">
+      <h2 style="color:#cba6f7;font-size:1em;letter-spacing:3px;text-transform:uppercase;margin-bottom:20px;">Projects</h2>
+      <article>
+        <h3 style="color:#89b4fa;margin:0 0 4px;"><a href="https://pub.dev/packages/intercepted_http" style="color:#89b4fa;">intercepted_http</a></h3>
+        <p style="color:#cdd6f4;margin:0 0 6px;">Open-source Dart / Flutter package on pub.dev. HTTP client interceptor library for Flutter, enabling request/response interception, logging, and modification in a clean, composable way.</p>
+        <p style="color:#6c7086;font-size:0.9em;"><a href="https://github.com/Mathvdias/intercepted_http" style="color:#6c7086;">github.com/Mathvdias/intercepted_http</a></p>
+      </article>
+    </section>
+
+    <nav style="margin-top:40px;padding-top:24px;border-top:1px solid #313244;display:flex;flex-wrap:wrap;gap:20px;">
+      <a href="https://github.com/Mathvdias" style="color:#89b4fa;">GitHub</a>
+      <a href="https://www.linkedin.com/in/matheusvdias/" style="color:#89b4fa;">LinkedIn</a>
+      <a href="https://medium.com/@matheusvdias" style="color:#89b4fa;">Medium</a>
+      <a href="https://pub.dev/packages/intercepted_http" style="color:#89b4fa;">pub.dev</a>
+      <a href="/resume.pdf" style="color:#89b4fa;">Resume / CV</a>
+    </nav>
+
+  </main>
+
   <div id="boot">
     <!-- BIOS header -->
     <div id="boot-bios">
@@ -220,7 +310,11 @@
         var el = document.getElementById('boot');
         if (!el) return;
         el.classList.add('fade-out');
-        setTimeout(function () { el.remove(); }, 650);
+        setTimeout(function () {
+          el.remove();
+          var seo = document.getElementById('portfolio-content');
+          if (seo) seo.remove();
+        }, 650);
       }
 
       messages.forEach(function (m, i) {
