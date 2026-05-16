@@ -3,11 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../theme/app_theme.dart';
-import '../../l10n/app_localizations.dart';
-import '../constants/app_strings.dart';
-import '../constants/app_sizes.dart';
+
 import '../../core/di/app_dependencies.dart';
+import '../../l10n/app_localizations.dart';
+import '../../theme/app_theme.dart';
+import '../constants/app_sizes.dart';
+import '../constants/app_strings.dart';
 
 class Dock extends StatelessWidget {
   const Dock({super.key});
@@ -23,6 +24,12 @@ class Dock extends StatelessWidget {
         label: AppStrings.dockGitHub,
         color: AppTheme.subtext,
         url: AppStrings.urlGitHub,
+      ),
+      _DockItemData(
+        icon: Icons.language,
+        label: AppStrings.dockPubDev,
+        color: AppTheme.blue,
+        url: AppStrings.urlPubDev,
       ),
       _DockItemData(
         icon: Icons.article_outlined,
