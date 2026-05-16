@@ -36,6 +36,7 @@ dependencies:
   url_launcher: ^6.3.2
   google_fonts: ^8.1.0
   firebase_core: ^4.7.0
+  firebase_analytics: ^12.4.1
   cloud_firestore: ^6.3.0
   shared_preferences: ^2.5.5
 

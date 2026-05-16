@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../core/services/analytics_service.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../desktop/domain/models/desktop_notification.dart';
 import '../../data/repositories/guestbook_repository.dart';
@@ -12,6 +13,7 @@ class GuestbookViewModel extends ChangeNotifier {
   final GuestbookRepository _repository;
   final SharedPreferences _prefs;
   void Function(DesktopNotification)? onNotification;
+  AnalyticsService? analytics;
 
   List<GuestbookMessage> _messages = [];
   List<GuestbookMessage> get messages => _messages;
@@ -144,6 +146,7 @@ class GuestbookViewModel extends ChangeNotifier {
             // coverage:ignore-end
           );
       _success = true;
+      unawaited(analytics?.logGuestbookPost(rating));
       if (!_isAdmin) {
         _prefs.setInt(
           'last_guestbook_post',

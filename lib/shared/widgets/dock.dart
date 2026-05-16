@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -113,15 +115,18 @@ class _DockItemState extends State<_DockItem> {
   bool _hovered = false;
 
   Future<void> _handleTap(BuildContext context) async {
+    final deps = AppDependencies.of(context);
     if (widget.data.url != null) {
+      unawaited(deps.analyticsService.logLinkClick(
+        widget.data.label,
+        widget.data.url!,
+      ));
       final uri = Uri.parse(widget.data.url!);
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri);
       }
     } else if (widget.data.windowId != null) {
-      AppDependencies.of(
-        context,
-      ).desktopViewModel.openWindowById(widget.data.windowId!, context);
+      deps.desktopViewModel.openWindowById(widget.data.windowId!, context);
     }
   }
 

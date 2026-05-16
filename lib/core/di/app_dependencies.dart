@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/services/analytics_service.dart';
 import '../../features/desktop/presentation/viewmodels/desktop_viewmodel.dart';
 import '../../features/guestbook/presentation/viewmodels/guestbook_viewmodel.dart';
 import '../../features/localization/presentation/viewmodels/locale_viewmodel.dart';
@@ -12,6 +13,7 @@ class AppDependencies extends InheritedWidget {
     required this.visitorRepository,
     required this.guestbookViewModel,
     required this.desktopViewModel,
+    required this.analyticsService,
     required super.child,
   });
 
@@ -19,6 +21,7 @@ class AppDependencies extends InheritedWidget {
   final VisitorRepository visitorRepository;
   final GuestbookViewModel guestbookViewModel;
   final DesktopViewModel desktopViewModel;
+  final AnalyticsService analyticsService;
 
   static AppDependencies of(BuildContext context) {
     final result =

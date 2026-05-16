@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:app_window/app_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,6 +7,7 @@ import 'package:flutter_lazy_load_web/flutter_lazy_load_web.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../../../core/di/app_dependencies.dart';
+import '../../../../core/services/analytics_service.dart';
 import '../../../../features/desktop/presentation/viewmodels/desktop_viewmodel.dart';
 import '../../../../features/visitors/presentation/viewmodels/visitor_viewmodel.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -59,6 +62,7 @@ class DesktopPage extends StatefulWidget {
 
 class _DesktopPageState extends State<DesktopPage> {
   late DesktopViewModel _desktopVM;
+  late AnalyticsService _analytics;
   late VisitorViewModel _visitorVM;
   bool _initialized = false;
 
@@ -68,6 +72,7 @@ class _DesktopPageState extends State<DesktopPage> {
 
     final deps = AppDependencies.of(context);
     _desktopVM = deps.desktopViewModel;
+    _analytics = deps.analyticsService;
 
     // Register window handler
     _desktopVM.onOpenWindowById ??= (id, ctx) {
@@ -160,10 +165,12 @@ class _DesktopPageState extends State<DesktopPage> {
 
   void _onSpotlightSelect(SpotlightItem item, AppLocalizations l10n) {
     _desktopVM.closeSpotlight();
+    unawaited(_analytics.logSpotlightSelect(item.id));
     _openWindowForId(item.id, l10n);
   }
 
   void _openWindowForId(String id, AppLocalizations l10n) {
+    unawaited(_analytics.logWindowOpen(id));
     switch (id) {
       case AppStrings.winAbout:
         _desktopVM.openWindow(
@@ -279,6 +286,7 @@ class _DesktopPageState extends State<DesktopPage> {
   // ── Context menu handler ─────────────────────────────────────────
   void _onContextAction(DesktopContextAction action, AppLocalizations l10n) {
     _desktopVM.closeContextMenu();
+    unawaited(_analytics.logContextMenuAction(action.name));
     switch (action) {
       case DesktopContextAction.newNote:
         break;
@@ -297,9 +305,12 @@ class _DesktopPageState extends State<DesktopPage> {
     final meta = HardwareKeyboard.instance.isMetaPressed;
 
     if (meta && event.logicalKey == LogicalKeyboardKey.space) {
-      _desktopVM.showSpotlight
-          ? _desktopVM.closeSpotlight()
-          : _desktopVM.openSpotlight();
+      if (_desktopVM.showSpotlight) {
+        _desktopVM.closeSpotlight();
+      } else {
+        _desktopVM.openSpotlight();
+        unawaited(_analytics.logSpotlightOpen());
+      }
       return KeyEventResult.handled;
     }
     if (meta && event.logicalKey == LogicalKeyboardKey.keyW) {
@@ -343,6 +354,7 @@ class _DesktopPageState extends State<DesktopPage> {
             backgroundColor: AppTheme.background,
             body: GestureDetector(
               onSecondaryTapUp: (details) {
+                unawaited(_analytics.logContextMenuOpen());
                 _desktopVM.openContextMenu(details.localPosition);
               },
               onPanStart: (details) {
@@ -379,6 +391,7 @@ class _DesktopPageState extends State<DesktopPage> {
                     child: DesktopIconsGrid(
                       experiences: experiences,
                       onOpenWindow: (id, title, content, accent) {
+                        unawaited(_analytics.logWindowOpen(id));
                         _desktopVM.openWindow(id, title, content, accent);
                       },
                     ),
@@ -404,7 +417,10 @@ class _DesktopPageState extends State<DesktopPage> {
                       maximizeTopOffset: AppSizes.menuBarHeight,
                       maximizeBottomOffset: AppSizes.desktopBottom,
                       titleFontSize: AppSizes.fontXs,
-                      onClose: () => _desktopVM.closeWindow(w.id),
+                      onClose: () {
+                        unawaited(_analytics.logWindowClose(w.id));
+                        _desktopVM.closeWindow(w.id);
+                      },
                       onFocus: () => _desktopVM.focusWindow(w.id),
                       child: w.content,
                     ),
@@ -427,7 +443,10 @@ class _DesktopPageState extends State<DesktopPage> {
                     child: RepaintBoundary(
                       child: MacMenuBar(
                         currentLanguage: localeVM.currentCode,
-                        onLanguageChanged: localeVM.setLocaleByCode,
+                        onLanguageChanged: (code) {
+                          unawaited(_analytics.logLocaleChange(code));
+                          localeVM.setLocaleByCode(code);
+                        },
                         onToggleNotifications: _desktopVM.toggleNotifications,
                         onAppMenuAction: (action) async {
                           switch (action) {

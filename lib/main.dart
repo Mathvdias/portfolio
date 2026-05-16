@@ -1,4 +1,5 @@
 import 'dart:developer' as dev;
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -6,6 +7,8 @@ import 'package:portifolio/shared/constants/app_strings.dart' show AppStrings;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/di/app_dependencies.dart';
+import 'core/services/analytics_service.dart';
+import 'core/services/firebase_analytics_service.dart';
 import 'features/desktop/presentation/pages/desktop_page.dart';
 import 'features/desktop/presentation/viewmodels/desktop_viewmodel.dart';
 import 'features/localization/presentation/viewmodels/locale_viewmodel.dart';
@@ -47,6 +50,8 @@ class _AppRootState extends State<AppRoot> {
   final _localeViewModel = LocaleViewModel();
   final _visitorRepository = VisitorRepositoryImpl(VisitorDatasource());
   final _desktopViewModel = DesktopViewModel();
+  final AnalyticsService _analyticsService =
+      FirebaseAnalyticsService(FirebaseAnalytics.instance);
   late final GuestbookViewModel _guestbookViewModel;
 
   @override
@@ -56,7 +61,7 @@ class _AppRootState extends State<AppRoot> {
     _guestbookViewModel = GuestbookViewModel(
       GuestbookRepository(),
       widget.prefs,
-    );
+    )..analytics = _analyticsService;
   }
 
   @override
@@ -74,6 +79,7 @@ class _AppRootState extends State<AppRoot> {
       visitorRepository: _visitorRepository,
       guestbookViewModel: _guestbookViewModel,
       desktopViewModel: _desktopViewModel,
+      analyticsService: _analyticsService,
       child: ListenableBuilder(
         listenable: _localeViewModel,
         builder: (context, _) {

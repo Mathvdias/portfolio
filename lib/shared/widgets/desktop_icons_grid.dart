@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -6,6 +8,7 @@ import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../constants/app_strings.dart';
 import '../constants/app_sizes.dart';
+import '../../core/di/app_dependencies.dart';
 import '../mappers/experience_mapper.dart';
 import '../models/experience.dart';
 import 'desktop_icon.dart';
@@ -158,6 +161,10 @@ class DesktopIconsGrid extends StatelessWidget {
         iconWidget: const Icon(Icons.description),
         color: AppTheme.blue,
         onTap: () async {
+          unawaited(AppDependencies.of(context).analyticsService.logLinkClick(
+            'whitepaper',
+            AppStrings.urlWhitepaper,
+          ));
           final uri = Uri.parse(AppStrings.urlWhitepaper);
           if (await canLaunchUrl(uri)) await launchUrl(uri);
         },
@@ -167,6 +174,9 @@ class DesktopIconsGrid extends StatelessWidget {
         iconWidget: const Icon(Icons.picture_as_pdf),
         color: AppTheme.red,
         onTap: () async {
+          unawaited(
+            AppDependencies.of(context).analyticsService.logResumeDownload(),
+          );
           final uri = Uri.parse(AppStrings.urlResume);
           await launchUrl(uri, mode: LaunchMode.externalApplication);
         },
