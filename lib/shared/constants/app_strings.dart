@@ -30,7 +30,8 @@ abstract final class AppStrings {
   static const String urlGitHub = 'https://github.com/Mathvdias';
   static const String urlLinkedIn = 'https://www.linkedin.com/in/matheusvdias/';
   static const String urlMedium = 'https://medium.com/@matheusvdias';
-  static const String urlPubDev = 'https://pub.dev/publishers/matheusvinicius.dev.br/packages';
+  static const String urlPubDev =
+      'https://pub.dev/publishers/matheusvinicius.dev.br/packages';
   static const String urlResume = '/resume.pdf';
   static const String urlWhitepaper = 'https://matheusdias.gitbook.io/tesouro';
   static const String urlGitHubIntercepted =

@@ -97,10 +97,7 @@ void main() {
     // We drag the title bar. Since we can't find the internal GestureDetector easily,
     // we drag the area where the title bar is.
     // The title bar is at the top.
-    await tester.drag(
-      find.text('Drag Test'),
-      const Offset(50, 50),
-    );
+    await tester.drag(find.text('Drag Test'), const Offset(50, 50));
     await tester.pump();
 
     final RenderBox boxAfter = tester.renderObject(windowFinder);
