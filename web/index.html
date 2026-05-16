@@ -144,9 +144,11 @@
     }
     #boot-fill {
       height: 100%;
-      width: 0%;
+      width: 100%;
       background: #89b4fa;
-      transition: width 0.4s ease;
+      transform: scaleX(0);
+      transform-origin: left center;
+      transition: transform 0.4s ease;
     }
 
     /* Blinking cursor */
@@ -265,8 +267,19 @@
 
     <hr class="sep">
 
-    <!-- Boot log — filled by JS -->
-    <div id="boot-log"></div>
+    <!-- Boot log — lines pre-rendered to avoid CLS; revealed via opacity by JS -->
+    <div id="boot-log">
+      <p style="opacity:0;transition:opacity 0.3s ease;"><span class="tag">[    0.000]</span> Initializing MathOS kernel...</p>
+      <p style="opacity:0;transition:opacity 0.3s ease;"><span class="ok">[ OK ]</span> Loading hardware drivers</p>
+      <p style="opacity:0;transition:opacity 0.3s ease;"><span class="ok">[ OK ]</span> Mounting Flutter runtime</p>
+      <p style="opacity:0;transition:opacity 0.3s ease;"><span class="ok">[ OK ]</span> Starting pixel renderer</p>
+      <p style="opacity:0;transition:opacity 0.3s ease;"><span class="ok">[ OK ]</span> Loading experience modules</p>
+      <p style="opacity:0;transition:opacity 0.3s ease;"><span class="ok">[ OK ]</span> Importing work history</p>
+      <p style="opacity:0;transition:opacity 0.3s ease;"><span class="ok">[ OK ]</span> Mounting project filesystem</p>
+      <p style="opacity:0;transition:opacity 0.3s ease;"><span class="ok">[ OK ]</span> Starting dock services</p>
+      <p style="opacity:0;transition:opacity 0.3s ease;"><span class="ok">[ OK ]</span> <span style="color:#cdd6f4">Desktop environment ready</span></p>
+      <p style="opacity:0;transition:opacity 0.3s ease;"><span style="color:#89b4fa;letter-spacing:2px">Welcome, Developer.</span></p>
+    </div>
 
     <!-- Progress bar -->
     <div id="boot-footer">
@@ -278,29 +291,23 @@
   <script src="flutter_bootstrap.js" async></script>
   <script>
     (function () {
-      var log     = document.getElementById('boot-log');
+      var lines   = document.getElementById('boot-log').children;
       var fill    = document.getElementById('boot-fill');
-      var ready   = false;   // flutter first-frame received
-      var seqDone = false;   // all messages printed
+      var ready   = false;
+      var seqDone = false;
 
-      var messages = [
-        { delay: 0,    pct: 8,   html: '<span class="tag">[    0.000]</span> Initializing MathOS kernel...' },
-        { delay: 280,  pct: 18,  html: '<span class="ok">[ OK ]</span> Loading hardware drivers' },
-        { delay: 520,  pct: 30,  html: '<span class="ok">[ OK ]</span> Mounting Flutter runtime' },
-        { delay: 760,  pct: 44,  html: '<span class="ok">[ OK ]</span> Starting pixel renderer' },
-        { delay: 980,  pct: 58,  html: '<span class="ok">[ OK ]</span> Loading experience modules' },
-        { delay: 1200, pct: 70,  html: '<span class="ok">[ OK ]</span> Importing work history' },
-        { delay: 1420, pct: 80,  html: '<span class="ok">[ OK ]</span> Mounting project filesystem' },
-        { delay: 1640, pct: 90,  html: '<span class="ok">[ OK ]</span> Starting dock services' },
-        { delay: 1860, pct: 98,  html: '<span class="ok">[ OK ]</span> <span style="color:#cdd6f4">Desktop environment ready</span>' },
-        { delay: 2100, pct: 100, html: '<span style="color:#89b4fa;letter-spacing:2px">Welcome, Developer.</span>' },
+      var steps = [
+        { delay: 0,    pct: 0.08 },
+        { delay: 280,  pct: 0.18 },
+        { delay: 520,  pct: 0.30 },
+        { delay: 760,  pct: 0.44 },
+        { delay: 980,  pct: 0.58 },
+        { delay: 1200, pct: 0.70 },
+        { delay: 1420, pct: 0.80 },
+        { delay: 1640, pct: 0.90 },
+        { delay: 1860, pct: 0.98 },
+        { delay: 2100, pct: 1.00 },
       ];
-
-      function addLine(html) {
-        var p = document.createElement('p');
-        p.innerHTML = html;
-        log.appendChild(p);
-      }
 
       function tryDismiss() {
         if (ready && seqDone) dismiss();
@@ -317,15 +324,15 @@
         }, 650);
       }
 
-      messages.forEach(function (m, i) {
+      steps.forEach(function (s, i) {
         setTimeout(function () {
-          addLine(m.html);
-          fill.style.width = m.pct + '%';
-          if (i === messages.length - 1) {
+          if (lines[i]) lines[i].style.opacity = '1';
+          fill.style.transform = 'scaleX(' + s.pct + ')';
+          if (i === steps.length - 1) {
             seqDone = true;
             tryDismiss();
           }
-        }, m.delay);
+        }, s.delay);
       });
 
       window.addEventListener('flutter-first-frame', function () {
