@@ -102,22 +102,26 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
       case LogicalKeyboardKey.arrowUp:
       case LogicalKeyboardKey.keyW:
         if (_dir != _Dir.down) _nextDir = _Dir.up;
+        return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowDown:
       case LogicalKeyboardKey.keyS:
         if (_dir != _Dir.up) _nextDir = _Dir.down;
+        return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowLeft:
       case LogicalKeyboardKey.keyA:
         if (_dir != _Dir.right) _nextDir = _Dir.left;
+        return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowRight:
       case LogicalKeyboardKey.keyD:
         if (_dir != _Dir.left) _nextDir = _Dir.right;
+        return KeyEventResult.handled;
       case LogicalKeyboardKey.enter:
       case LogicalKeyboardKey.space:
         if (!_running || _gameOver) _start();
+        return KeyEventResult.handled;
       default:
         return KeyEventResult.ignored;
     }
-    return KeyEventResult.handled;
   }
 
   @override

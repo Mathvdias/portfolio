@@ -188,17 +188,6 @@ class _AppNameMenu extends StatelessWidget {
                 color: AppTheme.text,
               ),
             ),
-            const SizedBox(width: AppSizes.spacingSm),
-            SizedBox(
-              width: AppSizes.spacingBase,
-              height: AppSizes.spacingBase,
-              child: Icon(
-                Icons.description,
-                color: AppTheme.blue,
-                size: AppSizes.spacingBase,
-                semanticLabel: AppLocalizations.of(context).semAppMenu,
-              ),
-            ),
           ],
         ),
       ),

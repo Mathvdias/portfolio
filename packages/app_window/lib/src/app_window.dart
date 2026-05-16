@@ -96,9 +96,7 @@ class _AppWindowState extends State<AppWindow>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedPositioned(
-      duration: const Duration(milliseconds: 250),
-      curve: Curves.easeInOut,
+    return Positioned(
       left: _position.dx,
       top: _position.dy,
       child: GestureDetector(
