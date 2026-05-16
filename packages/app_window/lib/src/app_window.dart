@@ -101,7 +101,6 @@ class _AppWindowState extends State<AppWindow>
       top: _position.dy,
       child: GestureDetector(
         onTap: widget.onFocus,
-        onPanStart: (_) => widget.onFocus(),
         child: buildAnimatedWindow(_buildWindow()),
       ),
     );
@@ -151,7 +150,9 @@ class _AppWindowState extends State<AppWindow>
   Widget _buildTitleBar() {
     return GestureDetector(
       onDoubleTap: _toggleMaximize,
+      onPanStart: (_) => widget.onFocus(),
       onPanUpdate: (details) {
+        debugPrint('onPanUpdate: ${details.delta}');
         if (!_isMaximized) {
           setState(() => _position += details.delta);
         }

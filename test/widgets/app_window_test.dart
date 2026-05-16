@@ -104,5 +104,6 @@ void main() {
     final Offset finalOffset = boxAfter.localToGlobal(Offset.zero);
 
     expect(finalOffset, isNot(equals(initialOffset)));
+    await tester.pumpAndSettle();
   });
 }
