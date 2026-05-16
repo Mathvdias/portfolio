@@ -57,17 +57,19 @@ void main() {
       ).called(1);
     });
 
-    test('logResumeDownload fires resume_download with no parameters',
-        () async {
-      await sut.logResumeDownload();
+    test(
+      'logResumeDownload fires resume_download with no parameters',
+      () async {
+        await sut.logResumeDownload();
 
-      verify(
-        () => mockAnalytics.logEvent(
-          name: 'resume_download',
-          parameters: any(named: 'parameters'),
-        ),
-      ).called(1);
-    });
+        verify(
+          () => mockAnalytics.logEvent(
+            name: 'resume_download',
+            parameters: any(named: 'parameters'),
+          ),
+        ).called(1);
+      },
+    );
 
     test('logLocaleChange fires locale_change with locale', () async {
       await sut.logLocaleChange('pt');
@@ -102,29 +104,33 @@ void main() {
       ).called(1);
     });
 
-    test('logContextMenuOpen fires context_menu_open with no parameters',
-        () async {
-      await sut.logContextMenuOpen();
+    test(
+      'logContextMenuOpen fires context_menu_open with no parameters',
+      () async {
+        await sut.logContextMenuOpen();
 
-      verify(
-        () => mockAnalytics.logEvent(
-          name: 'context_menu_open',
-          parameters: any(named: 'parameters'),
-        ),
-      ).called(1);
-    });
+        verify(
+          () => mockAnalytics.logEvent(
+            name: 'context_menu_open',
+            parameters: any(named: 'parameters'),
+          ),
+        ).called(1);
+      },
+    );
 
-    test('logContextMenuAction fires context_menu_action with action',
-        () async {
-      await sut.logContextMenuAction('openTerminal');
+    test(
+      'logContextMenuAction fires context_menu_action with action',
+      () async {
+        await sut.logContextMenuAction('openTerminal');
 
-      verify(
-        () => mockAnalytics.logEvent(
-          name: 'context_menu_action',
-          parameters: {'action': 'openTerminal'},
-        ),
-      ).called(1);
-    });
+        verify(
+          () => mockAnalytics.logEvent(
+            name: 'context_menu_action',
+            parameters: {'action': 'openTerminal'},
+          ),
+        ).called(1);
+      },
+    );
 
     test('logGuestbookPost fires guestbook_post with rating', () async {
       await sut.logGuestbookPost(5);
@@ -133,6 +139,62 @@ void main() {
         () => mockAnalytics.logEvent(
           name: 'guestbook_post',
           parameters: {'rating': 5},
+        ),
+      ).called(1);
+    });
+
+    test('logError fires app_error with capped fields', () async {
+      await sut.logError('TypeError', 'Something went wrong');
+
+      verify(
+        () => mockAnalytics.logEvent(
+          name: 'app_error',
+          parameters: {
+            'error_type': 'TypeError',
+            'message': 'Something went wrong',
+          },
+        ),
+      ).called(1);
+    });
+
+    test('logError includes stack_trace when provided', () async {
+      await sut.logError(
+        'RangeError',
+        'Index out of bounds',
+        stackTrace: '#0 main',
+      );
+
+      verify(
+        () => mockAnalytics.logEvent(
+          name: 'app_error',
+          parameters: {
+            'error_type': 'RangeError',
+            'message': 'Index out of bounds',
+            'stack_trace': '#0 main',
+          },
+        ),
+      ).called(1);
+    });
+
+    test('logError caps error_type at 40 chars', () async {
+      final long = 'A' * 50;
+      await sut.logError(long, 'msg');
+
+      verify(
+        () => mockAnalytics.logEvent(
+          name: 'app_error',
+          parameters: {'error_type': 'A' * 40, 'message': 'msg'},
+        ),
+      ).called(1);
+    });
+
+    test('logJankFrame fires jank_frame with timing fields', () async {
+      await sut.logJankFrame(totalMs: 45, buildMs: 20, rasterMs: 25);
+
+      verify(
+        () => mockAnalytics.logEvent(
+          name: 'jank_frame',
+          parameters: {'total_ms': 45, 'build_ms': 20, 'raster_ms': 25},
         ),
       ).called(1);
     });

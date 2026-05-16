@@ -9,15 +9,15 @@ class FirebaseAnalyticsService implements AnalyticsService {
 
   @override
   Future<void> logWindowOpen(String windowId) => _analytics.logEvent(
-        name: 'window_open',
-        parameters: {'window_id': windowId},
-      );
+    name: 'window_open',
+    parameters: {'window_id': windowId},
+  );
 
   @override
   Future<void> logWindowClose(String windowId) => _analytics.logEvent(
-        name: 'window_close',
-        parameters: {'window_id': windowId},
-      );
+    name: 'window_close',
+    parameters: {'window_id': windowId},
+  );
 
   @override
   Future<void> logLinkClick(String destination, String url) =>
@@ -32,9 +32,9 @@ class FirebaseAnalyticsService implements AnalyticsService {
 
   @override
   Future<void> logLocaleChange(String locale) => _analytics.logEvent(
-        name: 'locale_change',
-        parameters: {'locale': locale},
-      );
+    name: 'locale_change',
+    parameters: {'locale': locale},
+  );
 
   @override
   Future<void> logSpotlightOpen() =>
@@ -42,9 +42,9 @@ class FirebaseAnalyticsService implements AnalyticsService {
 
   @override
   Future<void> logSpotlightSelect(String windowId) => _analytics.logEvent(
-        name: 'spotlight_select',
-        parameters: {'window_id': windowId},
-      );
+    name: 'spotlight_select',
+    parameters: {'window_id': windowId},
+  );
 
   @override
   Future<void> logContextMenuOpen() =>
@@ -52,13 +52,44 @@ class FirebaseAnalyticsService implements AnalyticsService {
 
   @override
   Future<void> logContextMenuAction(String action) => _analytics.logEvent(
-        name: 'context_menu_action',
-        parameters: {'action': action},
-      );
+    name: 'context_menu_action',
+    parameters: {'action': action},
+  );
 
   @override
   Future<void> logGuestbookPost(int rating) => _analytics.logEvent(
-        name: 'guestbook_post',
-        parameters: {'rating': rating},
-      );
+    name: 'guestbook_post',
+    parameters: {'rating': rating},
+  );
+
+  @override
+  Future<void> logError(
+    String errorType,
+    String message, {
+    String? stackTrace,
+  }) => _analytics.logEvent(
+    name: 'app_error',
+    parameters: {
+      'error_type': _cap(errorType, 40),
+      'message': _cap(message, 100),
+      if (stackTrace != null) 'stack_trace': _cap(stackTrace, 100),
+    },
+  );
+
+  @override
+  Future<void> logJankFrame({
+    required int totalMs,
+    required int buildMs,
+    required int rasterMs,
+  }) => _analytics.logEvent(
+    name: 'jank_frame',
+    parameters: {
+      'total_ms': totalMs,
+      'build_ms': buildMs,
+      'raster_ms': rasterMs,
+    },
+  );
+
+  static String _cap(String s, int max) =>
+      s.length <= max ? s : s.substring(0, max);
 }

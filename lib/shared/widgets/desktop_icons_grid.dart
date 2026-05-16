@@ -161,10 +161,12 @@ class DesktopIconsGrid extends StatelessWidget {
         iconWidget: const Icon(Icons.description),
         color: AppTheme.blue,
         onTap: () async {
-          unawaited(AppDependencies.of(context).analyticsService.logLinkClick(
-            'whitepaper',
-            AppStrings.urlWhitepaper,
-          ));
+          unawaited(
+            AppDependencies.of(context).analyticsService.logLinkClick(
+              'whitepaper',
+              AppStrings.urlWhitepaper,
+            ),
+          );
           final uri = Uri.parse(AppStrings.urlWhitepaper);
           if (await canLaunchUrl(uri)) await launchUrl(uri);
         },
