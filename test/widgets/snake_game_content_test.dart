@@ -11,9 +11,6 @@ void main() {
       const MaterialApp(home: Scaffold(body: SnakeGameContent())),
     );
     await tester.pumpAndSettle();
-
-    final focusNode = FocusNode();
-
     // Start the game with Enter
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
     await tester.pump();
