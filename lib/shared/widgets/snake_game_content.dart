@@ -30,6 +30,7 @@ class SnakeGameContent extends StatefulWidget {
 }
 
 class _SnakeGameContentState extends State<SnakeGameContent> {
+  final FocusNode _focusNode = FocusNode();
   List<_Pos> _snake = [];
   _Dir _dir = _Dir.right;
   _Dir _nextDir = _Dir.right;
@@ -40,8 +41,18 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
   Timer? _timer;
 
   @override
+  void initState() {
+    super.initState();
+    // Request focus initially
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus();
+    });
+  }
+
+  @override
   void dispose() {
     _timer?.cancel();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -127,81 +138,85 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
   @override
   Widget build(BuildContext context) {
     return Focus(
+      focusNode: _focusNode,
       autofocus: true,
       onKeyEvent: _onKey,
-      child: Container(
-        color: AppTheme.background,
-        padding: const EdgeInsets.all(AppSizes.spacingLg),
-        child: Column(
-          children: [
-            // Score bar
-            Padding(
-              padding: const EdgeInsets.only(bottom: AppSizes.spacingMd),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'SCORE: $_score',
-                    style: GoogleFonts.pressStart2p(
-                      fontSize: AppSizes.fontMd,
-                      color: AppTheme.yellow,
-                    ),
-                  ),
-                  Text(
-                    _running ? 'WASD / ↑↓←→' : 'PRESS ENTER',
-                    style: GoogleFonts.pressStart2p(
-                      fontSize: AppSizes.fontXs,
-                      color: AppTheme.subtext,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Game grid
-            Expanded(
-              child: AspectRatio(
-                aspectRatio: _kCols / _kRows,
-                child:
-                    _running || _gameOver
-                        ? CustomPaint(
-                          painter: _SnakePainter(
-                            snake: _snake,
-                            food: _food,
-                            cols: _kCols,
-                            rows: _kRows,
-                            gameOver: _gameOver,
-                          ),
-                        )
-                        : _StartScreen(onStart: _start),
-              ),
-            ),
-            if (_gameOver)
+      child: GestureDetector(
+        onTap: () => _focusNode.requestFocus(),
+        child: Container(
+          color: AppTheme.background,
+          padding: const EdgeInsets.all(AppSizes.spacingLg),
+          child: Column(
+            children: [
+              // Score bar
               Padding(
-                padding: const EdgeInsets.only(top: AppSizes.spacingLg),
-                child: Column(
+                padding: const EdgeInsets.only(bottom: AppSizes.spacingMd),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'GAME OVER  •  SCORE: $_score',
+                      'SCORE: $_score',
                       style: GoogleFonts.pressStart2p(
                         fontSize: AppSizes.fontMd,
-                        color: AppTheme.red,
+                        color: AppTheme.yellow,
                       ),
                     ),
-                    const SizedBox(height: AppSizes.spacingMd),
-                    TextButton(
-                      onPressed: _start,
-                      child: Text(
-                        AppStrings.snakePlayAgain,
-                        style: GoogleFonts.pressStart2p(
-                          fontSize: AppSizes.fontSm,
-                          color: AppTheme.green,
-                        ),
+                    Text(
+                      _running ? 'WASD / ↑↓←→' : 'PRESS ENTER',
+                      style: GoogleFonts.pressStart2p(
+                        fontSize: AppSizes.fontXs,
+                        color: AppTheme.subtext,
                       ),
                     ),
                   ],
                 ),
               ),
-          ],
+              // Game grid
+              Expanded(
+                child: AspectRatio(
+                  aspectRatio: _kCols / _kRows,
+                  child:
+                      _running || _gameOver
+                          ? CustomPaint(
+                            painter: _SnakePainter(
+                              snake: _snake,
+                              food: _food,
+                              cols: _kCols,
+                              rows: _kRows,
+                              gameOver: _gameOver,
+                            ),
+                          )
+                          : _StartScreen(onStart: _start),
+                ),
+              ),
+              if (_gameOver)
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSizes.spacingLg),
+                  child: Column(
+                    children: [
+                      Text(
+                        'GAME OVER  •  SCORE: $_score',
+                        style: GoogleFonts.pressStart2p(
+                          fontSize: AppSizes.fontMd,
+                          color: AppTheme.red,
+                        ),
+                      ),
+                      const SizedBox(height: AppSizes.spacingMd),
+                      TextButton(
+                        onPressed: _start,
+                        child: Text(
+                          AppStrings.snakePlayAgain,
+                          style: GoogleFonts.pressStart2p(
+                            fontSize: AppSizes.fontSm,
+                            color: AppTheme.green,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

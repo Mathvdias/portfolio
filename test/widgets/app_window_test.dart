@@ -94,20 +94,13 @@ void main() {
     final RenderBox box = tester.renderObject(windowFinder);
     final Offset initialOffset = box.localToGlobal(Offset.zero);
 
-    // The title bar is at the top. We drag from the center of the title bar.
-    // Title bar height is 32.0 by default.
-    final Offset dragStart = Offset(
-      initialOffset.dx + box.size.width / 2,
-      initialOffset.dy + 16,
-    );
-
+    // We drag the title bar. Since we can't find the internal GestureDetector easily,
+    // we drag the area where the title bar is.
+    // The title bar is at the top.
     await tester.drag(
-      find.text('Drag Test'), 
+      find.text('Drag Test'),
       const Offset(50, 50),
     );
-    
-    // If drag doesn't work on text, try dragging the widget area
-    // Use a more direct gesture if needed, but let's try pumping first
     await tester.pump();
 
     final RenderBox boxAfter = tester.renderObject(windowFinder);

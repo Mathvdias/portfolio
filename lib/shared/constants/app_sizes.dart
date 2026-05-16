@@ -68,7 +68,7 @@ abstract final class AppSizes {
   // ─── Snake game ─────────────────────────────────────────────────
   static const int snakeCols = 22;
   static const int snakeRows = 16;
-  static const int snakeTickMs = 140;
+  static const int snakeTickMs = 200;
 
   // ─── Font sizes ─────────────────────────────────────────────────
   static const double fontXxs = 6.0;
