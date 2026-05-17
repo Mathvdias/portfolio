@@ -23,7 +23,9 @@ _Pos _move(_Pos p, _Dir d) => switch (d) {
 };
 
 class SnakeGameContent extends StatefulWidget {
-  const SnakeGameContent({super.key});
+  const SnakeGameContent({super.key, this.randomSeed});
+
+  final int? randomSeed;
 
   @override
   State<SnakeGameContent> createState() => _SnakeGameContentState();
@@ -31,6 +33,7 @@ class SnakeGameContent extends StatefulWidget {
 
 class _SnakeGameContentState extends State<SnakeGameContent> {
   final FocusNode _focusNode = FocusNode();
+  late final Random _rng;
   List<_Pos> _snake = [];
   _Dir _dir = _Dir.right;
   _Dir _nextDir = _Dir.right;
@@ -43,7 +46,7 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
   @override
   void initState() {
     super.initState();
-    // Request focus initially
+    _rng = widget.randomSeed != null ? Random(widget.randomSeed!) : Random();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
     });
@@ -76,10 +79,9 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
   }
 
   void _spawnFood() {
-    final rng = Random();
     _Pos f;
     do {
-      f = (x: rng.nextInt(_kCols), y: rng.nextInt(_kRows));
+      f = (x: _rng.nextInt(_kCols), y: _rng.nextInt(_kRows));
     } while (_snake.any((p) => p.x == f.x && p.y == f.y));
     setState(() => _food = f);
   }
