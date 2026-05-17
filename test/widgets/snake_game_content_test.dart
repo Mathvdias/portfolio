@@ -7,9 +7,8 @@ import 'package:portifolio/shared/widgets/snake_game_content.dart';
 // and second food at (2,11) reachable via the scripted path below.
 const _kTestSeed = 94;
 
-Widget _buildApp({int? seed}) => MaterialApp(
-  home: Scaffold(body: SnakeGameContent(randomSeed: seed)),
-);
+Widget _buildApp({int? seed}) =>
+    MaterialApp(home: Scaffold(body: SnakeGameContent(randomSeed: seed)));
 
 void main() {
   testWidgets('SnakeGameContent handles keyboard input correctly', (
