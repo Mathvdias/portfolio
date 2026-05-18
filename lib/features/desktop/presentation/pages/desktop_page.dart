@@ -354,7 +354,7 @@ class _DesktopPageState extends State<DesktopPage> {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
     final meta = HardwareKeyboard.instance.isMetaPressed;
 
-    if (meta && event.logicalKey == LogicalKeyboardKey.space) {
+    if (meta && event.logicalKey == LogicalKeyboardKey.keyK) {
       if (_desktopVM.showSpotlight) {
         _desktopVM.closeSpotlight();
       } else {
@@ -523,6 +523,10 @@ class _DesktopPageState extends State<DesktopPage> {
                     onLanguageChanged: (code) {
                       unawaited(_analytics.logLocaleChange(code));
                       localeVM.setLocaleByCode(code);
+                    },
+                    onSpotlight: () {
+                      _desktopVM.openSpotlight();
+                      unawaited(_analytics.logSpotlightOpen());
                     },
                     onToggleNotifications: _desktopVM.toggleNotifications,
                     onAppMenuAction: (action) async {

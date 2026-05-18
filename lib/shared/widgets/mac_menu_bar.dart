@@ -25,12 +25,14 @@ class MacMenuBar extends StatelessWidget {
     required this.onLanguageChanged,
     this.onToggleNotifications,
     this.onAppMenuAction,
+    this.onSpotlight,
   });
 
   final String currentLanguage;
   final void Function(String) onLanguageChanged;
   final VoidCallback? onToggleNotifications;
   final void Function(AppMenuAction)? onAppMenuAction;
+  final VoidCallback? onSpotlight;
 
   String _flagFor(String code) =>
       _kLanguages
@@ -71,6 +73,25 @@ class MacMenuBar extends StatelessWidget {
           const _ClockWidget(),
 
           const SizedBox(width: AppSizes.font2xl),
+
+          if (onSpotlight != null) ...[
+            Tooltip(
+              message: '⌘K',
+              child: GestureDetector(
+                onTap: onSpotlight,
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: Icon(
+                    Icons.search,
+                    size: AppSizes.font3xl,
+                    color: AppTheme.subtext,
+                    semanticLabel: AppLocalizations.of(context).semSearch,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSizes.spacingBase),
+          ],
 
           if (onToggleNotifications != null) ...[
             GestureDetector(
