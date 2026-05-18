@@ -171,36 +171,38 @@ class _SpotlightOverlayState extends State<SpotlightOverlay> {
                         ],
                       ),
                     ),
-                    // Results list — only this rebuilds on filter/selection change
-                    ValueListenableBuilder<_SpotlightState>(
-                      valueListenable: _state,
-                      builder: (_, s, _) {
-                        if (s.filtered.isEmpty) return const SizedBox.shrink();
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(height: 1, color: AppTheme.surface0),
-                            Flexible(
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: AppSizes.spacingXs,
+                    // Results list — Flexible as direct child of outer Column so
+                    // the maxHeight constraint from the Container flows down correctly.
+                    Flexible(
+                      child: ValueListenableBuilder<_SpotlightState>(
+                        valueListenable: _state,
+                        builder: (_, s, __) {
+                          if (s.filtered.isEmpty)
+                            return const SizedBox.shrink();
+                          return Column(
+                            children: [
+                              Container(height: 1, color: AppTheme.surface0),
+                              Expanded(
+                                child: ListView.builder(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: AppSizes.spacingXs,
+                                  ),
+                                  itemCount: s.filtered.length,
+                                  itemBuilder: (_, i) {
+                                    final item = s.filtered[i];
+                                    return _SpotlightRow(
+                                      key: ValueKey(item.id),
+                                      item: item,
+                                      selected: i == s.selectedIndex,
+                                      onTap: () => widget.onSelect(item),
+                                    );
+                                  },
                                 ),
-                                itemCount: s.filtered.length,
-                                itemBuilder: (_, i) {
-                                  final item = s.filtered[i];
-                                  return _SpotlightRow(
-                                    key: ValueKey(item.id),
-                                    item: item,
-                                    selected: i == s.selectedIndex,
-                                    onTap: () => widget.onSelect(item),
-                                  );
-                                },
                               ),
-                            ),
-                          ],
-                        );
-                      },
+                            ],
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),
