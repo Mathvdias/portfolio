@@ -51,7 +51,7 @@ jobs:
         run: flutter pub get
 
       - name: Build Web
-        run: flutter build web --release --wasm
+        run: flutter build web --release --wasm --pwa-strategy=offline-first
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v7
@@ -64,6 +64,8 @@ jobs:
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - uses: actions/checkout@v6
       
