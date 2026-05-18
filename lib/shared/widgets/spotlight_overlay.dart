@@ -7,6 +7,8 @@ import '../../theme/app_theme.dart';
 import '../constants/app_strings.dart';
 import '../constants/app_sizes.dart';
 
+typedef _SpotlightState = ({List<SpotlightItem> filtered, int selectedIndex});
+
 /// A Spotlight-style search overlay that lets the user search and open any
 /// desktop window by name.
 class SpotlightOverlay extends StatefulWidget {
@@ -28,13 +30,12 @@ class SpotlightOverlay extends StatefulWidget {
 class _SpotlightOverlayState extends State<SpotlightOverlay> {
   final _controller = TextEditingController();
   final _focusNode = FocusNode();
-  List<SpotlightItem> _filtered = [];
-  int _selectedIndex = 0;
+  late final ValueNotifier<_SpotlightState> _state;
 
   @override
   void initState() {
     super.initState();
-    _filtered = widget.items;
+    _state = ValueNotifier((filtered: widget.items, selectedIndex: 0));
     _controller.addListener(_onChanged);
     _focusNode.requestFocus();
   }
@@ -43,18 +44,19 @@ class _SpotlightOverlayState extends State<SpotlightOverlay> {
   void dispose() {
     _controller.dispose();
     _focusNode.dispose();
+    _state.dispose();
     super.dispose();
   }
 
   void _onChanged() {
     final query = _controller.text.toLowerCase();
-    setState(() {
-      _filtered =
+    _state.value = (
+      filtered:
           widget.items
               .where((item) => item.label.toLowerCase().contains(query))
-              .toList();
-      _selectedIndex = 0;
-    });
+              .toList(),
+      selectedIndex: 0,
+    );
   }
 
   KeyEventResult _onKey(FocusNode _, KeyEvent event) {
@@ -65,19 +67,24 @@ class _SpotlightOverlayState extends State<SpotlightOverlay> {
       return KeyEventResult.handled;
     }
     if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
-      setState(() {
-        _selectedIndex = (_selectedIndex + 1).clamp(0, _filtered.length - 1);
-      });
+      final s = _state.value;
+      _state.value = (
+        filtered: s.filtered,
+        selectedIndex: (s.selectedIndex + 1).clamp(0, s.filtered.length - 1),
+      );
       return KeyEventResult.handled;
     }
     if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
-      setState(() {
-        _selectedIndex = (_selectedIndex - 1).clamp(0, _filtered.length - 1);
-      });
+      final s = _state.value;
+      _state.value = (
+        filtered: s.filtered,
+        selectedIndex: (s.selectedIndex - 1).clamp(0, s.filtered.length - 1),
+      );
       return KeyEventResult.handled;
     }
     if (event.logicalKey == LogicalKeyboardKey.enter) {
-      if (_filtered.isNotEmpty) widget.onSelect(_filtered[_selectedIndex]);
+      final s = _state.value;
+      if (s.filtered.isNotEmpty) widget.onSelect(s.filtered[s.selectedIndex]);
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
@@ -123,7 +130,7 @@ class _SpotlightOverlayState extends State<SpotlightOverlay> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Search field
+                    // Search field — never rebuilds on keystroke
                     Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSizes.spacingXl,
@@ -164,27 +171,37 @@ class _SpotlightOverlayState extends State<SpotlightOverlay> {
                         ],
                       ),
                     ),
-                    if (_filtered.isNotEmpty) ...[
-                      Container(height: 1, color: AppTheme.surface0),
-                      Flexible(
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: AppSizes.spacingXs,
-                          ),
-                          itemCount: _filtered.length,
-                          itemBuilder: (_, i) {
-                            final item = _filtered[i];
-                            final selected = i == _selectedIndex;
-                            return _SpotlightRow(
-                              item: item,
-                              selected: selected,
-                              onTap: () => widget.onSelect(item),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
+                    // Results list — only this rebuilds on filter/selection change
+                    ValueListenableBuilder<_SpotlightState>(
+                      valueListenable: _state,
+                      builder: (_, s, __) {
+                        if (s.filtered.isEmpty) return const SizedBox.shrink();
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(height: 1, color: AppTheme.surface0),
+                            Flexible(
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: AppSizes.spacingXs,
+                                ),
+                                itemCount: s.filtered.length,
+                                itemBuilder: (_, i) {
+                                  final item = s.filtered[i];
+                                  return _SpotlightRow(
+                                    key: ValueKey(item.id),
+                                    item: item,
+                                    selected: i == s.selectedIndex,
+                                    onTap: () => widget.onSelect(item),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -198,6 +215,7 @@ class _SpotlightOverlayState extends State<SpotlightOverlay> {
 
 class _SpotlightRow extends StatelessWidget {
   const _SpotlightRow({
+    super.key,
     required this.item,
     required this.selected,
     required this.onTap,

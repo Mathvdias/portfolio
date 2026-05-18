@@ -19,12 +19,13 @@ class GuestbookContent extends StatefulWidget {
 class _GuestbookContentState extends State<GuestbookContent> {
   final _nameCtrl = TextEditingController();
   final _msgCtrl = TextEditingController();
-  int _rating = 5;
+  final _rating = ValueNotifier<int>(5);
 
   @override
   void dispose() {
     _nameCtrl.dispose();
     _msgCtrl.dispose();
+    _rating.dispose();
     super.dispose();
   }
 
@@ -34,7 +35,7 @@ class _GuestbookContentState extends State<GuestbookContent> {
     await widget.viewModel.submitMessage(
       _nameCtrl.text,
       _msgCtrl.text,
-      _rating,
+      _rating.value,
     );
 
     if (!mounted) return;
@@ -51,7 +52,7 @@ class _GuestbookContentState extends State<GuestbookContent> {
     } else if (widget.viewModel.success) {
       _nameCtrl.clear();
       _msgCtrl.clear();
-      setState(() => _rating = 5);
+      _rating.value = 5;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.messagePosted),
@@ -152,21 +153,34 @@ class _GuestbookContentState extends State<GuestbookContent> {
                     const SizedBox(height: AppSizes.spacingMd),
                     Row(
                       children: [
-                        Text(
-                          l10n.rating,
-                          style: GoogleFonts.spaceMono(color: AppTheme.subtext),
+                        ValueListenableBuilder<int>(
+                          valueListenable: _rating,
+                          builder:
+                              (_, rating, __) => Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    l10n.rating,
+                                    style: GoogleFonts.spaceMono(
+                                      color: AppTheme.subtext,
+                                    ),
+                                  ),
+                                  ...List.generate(5, (index) {
+                                    return IconButton(
+                                      tooltip: l10n.semRateStar(index + 1),
+                                      icon: Icon(
+                                        index < rating
+                                            ? Icons.star
+                                            : Icons.star_border,
+                                        color: AppTheme.yellow,
+                                      ),
+                                      onPressed:
+                                          () => _rating.value = index + 1,
+                                    );
+                                  }),
+                                ],
+                              ),
                         ),
-                        ...List.generate(5, (index) {
-                          return IconButton(
-                            tooltip: l10n.semRateStar(index + 1),
-                            icon: Icon(
-                              index < _rating ? Icons.star : Icons.star_border,
-                              color: AppTheme.yellow,
-                            ),
-                            onPressed:
-                                () => setState(() => _rating = index + 1),
-                          );
-                        }),
                         const Spacer(),
                         ElevatedButton(
                           onPressed:

@@ -119,6 +119,7 @@ class _TerminalContentState extends State<TerminalContent> {
   final _focus = FocusNode();
   final _history = <_Line>[];
   final _cmdHistory = <String>[];
+  final _version = ValueNotifier<int>(0);
   int _historyIndex = -1;
 
   @override
@@ -138,19 +139,19 @@ class _TerminalContentState extends State<TerminalContent> {
     _scroll.dispose();
     _ctrl.dispose();
     _focus.dispose();
+    _version.dispose();
     super.dispose();
   }
 
   // ── Submit ─────────────────────────────────────────────────────
   Future<void> _submit(String input) async {
     final trimmed = input.trim();
-    setState(() {
-      _history.add(_Line('$_kPrompt$trimmed', AppTheme.blue));
-      if (trimmed.isNotEmpty) {
-        _cmdHistory.insert(0, trimmed);
-      }
-      _historyIndex = -1;
-    });
+    _history.add(_Line('$_kPrompt$trimmed', AppTheme.blue));
+    if (trimmed.isNotEmpty) {
+      _cmdHistory.insert(0, trimmed);
+    }
+    _historyIndex = -1;
+    _version.value++;
     _ctrl.clear();
 
     await _executeSequential(trimmed);
@@ -170,16 +171,15 @@ class _TerminalContentState extends State<TerminalContent> {
         if (cmd.isEmpty) continue;
         final output = await _run(cmd);
         if (!mounted) return;
-        setState(() {
-          if (output == null) {
-            _history.clear();
-          } else if (output.isNotEmpty) {
-            for (final line in output.split('\n')) {
-              _history.add(_Line(line));
-            }
+        if (output == null) {
+          _history.clear();
+        } else if (output.isNotEmpty) {
+          for (final line in output.split('\n')) {
+            _history.add(_Line(line));
           }
-          _history.add(const _Line(''));
-        });
+        }
+        _history.add(const _Line(''));
+        _version.value++;
         // If the command "failed" (command not found) and we're in && mode,
         // skip remaining && parts
         if (output != null && output.contains('command not found')) break;
@@ -257,11 +257,10 @@ class _TerminalContentState extends State<TerminalContent> {
         _ctrl.text = '${matches[0]} ';
         _ctrl.selection = TextSelection.collapsed(offset: _ctrl.text.length);
       } else if (matches.isNotEmpty) {
-        setState(() {
-          _history.add(_Line('$_kPrompt$text', AppTheme.blue));
-          _history.add(_Line(matches.join('  ')));
-          _history.add(const _Line(''));
-        });
+        _history.add(_Line('$_kPrompt$text', AppTheme.blue));
+        _history.add(_Line(matches.join('  ')));
+        _history.add(const _Line(''));
+        _version.value++;
         _scrollToBottom();
       }
     } else {
@@ -284,11 +283,10 @@ class _TerminalContentState extends State<TerminalContent> {
         _ctrl.text = '${parts.join(' ')} ';
         _ctrl.selection = TextSelection.collapsed(offset: _ctrl.text.length);
       } else if (matches.isNotEmpty) {
-        setState(() {
-          _history.add(_Line('$_kPrompt$text', AppTheme.blue));
-          _history.add(_Line(matches.join('  ')));
-          _history.add(const _Line(''));
-        });
+        _history.add(_Line('$_kPrompt$text', AppTheme.blue));
+        _history.add(_Line(matches.join('  ')));
+        _history.add(const _Line(''));
+        _version.value++;
         _scrollToBottom();
       }
     }
@@ -354,17 +352,21 @@ class _TerminalContentState extends State<TerminalContent> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
-              child: ListView.builder(
-                controller: _scroll,
-                itemCount: _history.length,
-                itemBuilder:
-                    (_, i) => Text(
-                      _history[i].text,
-                      style: GoogleFonts.spaceMono(
-                        fontSize: AppSizes.terminalFontSize,
-                        color: _history[i].color,
-                        height: 1.5,
-                      ),
+              child: ValueListenableBuilder<int>(
+                valueListenable: _version,
+                builder:
+                    (_, __, ___) => ListView.builder(
+                      controller: _scroll,
+                      itemCount: _history.length,
+                      itemBuilder:
+                          (_, i) => Text(
+                            _history[i].text,
+                            style: GoogleFonts.spaceMono(
+                              fontSize: AppSizes.terminalFontSize,
+                              color: _history[i].color,
+                              height: 1.5,
+                            ),
+                          ),
                     ),
               ),
             ),
