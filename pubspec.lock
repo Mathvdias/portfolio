@@ -214,10 +214,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_lazy_load_web
-      sha256: "202492b8499ae3e90b6eb3a41eb26e1044223d7515b249461d6b5522a6a78e09"
+      sha256: "8ee4baa1da6e87a8bff1b6eabff01edcaad323feedca3f52f1022e61398ea259"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.1"
+    version: "0.1.2"
   flutter_lints:
     dependency: "direct dev"
     description:
