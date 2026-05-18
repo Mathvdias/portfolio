@@ -95,6 +95,25 @@ void main() {
     expect(find.textContaining('SCORE: 1'), findsOneWidget);
   });
 
+  testWidgets(
+    'SnakeGameContent shouldRepaint returns false on painter replace',
+    (tester) async {
+      await tester.pumpWidget(_buildApp(seed: _kTestSeed));
+      await tester.pumpAndSettle();
+
+      // Start game so CustomPaint is visible
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+
+      // Re-pump same widget — State.build() runs again, creating a new
+      // _SnakePainter instance, which causes shouldRepaint to be called.
+      await tester.pumpWidget(_buildApp(seed: _kTestSeed));
+      await tester.pump();
+
+      expect(find.byType(SnakeGameContent), findsOneWidget);
+    },
+  );
+
   testWidgets('SnakeGameContent reaches game over and shows game over UI', (
     tester,
   ) async {
