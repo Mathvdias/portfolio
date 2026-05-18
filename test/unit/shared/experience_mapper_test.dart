@@ -75,28 +75,38 @@ void main() {
     int cp(Widget w) => (w as FaIcon).icon!.codePoint;
 
     test('returns briefcase for Zallpy', () {
-      expect(cp(ExperienceMapper.iconWidgetFor('Zallpy')),
-          FontAwesomeIcons.briefcase.codePoint);
+      expect(
+        cp(ExperienceMapper.iconWidgetFor('Zallpy')),
+        FontAwesomeIcons.briefcase.codePoint,
+      );
     });
 
     test('returns buildingColumns for Banco Pan', () {
-      expect(cp(ExperienceMapper.iconWidgetFor('Banco Pan')),
-          FontAwesomeIcons.buildingColumns.codePoint);
+      expect(
+        cp(ExperienceMapper.iconWidgetFor('Banco Pan')),
+        FontAwesomeIcons.buildingColumns.codePoint,
+      );
     });
 
     test('returns wifi for Conecthus', () {
-      expect(cp(ExperienceMapper.iconWidgetFor('Conecthus')),
-          FontAwesomeIcons.wifi.codePoint);
+      expect(
+        cp(ExperienceMapper.iconWidgetFor('Conecthus')),
+        FontAwesomeIcons.wifi.codePoint,
+      );
     });
 
     test('returns phone for Oi', () {
-      expect(cp(ExperienceMapper.iconWidgetFor('Oi')),
-          FontAwesomeIcons.phone.codePoint);
+      expect(
+        cp(ExperienceMapper.iconWidgetFor('Oi')),
+        FontAwesomeIcons.phone.codePoint,
+      );
     });
 
     test('returns buildingColumns for unknown', () {
-      expect(cp(ExperienceMapper.iconWidgetFor('Acme Corp')),
-          FontAwesomeIcons.buildingColumns.codePoint);
+      expect(
+        cp(ExperienceMapper.iconWidgetFor('Acme Corp')),
+        FontAwesomeIcons.buildingColumns.codePoint,
+      );
     });
   });
 

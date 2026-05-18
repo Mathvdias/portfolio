@@ -34,9 +34,11 @@ abstract final class ExperienceMapper {
 
   // ── Resolve IconData ───────────────────────────────────
   static Widget iconWidgetFor(String company) {
-    if (company.contains('Zallpy')) return const FaIcon(FontAwesomeIcons.briefcase);
+    if (company.contains('Zallpy'))
+      return const FaIcon(FontAwesomeIcons.briefcase);
     if (_isPan(company)) return const FaIcon(FontAwesomeIcons.buildingColumns);
-    if (company.contains('Conecthus')) return const FaIcon(FontAwesomeIcons.wifi);
+    if (company.contains('Conecthus'))
+      return const FaIcon(FontAwesomeIcons.wifi);
     if (company.contains('Oi')) return const FaIcon(FontAwesomeIcons.phone);
     return const FaIcon(FontAwesomeIcons.buildingColumns);
   }
