@@ -86,6 +86,9 @@
       }
     ]
   },
+  "firestore": {
+    "rules": "firestore.rules"
+  },
   "flutter": {
     "platforms": {
       "dart": {
