@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../theme/app_theme.dart';
 import '../models/experience.dart';
@@ -33,11 +34,11 @@ abstract final class ExperienceMapper {
 
   // ── Resolve IconData ───────────────────────────────────
   static Widget iconWidgetFor(String company) {
-    if (company.contains('Zallpy')) return const Icon(Icons.business);
-    if (_isPan(company)) return const Icon(Icons.account_balance);
-    if (company.contains('Conecthus')) return const Icon(Icons.network_wifi);
-    if (company.contains('Oi')) return const Icon(Icons.phone);
-    return const Icon(Icons.work);
+    if (company.contains('Zallpy')) return const FaIcon(FontAwesomeIcons.briefcase);
+    if (_isPan(company)) return const FaIcon(FontAwesomeIcons.buildingColumns);
+    if (company.contains('Conecthus')) return const FaIcon(FontAwesomeIcons.wifi);
+    if (company.contains('Oi')) return const FaIcon(FontAwesomeIcons.phone);
+    return const FaIcon(FontAwesomeIcons.buildingColumns);
   }
 
   // ── Resolve short display name ─────────────────────────────────

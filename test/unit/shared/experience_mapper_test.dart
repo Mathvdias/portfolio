@@ -1,8 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:portifolio/shared/mappers/experience_mapper.dart';
 import 'package:portifolio/shared/models/experience.dart';
 import 'package:portifolio/theme/app_theme.dart';
-import 'package:flutter/material.dart';
 
 void main() {
   group('ExperienceMapper.fromL10n', () {
@@ -71,29 +72,31 @@ void main() {
   });
 
   group('ExperienceMapper.iconWidgetFor', () {
-    test('returns Icons.business for Zallpy', () {
-      final widget = ExperienceMapper.iconWidgetFor('Zallpy') as Icon;
-      expect(widget.icon, Icons.business);
+    int cp(Widget w) => (w as FaIcon).icon!.codePoint;
+
+    test('returns briefcase for Zallpy', () {
+      expect(cp(ExperienceMapper.iconWidgetFor('Zallpy')),
+          FontAwesomeIcons.briefcase.codePoint);
     });
 
-    test('returns Icons.account_balance for Banco Pan', () {
-      final widget = ExperienceMapper.iconWidgetFor('Banco Pan') as Icon;
-      expect(widget.icon, Icons.account_balance);
+    test('returns buildingColumns for Banco Pan', () {
+      expect(cp(ExperienceMapper.iconWidgetFor('Banco Pan')),
+          FontAwesomeIcons.buildingColumns.codePoint);
     });
 
-    test('returns Icons.network_wifi for Conecthus', () {
-      final widget = ExperienceMapper.iconWidgetFor('Conecthus') as Icon;
-      expect(widget.icon, Icons.network_wifi);
+    test('returns wifi for Conecthus', () {
+      expect(cp(ExperienceMapper.iconWidgetFor('Conecthus')),
+          FontAwesomeIcons.wifi.codePoint);
     });
 
-    test('returns Icons.phone for Oi', () {
-      final widget = ExperienceMapper.iconWidgetFor('Oi') as Icon;
-      expect(widget.icon, Icons.phone);
+    test('returns phone for Oi', () {
+      expect(cp(ExperienceMapper.iconWidgetFor('Oi')),
+          FontAwesomeIcons.phone.codePoint);
     });
 
-    test('returns Icons.work for unknown', () {
-      final widget = ExperienceMapper.iconWidgetFor('Acme Corp') as Icon;
-      expect(widget.icon, Icons.work);
+    test('returns buildingColumns for unknown', () {
+      expect(cp(ExperienceMapper.iconWidgetFor('Acme Corp')),
+          FontAwesomeIcons.buildingColumns.codePoint);
     });
   });
 

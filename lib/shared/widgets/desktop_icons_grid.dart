@@ -146,7 +146,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconContact,
-        iconWidget: const Icon(Icons.mail),
+        iconWidget: const FaIcon(FontAwesomeIcons.envelope),
         color: AppTheme.teal,
         onTap:
             () => onOpenWindow(
@@ -158,7 +158,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconWhitepaper,
-        iconWidget: const Icon(Icons.description),
+        iconWidget: const FaIcon(FontAwesomeIcons.fileLines),
         color: AppTheme.blue,
         onTap: () async {
           unawaited(
@@ -173,7 +173,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconResume,
-        iconWidget: const Icon(Icons.picture_as_pdf),
+        iconWidget: const FaIcon(FontAwesomeIcons.filePdf),
         color: AppTheme.red,
         onTap: () async {
           unawaited(
@@ -185,7 +185,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconInterceptedHttp,
-        iconWidget: const Icon(Icons.security),
+        iconWidget: const FaIcon(FontAwesomeIcons.shield),
         color: AppTheme.blue,
         onTap:
             () => onOpenWindow(
