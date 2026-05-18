@@ -82,6 +82,31 @@ void main() {
       ).called(1);
     });
 
+    test(
+      'logLocaleView fires locale_view with locale and source=initial',
+      () async {
+        await sut.logLocaleView('pt', initial: true);
+
+        verify(
+          () => mockAnalytics.logEvent(
+            name: 'locale_view',
+            parameters: {'locale': 'pt', 'source': 'initial'},
+          ),
+        ).called(1);
+      },
+    );
+
+    test('logLocaleView fires locale_view with source=changed', () async {
+      await sut.logLocaleView('en', initial: false);
+
+      verify(
+        () => mockAnalytics.logEvent(
+          name: 'locale_view',
+          parameters: {'locale': 'en', 'source': 'changed'},
+        ),
+      ).called(1);
+    });
+
     test('logSpotlightOpen fires spotlight_open with no parameters', () async {
       await sut.logSpotlightOpen();
 

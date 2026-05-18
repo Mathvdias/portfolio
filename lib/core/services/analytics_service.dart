@@ -4,6 +4,11 @@ abstract class AnalyticsService {
   Future<void> logLinkClick(String destination, String url);
   Future<void> logResumeDownload();
   Future<void> logLocaleChange(String locale);
+
+  /// Logs which locale was active when the desktop loaded (initial) or after
+  /// the user explicitly changed it (changed). Use to measure real language
+  /// distribution across sessions, not just switcher engagement.
+  Future<void> logLocaleView(String locale, {required bool initial});
   Future<void> logSpotlightOpen();
   Future<void> logSpotlightSelect(String windowId);
   Future<void> logContextMenuOpen();

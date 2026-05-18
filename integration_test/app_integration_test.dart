@@ -53,6 +53,8 @@ class _NoOpAnalytics implements AnalyticsService {
   }) async {}
   @override
   Future<void> logFirstWindow(String windowId) async {}
+  @override
+  Future<void> logLocaleView(String locale, {required bool initial}) async {}
 }
 
 void main() {

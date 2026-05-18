@@ -90,6 +90,12 @@ class _DesktopPageState extends State<DesktopPage> {
     if (!_initialized) {
       _initialized = true;
       _visitorVM = VisitorViewModel(deps.visitorRepository)..init();
+      unawaited(
+        _analytics.logLocaleView(
+          deps.localeViewModel.currentCode,
+          initial: true,
+        ),
+      );
     }
 
     final guestbookVM = deps.guestbookViewModel;
@@ -522,6 +528,7 @@ class _DesktopPageState extends State<DesktopPage> {
                     currentLanguage: localeVM.currentCode,
                     onLanguageChanged: (code) {
                       unawaited(_analytics.logLocaleChange(code));
+                      unawaited(_analytics.logLocaleView(code, initial: false));
                       localeVM.setLocaleByCode(code);
                     },
                     onSpotlight: () {

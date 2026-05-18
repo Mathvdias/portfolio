@@ -37,6 +37,16 @@ class FirebaseAnalyticsService implements AnalyticsService {
   );
 
   @override
+  Future<void> logLocaleView(String locale, {required bool initial}) =>
+      _analytics.logEvent(
+        name: 'locale_view',
+        parameters: {
+          'locale': locale,
+          'source': initial ? 'initial' : 'changed',
+        },
+      );
+
+  @override
   Future<void> logSpotlightOpen() =>
       _analytics.logEvent(name: 'spotlight_open');
 
