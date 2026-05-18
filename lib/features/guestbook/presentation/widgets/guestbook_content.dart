@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/constants/app_sizes.dart';
 import '../../../../theme/app_theme.dart';
-import '../../../../l10n/app_localizations.dart';
-import '../viewmodels/guestbook_viewmodel.dart';
 import '../../domain/models/guestbook_message.dart';
+import '../viewmodels/guestbook_viewmodel.dart';
 
 class GuestbookContent extends StatefulWidget {
   final GuestbookViewModel viewModel;
@@ -156,7 +156,7 @@ class _GuestbookContentState extends State<GuestbookContent> {
                         ValueListenableBuilder<int>(
                           valueListenable: _rating,
                           builder:
-                              (_, rating, __) => Row(
+                              (_, rating, _) => Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(

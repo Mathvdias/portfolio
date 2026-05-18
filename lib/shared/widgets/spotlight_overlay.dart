@@ -4,8 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../theme/app_theme.dart';
-import '../constants/app_strings.dart';
 import '../constants/app_sizes.dart';
+import '../constants/app_strings.dart';
 
 typedef _SpotlightState = ({List<SpotlightItem> filtered, int selectedIndex});
 
@@ -174,7 +174,7 @@ class _SpotlightOverlayState extends State<SpotlightOverlay> {
                     // Results list — only this rebuilds on filter/selection change
                     ValueListenableBuilder<_SpotlightState>(
                       valueListenable: _state,
-                      builder: (_, s, __) {
+                      builder: (_, s, _) {
                         if (s.filtered.isEmpty) return const SizedBox.shrink();
                         return Column(
                           mainAxisSize: MainAxisSize.min,

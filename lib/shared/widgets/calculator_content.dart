@@ -41,8 +41,9 @@ class _CalculatorContentState extends State<CalculatorContent> {
       if (_operand == '-') result = (_num1 - num2).toString();
       if (_operand == '*') result = (_num1 * num2).toString();
       if (_operand == '/') result = (_num1 / num2).toString();
-      if (result.endsWith('.0'))
+      if (result.endsWith('.0')) {
         result = result.substring(0, result.length - 2);
+      }
       _operand = '';
       _shouldClear = true;
       _display.value = result;

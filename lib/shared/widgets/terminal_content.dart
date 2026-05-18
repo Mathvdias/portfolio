@@ -3,10 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../core/di/app_dependencies.dart';
 import '../../theme/app_theme.dart';
 import '../constants/app_sizes.dart';
 import '../constants/app_strings.dart';
-import '../../core/di/app_dependencies.dart';
 
 const _kPrompt = 'matheus@portfolio:~\$ ';
 
@@ -355,7 +355,7 @@ class _TerminalContentState extends State<TerminalContent> {
               child: ValueListenableBuilder<int>(
                 valueListenable: _version,
                 builder:
-                    (_, __, ___) => ListView.builder(
+                    (_, _, _) => ListView.builder(
                       controller: _scroll,
                       itemCount: _history.length,
                       itemBuilder:

@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../theme/app_theme.dart';
 import '../constants/app_sizes.dart';
 import '../constants/app_strings.dart';
@@ -185,7 +187,7 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
               ValueListenableBuilder<_GameState>(
                 valueListenable: _state,
                 builder:
-                    (_, s, __) => Padding(
+                    (_, s, _) => Padding(
                       padding: const EdgeInsets.only(
                         bottom: AppSizes.spacingMd,
                       ),
@@ -232,7 +234,7 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
               ValueListenableBuilder<_GameState>(
                 valueListenable: _state,
                 builder:
-                    (_, s, __) =>
+                    (_, s, _) =>
                         s.gameOver
                             ? Padding(
                               padding: const EdgeInsets.only(
