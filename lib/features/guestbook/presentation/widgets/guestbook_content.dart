@@ -261,6 +261,8 @@ class _GuestbookContentState extends State<GuestbookContent> {
                         : ListView.separated(
                           padding: const EdgeInsets.all(AppSizes.spacingLg),
                           itemCount: widget.viewModel.messages.length,
+                          addAutomaticKeepAlives: false,
+                          addRepaintBoundaries: false,
                           separatorBuilder:
                               (_, _) =>
                                   const SizedBox(height: AppSizes.spacingLg),

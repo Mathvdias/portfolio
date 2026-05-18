@@ -86,10 +86,12 @@ class _PixelWallpaperState extends State<PixelWallpaper>
 }
 
 class _WallpaperPainter extends CustomPainter {
+  _WallpaperPainter(this.particles, this._elapsed) : super(repaint: _elapsed);
+
   final List<_Particle> particles;
   final ValueNotifier<double> _elapsed;
-
-  _WallpaperPainter(this.particles, this._elapsed) : super(repaint: _elapsed);
+  // Cached to avoid allocating a new Paint on every particle every frame.
+  final _paint = Paint();
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -98,7 +100,8 @@ class _WallpaperPainter extends CustomPainter {
       final y = ((p.phase + elapsed * p.speed) % 1.0) * size.height;
       final x = p.x * size.width;
       final s = p.size.toDouble();
-      canvas.drawRect(Rect.fromLTWH(x, y, s, s), Paint()..color = p.color);
+      _paint.color = p.color;
+      canvas.drawRect(Rect.fromLTWH(x, y, s, s), _paint);
     }
   }
 

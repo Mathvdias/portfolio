@@ -377,45 +377,46 @@ class _BatteryIndicator extends StatelessWidget {
 }
 
 class _BatteryPainter extends CustomPainter {
-  const _BatteryPainter({required this.level});
+  _BatteryPainter({required this.level});
   final double level;
+
+  // Cached — avoid allocating on every repaint.
+  final _borderPaint =
+      Paint()
+        ..color = AppTheme.subtext
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.0;
+  final _nubPaint = Paint()..color = AppTheme.subtext;
+  final _fillPaint = Paint();
 
   @override
   void paint(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
-    final border =
-        Paint()
-          ..color = AppTheme.subtext
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.0;
-    final fill =
-        Paint()
-          ..color = level > 0.2 ? AppTheme.green : AppTheme.red
-          ..style = PaintingStyle.fill;
 
     canvas.drawRRect(
       RRect.fromRectAndRadius(
         Rect.fromLTWH(0, 1, w * 0.88, h - 2),
         const Radius.circular(2),
       ),
-      border,
+      _borderPaint,
     );
     canvas.drawRRect(
       RRect.fromRectAndRadius(
         Rect.fromLTWH(w * 0.88, h * 0.3, w * 0.12, h * 0.4),
         const Radius.circular(1),
       ),
-      Paint()..color = AppTheme.subtext,
+      _nubPaint,
     );
     final fillW = (w * 0.88 - 4) * level;
     if (fillW > 0) {
+      _fillPaint.color = level > 0.2 ? AppTheme.green : AppTheme.red;
       canvas.drawRRect(
         RRect.fromRectAndRadius(
           Rect.fromLTWH(2, 3, fillW, h - 6),
           const Radius.circular(1),
         ),
-        fill,
+        _fillPaint,
       );
     }
   }

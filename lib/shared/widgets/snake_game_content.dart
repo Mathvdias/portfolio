@@ -27,6 +27,7 @@ _Pos _move(_Pos p, _Dir d) => switch (d) {
 class _GameState {
   const _GameState({
     required this.snake,
+    required this.snakeSet,
     required this.food,
     required this.score,
     required this.running,
@@ -34,6 +35,8 @@ class _GameState {
   });
 
   final List<_Pos> snake;
+  // Mirrors snake positions for O(1) collision and food-spawn checks.
+  final Set<_Pos> snakeSet;
   final _Pos food;
   final int score;
   final bool running;
@@ -64,6 +67,7 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
     _state = ValueNotifier(
       const _GameState(
         snake: [],
+        snakeSet: {},
         food: (x: 5, y: 5),
         score: 0,
         running: false,
@@ -91,11 +95,13 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
       (x: center.x - 1, y: center.y),
       (x: center.x - 2, y: center.y),
     ];
+    final snakeSet = snake.toSet();
     _dir = _Dir.right;
     _nextDir = _Dir.right;
     _state.value = _GameState(
       snake: snake,
-      food: _spawnFood(snake),
+      snakeSet: snakeSet,
+      food: _spawnFood(snakeSet),
       score: 0,
       running: true,
       gameOver: false,
@@ -103,11 +109,12 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
     _timer = Timer.periodic(const Duration(milliseconds: _kTickMs), _tick);
   }
 
-  _Pos _spawnFood(List<_Pos> snake) {
+  // O(1) lookup via Set instead of O(n) list scan.
+  _Pos _spawnFood(Set<_Pos> occupied) {
     _Pos f;
     do {
       f = (x: _rng.nextInt(_kCols), y: _rng.nextInt(_kRows));
-    } while (snake.any((p) => p.x == f.x && p.y == f.y));
+    } while (occupied.contains(f));
     return f;
   }
 
@@ -116,10 +123,12 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
     if (s.gameOver) return;
     _dir = _nextDir;
     final newHead = _move(s.snake.first, _dir);
-    if (s.snake.any((p) => p.x == newHead.x && p.y == newHead.y)) {
+    // O(1) collision check via Set.
+    if (s.snakeSet.contains(newHead)) {
       _timer?.cancel();
       _state.value = _GameState(
         snake: s.snake,
+        snakeSet: s.snakeSet,
         food: s.food,
         score: s.score,
         running: false,
@@ -127,14 +136,20 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
       );
       return;
     }
-    final ate = newHead.x == s.food.x && newHead.y == s.food.y;
+    // Records support structural ==.
+    final ate = newHead == s.food;
+    final tail = ate ? null : s.snake.last;
     final newSnake = [
       newHead,
       ...s.snake.sublist(0, ate ? s.snake.length : s.snake.length - 1),
     ];
+    // O(1) set update: add head, remove tail when not eating.
+    final newSet = {...s.snakeSet}..add(newHead);
+    if (tail != null) newSet.remove(tail);
     _state.value = _GameState(
       snake: newSnake,
-      food: ate ? _spawnFood(newSnake) : s.food,
+      snakeSet: newSet,
+      food: ate ? _spawnFood(newSet) : s.food,
       score: ate ? s.score + 1 : s.score,
       running: true,
       gameOver: false,
@@ -324,6 +339,13 @@ class _SnakePainter extends CustomPainter {
   _SnakePainter(this._state) : super(repaint: _state);
 
   final ValueNotifier<_GameState> _state;
+  // Cached paints — never reallocated after painter creation.
+  final _gridPaint =
+      Paint()
+        ..color = AppTheme.surface0.withValues(alpha: 0.25)
+        ..strokeWidth = 0.5
+        ..style = PaintingStyle.stroke;
+  final _fillPaint = Paint();
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -332,25 +354,26 @@ class _SnakePainter extends CustomPainter {
     final ch = size.height / _kRows;
 
     // grid
-    final gridPaint =
-        Paint()
-          ..color = AppTheme.surface0.withValues(alpha: 0.25)
-          ..strokeWidth = 0.5;
     for (int r = 0; r <= _kRows; r++) {
-      canvas.drawLine(Offset(0, r * ch), Offset(size.width, r * ch), gridPaint);
+      canvas.drawLine(
+        Offset(0, r * ch),
+        Offset(size.width, r * ch),
+        _gridPaint,
+      );
     }
     for (int c = 0; c <= _kCols; c++) {
       canvas.drawLine(
         Offset(c * cw, 0),
         Offset(c * cw, size.height),
-        gridPaint,
+        _gridPaint,
       );
     }
 
     // food
+    _fillPaint.color = AppTheme.red;
     canvas.drawRect(
       Rect.fromLTWH(s.food.x * cw + 2, s.food.y * ch + 2, cw - 4, ch - 4),
-      Paint()..color = AppTheme.red,
+      _fillPaint,
     );
 
     // snake body
@@ -358,9 +381,10 @@ class _SnakePainter extends CustomPainter {
     final headColor = s.gameOver ? AppTheme.red : AppTheme.green;
     for (int i = s.snake.length - 1; i >= 0; i--) {
       final p = s.snake[i];
+      _fillPaint.color = i == 0 ? headColor : bodyColor;
       canvas.drawRect(
         Rect.fromLTWH(p.x * cw + 1, p.y * ch + 1, cw - 2, ch - 2),
-        Paint()..color = i == 0 ? headColor : bodyColor,
+        _fillPaint,
       );
     }
   }

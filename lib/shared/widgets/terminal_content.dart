@@ -358,6 +358,8 @@ class _TerminalContentState extends State<TerminalContent> {
                     (_, _, _) => ListView.builder(
                       controller: _scroll,
                       itemCount: _history.length,
+                      addAutomaticKeepAlives: false,
+                      addRepaintBoundaries: false,
                       itemBuilder:
                           (_, i) => Text(
                             _history[i].text,
