@@ -176,9 +176,10 @@ class _SpotlightOverlayState extends State<SpotlightOverlay> {
                     Flexible(
                       child: ValueListenableBuilder<_SpotlightState>(
                         valueListenable: _state,
-                        builder: (_, s, __) {
-                          if (s.filtered.isEmpty)
+                        builder: (_, s, _) {
+                          if (s.filtered.isEmpty) {
                             return const SizedBox.shrink();
+                          }
                           return Column(
                             children: [
                               Container(height: 1, color: AppTheme.surface0),
