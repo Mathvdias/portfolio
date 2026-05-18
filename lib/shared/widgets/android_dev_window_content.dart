@@ -61,34 +61,51 @@ class AndroidDevWindowContent extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSizes.spacingMd),
-          _buildExpertiseSection(l10n.core, [
-            'Kotlin',
-            'Jetpack Compose',
-            'Coroutines',
-            'Flow',
-            'Dagger/Hilt',
-          ]),
+          _ExpertiseSection(
+            title: l10n.core,
+            items: const [
+              'Kotlin',
+              'Jetpack Compose',
+              'Coroutines',
+              'Flow',
+              'Dagger/Hilt',
+            ],
+          ),
           const SizedBox(height: AppSizes.spacingMd),
-          _buildExpertiseSection(l10n.tools, [
-            'Android Studio',
-            'Firebase',
-            'LeakCanary',
-            'Bitrise',
-            'ADB',
-          ]),
+          _ExpertiseSection(
+            title: l10n.tools,
+            items: const [
+              'Android Studio',
+              'Firebase',
+              'LeakCanary',
+              'Bitrise',
+              'ADB',
+            ],
+          ),
           const SizedBox(height: AppSizes.spacingMd),
-          _buildExpertiseSection(l10n.architecture, [
-            'MVVM',
-            'MVI',
-            'Clean Architecture',
-            'Modularization',
-          ]),
+          _ExpertiseSection(
+            title: l10n.architecture,
+            items: const [
+              'MVVM',
+              'MVI',
+              'Clean Architecture',
+              'Modularization',
+            ],
+          ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildExpertiseSection(String title, List<String> items) {
+class _ExpertiseSection extends StatelessWidget {
+  const _ExpertiseSection({required this.title, required this.items});
+
+  final String title;
+  final List<String> items;
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -104,13 +121,20 @@ class AndroidDevWindowContent extends StatelessWidget {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: items.map((item) => _buildChip(item)).toList(),
+          children: items.map((item) => _TechChip(item)).toList(),
         ),
       ],
     );
   }
+}
 
-  Widget _buildChip(String label) {
+class _TechChip extends StatelessWidget {
+  const _TechChip(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(

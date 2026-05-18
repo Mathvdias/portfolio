@@ -72,9 +72,12 @@ class ProjectStatsWindowContent extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSizes.spacingLg),
-          _buildStatRow(l10n.unitTests, ProjectStats.totalTests.toString()),
-          _buildStatRow(l10n.codeQuality, 'A+'),
-          _buildStatRow(l10n.buildStatus, l10n.passing),
+          _StatRow(
+            label: l10n.unitTests,
+            value: ProjectStats.totalTests.toString(),
+          ),
+          _StatRow(label: l10n.codeQuality, value: 'A+'),
+          _StatRow(label: l10n.buildStatus, value: l10n.passing),
           const Spacer(),
           Text(
             l10n.keepBuilding,
@@ -89,12 +92,19 @@ class ProjectStatsWindowContent extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildStatRow(String label, String value) {
+class _StatRow extends StatelessWidget {
+  const _StatRow({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
-        mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(

@@ -10,26 +10,25 @@ class LicensesWindowContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSizes.spacingXxl),
+    return const SingleChildScrollView(
+      padding: EdgeInsets.all(AppSizes.spacingXxl),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _sectionHeader(AppStrings.licensesCustomPackages),
-          const SizedBox(height: AppSizes.spacingLg),
-          _licenseCard(
+          _SectionHeader(AppStrings.licensesCustomPackages),
+          SizedBox(height: AppSizes.spacingLg),
+          _LicenseCard(
             name: 'app_window',
             version: '1.0.0',
             license: 'MIT',
             description:
                 'Draggable, macOS-style app window widget with configurable '
                 'traffic-light controls. Built in-house for this portfolio.',
-            url: null,
           ),
-          const SizedBox(height: AppSizes.spacing3xl),
-          _sectionHeader(AppStrings.licensesOpenSource),
-          const SizedBox(height: AppSizes.spacingLg),
-          _licenseCard(
+          SizedBox(height: AppSizes.spacing3xl),
+          _SectionHeader(AppStrings.licensesOpenSource),
+          SizedBox(height: AppSizes.spacingLg),
+          _LicenseCard(
             name: 'font_awesome_flutter',
             version: '^11.0.0',
             license: 'MIT',
@@ -38,7 +37,7 @@ class LicensesWindowContent extends StatelessWidget {
                 'Provides high quality vector graphics for the UI.',
             url: 'https://pub.dev/packages/font_awesome_flutter',
           ),
-          _licenseCard(
+          _LicenseCard(
             name: 'Flutter',
             version: '3.x',
             license: 'BSD-3-Clause',
@@ -47,7 +46,7 @@ class LicensesWindowContent extends StatelessWidget {
                 'for mobile, web, and desktop from a single codebase.',
             url: 'https://flutter.dev',
           ),
-          _licenseCard(
+          _LicenseCard(
             name: 'Dart',
             version: '3.x',
             license: 'BSD-3-Clause',
@@ -55,7 +54,7 @@ class LicensesWindowContent extends StatelessWidget {
                 'A client-optimized language for fast apps on any platform.',
             url: 'https://dart.dev',
           ),
-          _licenseCard(
+          _LicenseCard(
             name: 'google_fonts',
             version: '^8.1.0',
             license: 'MIT',
@@ -64,7 +63,7 @@ class LicensesWindowContent extends StatelessWidget {
                 'Used for Space Mono, Press Start 2P, and Indie Flower.',
             url: 'https://pub.dev/packages/google_fonts',
           ),
-          _licenseCard(
+          _LicenseCard(
             name: 'firebase_core',
             version: '^4.7.0',
             license: 'BSD-3-Clause',
@@ -72,7 +71,7 @@ class LicensesWindowContent extends StatelessWidget {
                 'Firebase Core Flutter plugin. Required for Firebase initialization.',
             url: 'https://pub.dev/packages/firebase_core',
           ),
-          _licenseCard(
+          _LicenseCard(
             name: 'cloud_firestore',
             version: '^6.3.0',
             license: 'BSD-3-Clause',
@@ -80,7 +79,7 @@ class LicensesWindowContent extends StatelessWidget {
                 'Flutter plugin for Cloud Firestore. Used to store and stream visitor counts.',
             url: 'https://pub.dev/packages/cloud_firestore',
           ),
-          _licenseCard(
+          _LicenseCard(
             name: 'shared_preferences',
             version: '^2.5.5',
             license: 'BSD-3-Clause',
@@ -89,7 +88,7 @@ class LicensesWindowContent extends StatelessWidget {
                 'Used to prevent duplicate visitor counts.',
             url: 'https://pub.dev/packages/shared_preferences',
           ),
-          _licenseCard(
+          _LicenseCard(
             name: 'url_launcher',
             version: '^6.1.14',
             license: 'BSD-3-Clause',
@@ -98,23 +97,22 @@ class LicensesWindowContent extends StatelessWidget {
                 'Used to open GitHub, LinkedIn, and the résumé PDF.',
             url: 'https://pub.dev/packages/url_launcher',
           ),
-          const SizedBox(height: AppSizes.spacing3xl),
-          Center(
-            child: Text(
-              AppStrings.licensesCopyright,
-              style: GoogleFonts.spaceMono(
-                fontSize: AppSizes.fontBase,
-                color: AppTheme.subtext,
-              ),
-            ),
-          ),
-          const SizedBox(height: AppSizes.spacingMd),
+          SizedBox(height: AppSizes.spacing3xl),
+          Center(child: _CopyrightText()),
+          SizedBox(height: AppSizes.spacingMd),
         ],
       ),
     );
   }
+}
 
-  Widget _sectionHeader(String title) {
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader(this.title);
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
     return Text(
       title,
       style: GoogleFonts.pressStart2p(
@@ -124,14 +122,25 @@ class LicensesWindowContent extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _licenseCard({
-    required String name,
-    required String version,
-    required String license,
-    required String description,
-    required String? url,
-  }) {
+class _LicenseCard extends StatelessWidget {
+  const _LicenseCard({
+    required this.name,
+    required this.version,
+    required this.license,
+    required this.description,
+    this.url,
+  });
+
+  final String name;
+  final String version;
+  final String license;
+  final String description;
+  final String? url;
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSizes.spacingBase),
       child: Container(
@@ -190,27 +199,53 @@ class LicensesWindowContent extends StatelessWidget {
             ),
             if (url != null) ...[
               const SizedBox(height: AppSizes.spacingSm),
-              GestureDetector(
-                onTap: () async {
-                  final uri = Uri.parse(url);
-                  if (await canLaunchUrl(uri)) await launchUrl(uri);
-                },
-                child: MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: Text(
-                    url,
-                    style: GoogleFonts.spaceMono(
-                      fontSize: 9,
-                      color: AppTheme.blue,
-                      decoration: TextDecoration.underline,
-                      decorationColor: AppTheme.blue,
-                    ),
-                  ),
-                ),
-              ),
+              _UrlLink(url: url!),
             ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _UrlLink extends StatelessWidget {
+  const _UrlLink({required this.url});
+
+  final String url;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () async {
+        final uri = Uri.parse(url);
+        if (await canLaunchUrl(uri)) await launchUrl(uri);
+      },
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: Text(
+          url,
+          style: GoogleFonts.spaceMono(
+            fontSize: 9,
+            color: AppTheme.blue,
+            decoration: TextDecoration.underline,
+            decorationColor: AppTheme.blue,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CopyrightText extends StatelessWidget {
+  const _CopyrightText();
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      AppStrings.licensesCopyright,
+      style: GoogleFonts.spaceMono(
+        fontSize: AppSizes.fontBase,
+        color: AppTheme.subtext,
       ),
     );
   }
