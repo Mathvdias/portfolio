@@ -66,6 +66,13 @@ class _DesktopPageState extends State<DesktopPage> {
   late VisitorViewModel _visitorVM;
   bool _initialized = false;
 
+  // Local rubber-band state — never calls notifyListeners during drag.
+  final _selectionNotifier = ValueNotifier<(Offset, Offset)?>(null);
+
+  // Analytics session tracking.
+  bool _firstWindowOpened = false;
+  final _windowOpenTimes = <String, DateTime>{};
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -94,7 +101,28 @@ class _DesktopPageState extends State<DesktopPage> {
   @override
   void dispose() {
     _visitorVM.dispose();
+    _selectionNotifier.dispose();
     super.dispose();
+  }
+
+  // ── Deferred load timing ─────────────────────────────────────────
+
+  Future<void> Function() _trackedLoad(
+    String windowId,
+    Future<void> Function() loader,
+  ) {
+    return () async {
+      final sw = Stopwatch()..start();
+      await loader();
+      sw.stop();
+      unawaited(
+        _analytics.logDeferredLoad(
+          windowId: windowId,
+          durationMs: sw.elapsedMilliseconds,
+          fromCache: sw.elapsedMilliseconds < 10,
+        ),
+      );
+    };
   }
 
   // ── Spotlight items ──────────────────────────────────────────────
@@ -169,15 +197,37 @@ class _DesktopPageState extends State<DesktopPage> {
     _openWindowForId(item.id, l10n);
   }
 
-  void _openWindowForId(String id, AppLocalizations l10n) {
+  // ── Analytics helpers ────────────────────────────────────────────
+
+  void _trackWindowOpen(String id) {
+    if (!_firstWindowOpened) {
+      _firstWindowOpened = true;
+      unawaited(_analytics.logFirstWindow(id));
+    }
+    _windowOpenTimes[id] = DateTime.now();
     unawaited(_analytics.logWindowOpen(id));
+  }
+
+  void _trackWindowClose(String id) {
+    unawaited(_analytics.logWindowClose(id));
+    final openTime = _windowOpenTimes.remove(id);
+    if (openTime != null) {
+      final seconds = DateTime.now().difference(openTime).inSeconds;
+      unawaited(_analytics.logWindowDwellTime(windowId: id, seconds: seconds));
+    }
+  }
+
+  // ── Window opening ───────────────────────────────────────────────
+
+  void _openWindowForId(String id, AppLocalizations l10n) {
+    _trackWindowOpen(id);
     switch (id) {
       case AppStrings.winAbout:
         _desktopVM.openWindow(
           id,
           l10n.about,
           DeferredWidget(
-            about_content.loadLibrary,
+            _trackedLoad(id, about_content.loadLibrary),
             () => about_content.AboutWindowContent(
               bio: l10n.bio,
               role: l10n.role,
@@ -190,7 +240,7 @@ class _DesktopPageState extends State<DesktopPage> {
           id,
           AppStrings.titleFinder,
           DeferredWidget(
-            finder_content.loadLibrary,
+            _trackedLoad(id, finder_content.loadLibrary),
             () => finder_content.FinderContent(),
           ),
           AppTheme.red,
@@ -200,7 +250,7 @@ class _DesktopPageState extends State<DesktopPage> {
           id,
           AppStrings.titleSkills,
           DeferredWidget(
-            skills_content.loadLibrary,
+            _trackedLoad(id, skills_content.loadLibrary),
             () => skills_content.SkillsWindowContent(),
           ),
           AppTheme.blue,
@@ -210,7 +260,7 @@ class _DesktopPageState extends State<DesktopPage> {
           id,
           l10n.androidDev,
           DeferredWidget(
-            android_content.loadLibrary,
+            _trackedLoad(id, android_content.loadLibrary),
             () => android_content.AndroidDevWindowContent(),
           ),
           AppTheme.green,
@@ -222,7 +272,7 @@ class _DesktopPageState extends State<DesktopPage> {
           id,
           AppStrings.titleTerminal,
           DeferredWidget(
-            terminal_content.loadLibrary,
+            _trackedLoad(id, terminal_content.loadLibrary),
             () => terminal_content.TerminalContent(),
           ),
           AppTheme.green,
@@ -232,7 +282,7 @@ class _DesktopPageState extends State<DesktopPage> {
           id,
           AppStrings.titleCalculator,
           DeferredWidget(
-            calculator_content.loadLibrary,
+            _trackedLoad(id, calculator_content.loadLibrary),
             () => calculator_content.CalculatorContent(),
           ),
           AppTheme.peach,
@@ -242,7 +292,7 @@ class _DesktopPageState extends State<DesktopPage> {
           id,
           AppStrings.titleSnake,
           DeferredWidget(
-            snake_content.loadLibrary,
+            _trackedLoad(id, snake_content.loadLibrary),
             () => snake_content.SnakeGameContent(),
           ),
           AppTheme.peach,
@@ -252,7 +302,7 @@ class _DesktopPageState extends State<DesktopPage> {
           id,
           AppStrings.titleContact,
           DeferredWidget(
-            contact_content.loadLibrary,
+            _trackedLoad(id, contact_content.loadLibrary),
             () => contact_content.ContactFormContent(),
           ),
           AppTheme.teal,
@@ -263,7 +313,7 @@ class _DesktopPageState extends State<DesktopPage> {
           id,
           l10n.guestbook,
           DeferredWidget(
-            guestbook_content.loadLibrary,
+            _trackedLoad(id, guestbook_content.loadLibrary),
             () => guestbook_content.GuestbookContent(viewModel: vm),
           ),
           AppTheme.mauve,
@@ -275,7 +325,7 @@ class _DesktopPageState extends State<DesktopPage> {
           id,
           l10n.projectStats,
           DeferredWidget(
-            stats_content.loadLibrary,
+            _trackedLoad(id, stats_content.loadLibrary),
             () => stats_content.ProjectStatsWindowContent(),
           ),
           AppTheme.yellow,
@@ -315,7 +365,9 @@ class _DesktopPageState extends State<DesktopPage> {
     }
     if (meta && event.logicalKey == LogicalKeyboardKey.keyW) {
       if (_desktopVM.windows.isNotEmpty) {
-        _desktopVM.closeWindow(_desktopVM.windows.last.id);
+        final id = _desktopVM.windows.last.id;
+        _trackWindowClose(id);
+        _desktopVM.closeWindow(id);
       }
       return KeyEventResult.handled;
     }
@@ -347,163 +399,209 @@ class _DesktopPageState extends State<DesktopPage> {
     return Focus(
       autofocus: true,
       onKeyEvent: _onKey,
-      child: ListenableBuilder(
-        listenable: _desktopVM,
-        builder: (context, _) {
-          return Scaffold(
-            backgroundColor: AppTheme.background,
-            body: GestureDetector(
-              onSecondaryTapUp: (details) {
-                unawaited(_analytics.logContextMenuOpen());
-                _desktopVM.openContextMenu(details.localPosition);
-              },
-              onPanStart: (details) {
-                _desktopVM.closeContextMenu();
-                _desktopVM.startSelection(details.localPosition);
-              },
-              onPanUpdate: (details) {
-                _desktopVM.updateSelection(details.localPosition);
-              },
-              onPanEnd: (_) => _desktopVM.endSelection(),
-              child: Stack(
-                children: [
-                  const Positioned.fill(child: PixelWallpaper()),
+      child: Scaffold(
+        backgroundColor: AppTheme.background,
+        body: GestureDetector(
+          onSecondaryTapUp: (details) {
+            unawaited(_analytics.logContextMenuOpen());
+            _desktopVM.openContextMenu(details.localPosition);
+          },
+          onPanStart: (details) {
+            _desktopVM.closeContextMenu();
+            _selectionNotifier.value = (
+              details.localPosition,
+              details.localPosition,
+            );
+          },
+          onPanUpdate: (details) {
+            final prev = _selectionNotifier.value;
+            if (prev != null) {
+              _selectionNotifier.value = (prev.$1, details.localPosition);
+            }
+          },
+          onPanEnd: (_) => _selectionNotifier.value = null,
+          child: Stack(
+            children: [
+              // Static layers — never rebuilt by VM changes.
+              const Positioned.fill(child: PixelWallpaper()),
 
-                  StickyNote(
-                    initialPosition: const Offset(40, 100),
-                    text: l10n.stickyNoteTodo,
-                    color: const Color(0xFFFDE68A),
-                  ),
-
-                  ListenableBuilder(
-                    listenable: _visitorVM,
-                    builder:
-                        (context, _) => VisitorStickyNote(
-                          initialPosition: const Offset(40, 260),
-                          color: const Color(0xFFBAE6FD),
-                          visitorCount: _visitorVM.count,
-                        ),
-                  ),
-
-                  Positioned.fill(
-                    top: AppSizes.menuBarOffset,
-                    bottom: AppSizes.desktopBottom,
-                    child: DesktopIconsGrid(
-                      experiences: experiences,
-                      onOpenWindow: (id, title, content, accent) {
-                        unawaited(_analytics.logWindowOpen(id));
-                        _desktopVM.openWindow(id, title, content, accent);
-                      },
-                    ),
-                  ),
-
-                  ..._desktopVM.windows.map(
-                    (w) => AppWindow(
-                      key: ValueKey(w.id),
-                      title: w.title,
-                      initialPosition: w.position,
-                      accentColor: w.accentColor,
-                      titleBarColor: AppTheme.surface,
-                      contentColor: AppTheme.background,
-                      borderColor: AppTheme.surface0,
-                      closeColor: AppTheme.red,
-                      minimizeColor: AppTheme.yellow,
-                      maximizeColor: AppTheme.green,
-                      width: w.width,
-                      height: w.height,
-                      titleBarHeight: AppSizes.windowTitleBarHeight,
-                      trafficLightSize: AppSizes.windowTrafficLightSize,
-                      trafficLightSpacing: AppSizes.windowTrafficLightSpacing,
-                      maximizeTopOffset: AppSizes.menuBarHeight,
-                      maximizeBottomOffset: AppSizes.desktopBottom,
-                      titleFontSize: AppSizes.fontXs,
-                      onClose: () {
-                        unawaited(_analytics.logWindowClose(w.id));
-                        _desktopVM.closeWindow(w.id);
-                      },
-                      onFocus: () => _desktopVM.focusWindow(w.id),
-                      child: w.content,
-                    ),
-                  ),
-
-                  if (_desktopVM.showNotifications)
-                    Positioned(
-                      top: AppSizes.menuBarOffset,
-                      right: 0,
-                      bottom: 0,
-                      child: RepaintBoundary(
-                        child: NotificationCenter(desktopVM: _desktopVM),
-                      ),
-                    ),
-
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: RepaintBoundary(
-                      child: MacMenuBar(
-                        currentLanguage: localeVM.currentCode,
-                        onLanguageChanged: (code) {
-                          unawaited(_analytics.logLocaleChange(code));
-                          localeVM.setLocaleByCode(code);
-                        },
-                        onToggleNotifications: _desktopVM.toggleNotifications,
-                        onAppMenuAction: (action) async {
-                          switch (action) {
-                            case AppMenuAction.about:
-                              _openWindowForId(AppStrings.winAbout, l10n);
-                            case AppMenuAction.licenses:
-                              _desktopVM.openWindow(
-                                AppStrings.winLicenses,
-                                AppStrings.titleLicenses,
-                                DeferredWidget(
-                                  licenses_content.loadLibrary,
-                                  () =>
-                                      licenses_content.LicensesWindowContent(),
-                                ),
-                                AppTheme.teal,
-                              );
-                            case AppMenuAction.github:
-                              break;
-                            case AppMenuAction.linkedin:
-                              break;
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-
-                  const Positioned(
-                    bottom: AppSizes.dockBottomOffset,
-                    left: 0,
-                    right: 0,
-                    child: Center(child: RepaintBoundary(child: Dock())),
-                  ),
-
-                  if (_desktopVM.isSelecting)
-                    RubberBandSelection(
-                      origin: _desktopVM.rubberBandOrigin!,
-                      current: _desktopVM.rubberBandCurrent!,
-                    ),
-
-                  if (_desktopVM.showContextMenu)
-                    DesktopContextMenu(
-                      position: _desktopVM.contextMenuPosition!,
-                      onAction: (action) => _onContextAction(action, l10n),
-                      onDismiss: _desktopVM.closeContextMenu,
-                    ),
-
-                  if (_desktopVM.showSpotlight)
-                    SpotlightOverlay(
-                      items: _buildSpotlightItems(l10n),
-                      onSelect: (item) => _onSpotlightSelect(item, l10n),
-                      onDismiss: _desktopVM.closeSpotlight,
-                    ),
-                ],
+              StickyNote(
+                initialPosition: const Offset(40, 100),
+                text: l10n.stickyNoteTodo,
+                color: const Color(0xFFFDE68A),
               ),
-            ),
-          );
-        },
+
+              ListenableBuilder(
+                listenable: _visitorVM,
+                builder:
+                    (context, _) => VisitorStickyNote(
+                      initialPosition: const Offset(40, 260),
+                      color: const Color(0xFFBAE6FD),
+                      visitorCount: _visitorVM.count,
+                    ),
+              ),
+
+              Positioned.fill(
+                top: AppSizes.menuBarOffset,
+                bottom: AppSizes.desktopBottom,
+                child: DesktopIconsGrid(
+                  experiences: experiences,
+                  onOpenWindow: (id, title, content, accent) {
+                    _trackWindowOpen(id);
+                    _desktopVM.openWindow(id, title, content, accent);
+                  },
+                ),
+              ),
+
+              // Windows — rebuilt only when window list changes.
+              ListenableBuilder(
+                listenable: _desktopVM,
+                builder: (context, _) => Stack(
+                  children: _desktopVM.windows
+                      .map(
+                        (w) => AppWindow(
+                          key: ValueKey(w.id),
+                          title: w.title,
+                          initialPosition: w.position,
+                          accentColor: w.accentColor,
+                          titleBarColor: AppTheme.surface,
+                          contentColor: AppTheme.background,
+                          borderColor: AppTheme.surface0,
+                          closeColor: AppTheme.red,
+                          minimizeColor: AppTheme.yellow,
+                          maximizeColor: AppTheme.green,
+                          width: w.width,
+                          height: w.height,
+                          titleBarHeight: AppSizes.windowTitleBarHeight,
+                          trafficLightSize: AppSizes.windowTrafficLightSize,
+                          trafficLightSpacing:
+                              AppSizes.windowTrafficLightSpacing,
+                          maximizeTopOffset: AppSizes.menuBarHeight,
+                          maximizeBottomOffset: AppSizes.desktopBottom,
+                          titleFontSize: AppSizes.fontXs,
+                          onClose: () {
+                            _trackWindowClose(w.id);
+                            _desktopVM.closeWindow(w.id);
+                          },
+                          onFocus: () => _desktopVM.focusWindow(w.id),
+                          child: w.content,
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+
+              // Notifications — rebuilt only when visibility changes.
+              ListenableBuilder(
+                listenable: _desktopVM,
+                builder: (context, _) {
+                  if (!_desktopVM.showNotifications) {
+                    return const SizedBox.shrink();
+                  }
+                  return Positioned(
+                    top: AppSizes.menuBarOffset,
+                    right: 0,
+                    bottom: 0,
+                    child: RepaintBoundary(
+                      child: NotificationCenter(desktopVM: _desktopVM),
+                    ),
+                  );
+                },
+              ),
+
+              // Menu bar — static, own RepaintBoundary.
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: RepaintBoundary(
+                  child: MacMenuBar(
+                    currentLanguage: localeVM.currentCode,
+                    onLanguageChanged: (code) {
+                      unawaited(_analytics.logLocaleChange(code));
+                      localeVM.setLocaleByCode(code);
+                    },
+                    onToggleNotifications: _desktopVM.toggleNotifications,
+                    onAppMenuAction: (action) async {
+                      switch (action) {
+                        case AppMenuAction.about:
+                          _openWindowForId(AppStrings.winAbout, l10n);
+                        case AppMenuAction.licenses:
+                          _trackWindowOpen(AppStrings.winLicenses);
+                          _desktopVM.openWindow(
+                            AppStrings.winLicenses,
+                            AppStrings.titleLicenses,
+                            DeferredWidget(
+                              _trackedLoad(
+                                AppStrings.winLicenses,
+                                licenses_content.loadLibrary,
+                              ),
+                              () => licenses_content.LicensesWindowContent(),
+                            ),
+                            AppTheme.teal,
+                          );
+                        case AppMenuAction.github:
+                          break;
+                        case AppMenuAction.linkedin:
+                          break;
+                      }
+                    },
+                  ),
+                ),
+              ),
+
+              // Dock — static, own RepaintBoundary.
+              const Positioned(
+                bottom: AppSizes.dockBottomOffset,
+                left: 0,
+                right: 0,
+                child: Center(child: RepaintBoundary(child: Dock())),
+              ),
+
+              // Rubber band — driven by local ValueNotifier, zero VM notifies.
+              ValueListenableBuilder<(Offset, Offset)?>(
+                valueListenable: _selectionNotifier,
+                builder: (context, sel, _) {
+                  if (sel == null) return const SizedBox.shrink();
+                  return RubberBandSelection(
+                    origin: sel.$1,
+                    current: sel.$2,
+                  );
+                },
+              ),
+
+              // Context menu — rebuilt only when menu open/close changes.
+              ListenableBuilder(
+                listenable: _desktopVM,
+                builder: (context, _) {
+                  if (!_desktopVM.showContextMenu) {
+                    return const SizedBox.shrink();
+                  }
+                  return DesktopContextMenu(
+                    position: _desktopVM.contextMenuPosition!,
+                    onAction: (action) => _onContextAction(action, l10n),
+                    onDismiss: _desktopVM.closeContextMenu,
+                  );
+                },
+              ),
+
+              // Spotlight — rebuilt only when visibility changes.
+              ListenableBuilder(
+                listenable: _desktopVM,
+                builder: (context, _) {
+                  if (!_desktopVM.showSpotlight) {
+                    return const SizedBox.shrink();
+                  }
+                  return SpotlightOverlay(
+                    items: _buildSpotlightItems(l10n),
+                    onSelect: (item) => _onSpotlightSelect(item, l10n),
+                    onDismiss: _desktopVM.closeSpotlight,
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

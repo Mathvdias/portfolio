@@ -38,7 +38,21 @@ class _NoOpAnalytics implements AnalyticsService {
     required int totalMs,
     required int buildMs,
     required int rasterMs,
+    int? openWindowCount,
   }) async {}
+  @override
+  Future<void> logDeferredLoad({
+    required String windowId,
+    required int durationMs,
+    required bool fromCache,
+  }) async {}
+  @override
+  Future<void> logWindowDwellTime({
+    required String windowId,
+    required int seconds,
+  }) async {}
+  @override
+  Future<void> logFirstWindow(String windowId) async {}
 }
 
 void main() {

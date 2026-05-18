@@ -21,5 +21,22 @@ abstract class AnalyticsService {
     required int totalMs,
     required int buildMs,
     required int rasterMs,
+    int? openWindowCount,
   });
+
+  /// Logs how long a deferred JS bundle took to load.
+  Future<void> logDeferredLoad({
+    required String windowId,
+    required int durationMs,
+    required bool fromCache,
+  });
+
+  /// Logs how long a user kept a window open before closing it.
+  Future<void> logWindowDwellTime({
+    required String windowId,
+    required int seconds,
+  });
+
+  /// Logs which window the user opens first in a session.
+  Future<void> logFirstWindow(String windowId);
 }

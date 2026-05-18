@@ -18,7 +18,7 @@ const _kLanguages = [
 
 enum AppMenuAction { about, licenses, github, linkedin }
 
-class MacMenuBar extends StatefulWidget {
+class MacMenuBar extends StatelessWidget {
   const MacMenuBar({
     super.key,
     required this.currentLanguage,
@@ -31,34 +31,6 @@ class MacMenuBar extends StatefulWidget {
   final void Function(String) onLanguageChanged;
   final VoidCallback? onToggleNotifications;
   final void Function(AppMenuAction)? onAppMenuAction;
-
-  @override
-  State<MacMenuBar> createState() => _MacMenuBarState();
-}
-
-class _MacMenuBarState extends State<MacMenuBar> {
-  String _time = '';
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _updateTime();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) => _updateTime());
-  }
-
-  void _updateTime() {
-    final now = DateTime.now();
-    final h = now.hour.toString().padLeft(2, '0');
-    final m = now.minute.toString().padLeft(2, '0');
-    if (mounted) setState(() => _time = '$h:$m');
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
 
   String _flagFor(String code) =>
       _kLanguages
@@ -76,7 +48,7 @@ class _MacMenuBarState extends State<MacMenuBar> {
       child: Row(
         children: [
           // Left: apple-style name menu
-          _AppNameMenu(onAction: widget.onAppMenuAction),
+          _AppNameMenu(onAction: onAppMenuAction),
 
           const Spacer(),
 
@@ -89,27 +61,20 @@ class _MacMenuBarState extends State<MacMenuBar> {
           const SizedBox(width: AppSizes.font2xl),
 
           _CompactLanguagePicker(
-            currentLanguage: widget.currentLanguage,
-            currentFlag: _flagFor(widget.currentLanguage),
-            onLanguageChanged: widget.onLanguageChanged,
+            currentLanguage: currentLanguage,
+            currentFlag: _flagFor(currentLanguage),
+            onLanguageChanged: onLanguageChanged,
           ),
 
           const SizedBox(width: AppSizes.spacingXl),
 
-          Text(
-            _time,
-            style: GoogleFonts.spaceMono(
-              fontSize: AppSizes.fontXl,
-              color: AppTheme.subtext,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          const _ClockWidget(),
 
           const SizedBox(width: AppSizes.font2xl),
 
-          if (widget.onToggleNotifications != null) ...[
+          if (onToggleNotifications != null) ...[
             GestureDetector(
-              onTap: widget.onToggleNotifications,
+              onTap: onToggleNotifications,
               child: MouseRegion(
                 cursor: SystemMouseCursors.click,
                 child: Icon(
@@ -123,6 +88,53 @@ class _MacMenuBarState extends State<MacMenuBar> {
             const SizedBox(width: AppSizes.spacingBase),
           ],
         ],
+      ),
+    );
+  }
+}
+
+class _ClockWidget extends StatefulWidget {
+  const _ClockWidget();
+
+  @override
+  State<_ClockWidget> createState() => _ClockWidgetState();
+}
+
+class _ClockWidgetState extends State<_ClockWidget> {
+  late String _time;
+  late final Timer _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _time = _formatTime();
+    _timer = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) {
+        if (mounted) setState(() => _time = _formatTime());
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  static String _formatTime() {
+    final now = DateTime.now();
+    return '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      _time,
+      style: GoogleFonts.spaceMono(
+        fontSize: AppSizes.fontXl,
+        color: AppTheme.subtext,
+        fontWeight: FontWeight.bold,
       ),
     );
   }

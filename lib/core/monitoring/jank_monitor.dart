@@ -5,9 +5,11 @@ import 'package:flutter/scheduler.dart';
 import '../services/analytics_service.dart';
 
 final class JankMonitor {
-  JankMonitor(this._analytics);
+  JankMonitor(this._analytics, {int Function()? windowCount})
+    : _windowCount = windowCount;
 
   final AnalyticsService _analytics;
+  final int Function()? _windowCount;
 
   static const _thresholdMs = 32;
   static const _throttle = Duration(seconds: 1);
@@ -34,6 +36,7 @@ final class JankMonitor {
           totalMs: totalMs,
           buildMs: t.buildDuration.inMilliseconds,
           rasterMs: t.rasterDuration.inMilliseconds,
+          openWindowCount: _windowCount?.call(),
         ),
       );
     }

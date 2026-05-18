@@ -81,13 +81,44 @@ class FirebaseAnalyticsService implements AnalyticsService {
     required int totalMs,
     required int buildMs,
     required int rasterMs,
+    int? openWindowCount,
   }) => _analytics.logEvent(
     name: 'jank_frame',
     parameters: {
       'total_ms': totalMs,
       'build_ms': buildMs,
       'raster_ms': rasterMs,
+      if (openWindowCount != null) 'open_windows': openWindowCount,
     },
+  );
+
+  @override
+  Future<void> logDeferredLoad({
+    required String windowId,
+    required int durationMs,
+    required bool fromCache,
+  }) => _analytics.logEvent(
+    name: 'deferred_load',
+    parameters: {
+      'window_id': windowId,
+      'duration_ms': durationMs,
+      'from_cache': fromCache ? 1 : 0,
+    },
+  );
+
+  @override
+  Future<void> logWindowDwellTime({
+    required String windowId,
+    required int seconds,
+  }) => _analytics.logEvent(
+    name: 'window_dwell',
+    parameters: {'window_id': windowId, 'seconds': seconds},
+  );
+
+  @override
+  Future<void> logFirstWindow(String windowId) => _analytics.logEvent(
+    name: 'first_window',
+    parameters: {'window_id': windowId},
   );
 
   static String _cap(String s, int max) =>

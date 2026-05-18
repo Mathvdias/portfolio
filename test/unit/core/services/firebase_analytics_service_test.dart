@@ -198,5 +198,86 @@ void main() {
         ),
       ).called(1);
     });
+
+    test('logJankFrame includes open_windows when provided', () async {
+      await sut.logJankFrame(
+        totalMs: 60,
+        buildMs: 30,
+        rasterMs: 30,
+        openWindowCount: 3,
+      );
+
+      verify(
+        () => mockAnalytics.logEvent(
+          name: 'jank_frame',
+          parameters: {
+            'total_ms': 60,
+            'build_ms': 30,
+            'raster_ms': 30,
+            'open_windows': 3,
+          },
+        ),
+      ).called(1);
+    });
+
+    test('logDeferredLoad fires deferred_load with timing and cache flag', () async {
+      await sut.logDeferredLoad(
+        windowId: 'skills',
+        durationMs: 120,
+        fromCache: false,
+      );
+
+      verify(
+        () => mockAnalytics.logEvent(
+          name: 'deferred_load',
+          parameters: {
+            'window_id': 'skills',
+            'duration_ms': 120,
+            'from_cache': 0,
+          },
+        ),
+      ).called(1);
+    });
+
+    test('logDeferredLoad encodes fromCache as 1 when true', () async {
+      await sut.logDeferredLoad(
+        windowId: 'about',
+        durationMs: 3,
+        fromCache: true,
+      );
+
+      verify(
+        () => mockAnalytics.logEvent(
+          name: 'deferred_load',
+          parameters: {
+            'window_id': 'about',
+            'duration_ms': 3,
+            'from_cache': 1,
+          },
+        ),
+      ).called(1);
+    });
+
+    test('logWindowDwellTime fires window_dwell with window_id and seconds', () async {
+      await sut.logWindowDwellTime(windowId: 'terminal', seconds: 42);
+
+      verify(
+        () => mockAnalytics.logEvent(
+          name: 'window_dwell',
+          parameters: {'window_id': 'terminal', 'seconds': 42},
+        ),
+      ).called(1);
+    });
+
+    test('logFirstWindow fires first_window with window_id', () async {
+      await sut.logFirstWindow('about');
+
+      verify(
+        () => mockAnalytics.logEvent(
+          name: 'first_window',
+          parameters: {'window_id': 'about'},
+        ),
+      ).called(1);
+    });
   });
 }

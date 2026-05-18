@@ -37,13 +37,14 @@ class PixelWallpaper extends StatefulWidget {
 class _PixelWallpaperState extends State<PixelWallpaper>
     with SingleTickerProviderStateMixin {
   late final Ticker _ticker;
-  double _elapsed = 0;
+  late final ValueNotifier<double> _elapsed;
   Duration _lastElapsed = Duration.zero;
   final _particles = <_Particle>[];
 
   @override
   void initState() {
     super.initState();
+    _elapsed = ValueNotifier(0.0);
     final rng = math.Random(42);
     for (int i = 0; i < 70; i++) {
       _particles.add(
@@ -61,13 +62,14 @@ class _PixelWallpaperState extends State<PixelWallpaper>
     _ticker = createTicker((elapsed) {
       final dt = (elapsed - _lastElapsed).inMicroseconds / 1e6;
       _lastElapsed = elapsed;
-      setState(() => _elapsed += dt);
+      _elapsed.value += dt;
     });
     _ticker.start();
   }
 
   @override
   void dispose() {
+    _elapsed.dispose();
     _ticker.dispose();
     super.dispose();
   }
@@ -85,12 +87,13 @@ class _PixelWallpaperState extends State<PixelWallpaper>
 
 class _WallpaperPainter extends CustomPainter {
   final List<_Particle> particles;
-  final double elapsed;
+  final ValueNotifier<double> _elapsed;
 
-  const _WallpaperPainter(this.particles, this.elapsed);
+  _WallpaperPainter(this.particles, this._elapsed) : super(repaint: _elapsed);
 
   @override
   void paint(Canvas canvas, Size size) {
+    final elapsed = _elapsed.value;
     for (final p in particles) {
       final y = ((p.phase + elapsed * p.speed) % 1.0) * size.height;
       final x = p.x * size.width;
@@ -100,5 +103,5 @@ class _WallpaperPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_WallpaperPainter old) => old.elapsed != elapsed;
+  bool shouldRepaint(_WallpaperPainter old) => false;
 }

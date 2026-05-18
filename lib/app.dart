@@ -42,7 +42,10 @@ class _AppState extends State<App> {
       GuestbookRepository(),
       widget.config.prefs,
     )..analytics = widget.config.analytics;
-    _jankMonitor = JankMonitor(widget.config.analytics)..start();
+    _jankMonitor = JankMonitor(
+      widget.config.analytics,
+      windowCount: () => _desktopVM.windows.length,
+    )..start();
   }
 
   @override

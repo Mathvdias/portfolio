@@ -20,22 +20,32 @@ class StickyNote extends StatefulWidget {
 }
 
 class _StickyNoteState extends State<StickyNote> {
-  late Offset _position;
+  late final ValueNotifier<Offset> _positionNotifier;
 
   @override
   void initState() {
     super.initState();
-    _position = widget.initialPosition;
+    _positionNotifier = ValueNotifier(widget.initialPosition);
+  }
+
+  @override
+  void dispose() {
+    _positionNotifier.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      left: _position.dx,
-      top: _position.dy,
+    return ValueListenableBuilder<Offset>(
+      valueListenable: _positionNotifier,
+      builder: (context, pos, child) => Positioned(
+        left: pos.dx,
+        top: pos.dy,
+        child: child!,
+      ),
       child: GestureDetector(
         onPanUpdate: (details) {
-          setState(() => _position += details.delta);
+          _positionNotifier.value += details.delta;
         },
         child: _NoteContainer(
           color: widget.color,
@@ -70,22 +80,32 @@ class VisitorStickyNote extends StatefulWidget {
 }
 
 class _VisitorStickyNoteState extends State<VisitorStickyNote> {
-  late Offset _position;
+  late final ValueNotifier<Offset> _positionNotifier;
 
   @override
   void initState() {
     super.initState();
-    _position = widget.initialPosition;
+    _positionNotifier = ValueNotifier(widget.initialPosition);
+  }
+
+  @override
+  void dispose() {
+    _positionNotifier.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      left: _position.dx,
-      top: _position.dy,
+    return ValueListenableBuilder<Offset>(
+      valueListenable: _positionNotifier,
+      builder: (context, pos, child) => Positioned(
+        left: pos.dx,
+        top: pos.dy,
+        child: child!,
+      ),
       child: GestureDetector(
         onPanUpdate: (details) {
-          setState(() => _position += details.delta);
+          _positionNotifier.value += details.delta;
         },
         child: _NoteContainer(
           color: widget.color,

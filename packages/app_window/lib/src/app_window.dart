@@ -55,9 +55,10 @@ class AppWindow extends StatefulWidget {
 
 class _AppWindowState extends State<AppWindow>
     with SingleTickerProviderStateMixin, WindowAnimationMixin {
-  late Offset _position;
+  late final ValueNotifier<Offset> _positionNotifier;
   late double _width;
   late double _height;
+  late final TextStyle _titleStyle;
   bool _isMaximized = false;
   Offset? _preMaximizePosition;
   Size? _preMaximizeSize;
@@ -65,43 +66,60 @@ class _AppWindowState extends State<AppWindow>
   @override
   void initState() {
     super.initState();
-    _position = widget.initialPosition;
+    _positionNotifier = ValueNotifier(widget.initialPosition);
     _width = widget.width;
     _height = widget.height;
+    _titleStyle = GoogleFonts.pressStart2p(
+      fontSize: widget.titleFontSize,
+      color: const Color(0xFF9399B2),
+    );
+  }
+
+  @override
+  void dispose() {
+    _positionNotifier.dispose();
+    super.dispose();
   }
 
   void _toggleMaximize() {
-    setState(() {
-      if (_isMaximized) {
-        _position = _preMaximizePosition ?? widget.initialPosition;
+    if (_isMaximized) {
+      _positionNotifier.value = _preMaximizePosition ?? widget.initialPosition;
+      setState(() {
         _width = _preMaximizeSize?.width ?? widget.width;
         _height = _preMaximizeSize?.height ?? widget.height;
         _isMaximized = false;
-      } else {
-        _preMaximizePosition = _position;
-        _preMaximizeSize = Size(_width, _height);
-
-        final mq = MediaQuery.of(context);
-        _position = Offset(0, widget.maximizeTopOffset);
+      });
+    } else {
+      _preMaximizePosition = _positionNotifier.value;
+      _preMaximizeSize = Size(_width, _height);
+      final mq = MediaQuery.of(context);
+      _positionNotifier.value = Offset(0, widget.maximizeTopOffset);
+      setState(() {
         _width = mq.size.width;
         _height =
             mq.size.height -
             widget.maximizeTopOffset -
             widget.maximizeBottomOffset;
         _isMaximized = true;
-      }
-    });
+      });
+    }
     widget.onFocus();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      left: _position.dx,
-      top: _position.dy,
+    return ValueListenableBuilder<Offset>(
+      valueListenable: _positionNotifier,
+      builder: (context, pos, child) => Positioned(
+        left: pos.dx,
+        top: pos.dy,
+        child: child!,
+      ),
       child: GestureDetector(
         onTap: widget.onFocus,
-        child: buildAnimatedWindow(_buildWindow()),
+        child: RepaintBoundary(
+          child: buildAnimatedWindow(_buildWindow()),
+        ),
       ),
     );
   }
@@ -152,9 +170,8 @@ class _AppWindowState extends State<AppWindow>
       onDoubleTap: _toggleMaximize,
       onPanStart: (_) => widget.onFocus(),
       onPanUpdate: (details) {
-        debugPrint('onPanUpdate: ${details.delta}');
         if (!_isMaximized) {
-          setState(() => _position += details.delta);
+          _positionNotifier.value += details.delta;
         }
       },
       child: Container(
@@ -200,10 +217,7 @@ class _AppWindowState extends State<AppWindow>
               child: Center(
                 child: Text(
                   widget.title,
-                  style: GoogleFonts.pressStart2p(
-                    fontSize: widget.titleFontSize,
-                    color: const Color(0xFF9399B2),
-                  ),
+                  style: _titleStyle,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
