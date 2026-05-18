@@ -108,12 +108,9 @@ class _ClockWidgetState extends State<_ClockWidget> {
   void initState() {
     super.initState();
     _time = _formatTime();
-    _timer = Timer.periodic(
-      const Duration(seconds: 1),
-      (_) {
-        if (mounted) setState(() => _time = _formatTime());
-      },
-    );
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) setState(() => _time = _formatTime());
+    });
   }
 
   @override

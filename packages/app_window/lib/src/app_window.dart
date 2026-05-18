@@ -110,16 +110,12 @@ class _AppWindowState extends State<AppWindow>
   Widget build(BuildContext context) {
     return ValueListenableBuilder<Offset>(
       valueListenable: _positionNotifier,
-      builder: (context, pos, child) => Positioned(
-        left: pos.dx,
-        top: pos.dy,
-        child: child!,
-      ),
+      builder:
+          (context, pos, child) =>
+              Positioned(left: pos.dx, top: pos.dy, child: child!),
       child: GestureDetector(
         onTap: widget.onFocus,
-        child: RepaintBoundary(
-          child: buildAnimatedWindow(_buildWindow()),
-        ),
+        child: RepaintBoundary(child: buildAnimatedWindow(_buildWindow())),
       ),
     );
   }

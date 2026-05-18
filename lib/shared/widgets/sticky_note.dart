@@ -38,11 +38,9 @@ class _StickyNoteState extends State<StickyNote> {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<Offset>(
       valueListenable: _positionNotifier,
-      builder: (context, pos, child) => Positioned(
-        left: pos.dx,
-        top: pos.dy,
-        child: child!,
-      ),
+      builder:
+          (context, pos, child) =>
+              Positioned(left: pos.dx, top: pos.dy, child: child!),
       child: GestureDetector(
         onPanUpdate: (details) {
           _positionNotifier.value += details.delta;
@@ -98,11 +96,9 @@ class _VisitorStickyNoteState extends State<VisitorStickyNote> {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<Offset>(
       valueListenable: _positionNotifier,
-      builder: (context, pos, child) => Positioned(
-        left: pos.dx,
-        top: pos.dy,
-        child: child!,
-      ),
+      builder:
+          (context, pos, child) =>
+              Positioned(left: pos.dx, top: pos.dy, child: child!),
       child: GestureDetector(
         onPanUpdate: (details) {
           _positionNotifier.value += details.delta;

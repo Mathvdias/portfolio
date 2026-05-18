@@ -220,24 +220,27 @@ void main() {
       ).called(1);
     });
 
-    test('logDeferredLoad fires deferred_load with timing and cache flag', () async {
-      await sut.logDeferredLoad(
-        windowId: 'skills',
-        durationMs: 120,
-        fromCache: false,
-      );
+    test(
+      'logDeferredLoad fires deferred_load with timing and cache flag',
+      () async {
+        await sut.logDeferredLoad(
+          windowId: 'skills',
+          durationMs: 120,
+          fromCache: false,
+        );
 
-      verify(
-        () => mockAnalytics.logEvent(
-          name: 'deferred_load',
-          parameters: {
-            'window_id': 'skills',
-            'duration_ms': 120,
-            'from_cache': 0,
-          },
-        ),
-      ).called(1);
-    });
+        verify(
+          () => mockAnalytics.logEvent(
+            name: 'deferred_load',
+            parameters: {
+              'window_id': 'skills',
+              'duration_ms': 120,
+              'from_cache': 0,
+            },
+          ),
+        ).called(1);
+      },
+    );
 
     test('logDeferredLoad encodes fromCache as 1 when true', () async {
       await sut.logDeferredLoad(
@@ -249,25 +252,24 @@ void main() {
       verify(
         () => mockAnalytics.logEvent(
           name: 'deferred_load',
-          parameters: {
-            'window_id': 'about',
-            'duration_ms': 3,
-            'from_cache': 1,
-          },
+          parameters: {'window_id': 'about', 'duration_ms': 3, 'from_cache': 1},
         ),
       ).called(1);
     });
 
-    test('logWindowDwellTime fires window_dwell with window_id and seconds', () async {
-      await sut.logWindowDwellTime(windowId: 'terminal', seconds: 42);
+    test(
+      'logWindowDwellTime fires window_dwell with window_id and seconds',
+      () async {
+        await sut.logWindowDwellTime(windowId: 'terminal', seconds: 42);
 
-      verify(
-        () => mockAnalytics.logEvent(
-          name: 'window_dwell',
-          parameters: {'window_id': 'terminal', 'seconds': 42},
-        ),
-      ).called(1);
-    });
+        verify(
+          () => mockAnalytics.logEvent(
+            name: 'window_dwell',
+            parameters: {'window_id': 'terminal', 'seconds': 42},
+          ),
+        ).called(1);
+      },
+    );
 
     test('logFirstWindow fires first_window with window_id', () async {
       await sut.logFirstWindow('about');

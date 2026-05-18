@@ -456,39 +456,42 @@ class _DesktopPageState extends State<DesktopPage> {
               // Windows — rebuilt only when window list changes.
               ListenableBuilder(
                 listenable: _desktopVM,
-                builder: (context, _) => Stack(
-                  children: _desktopVM.windows
-                      .map(
-                        (w) => AppWindow(
-                          key: ValueKey(w.id),
-                          title: w.title,
-                          initialPosition: w.position,
-                          accentColor: w.accentColor,
-                          titleBarColor: AppTheme.surface,
-                          contentColor: AppTheme.background,
-                          borderColor: AppTheme.surface0,
-                          closeColor: AppTheme.red,
-                          minimizeColor: AppTheme.yellow,
-                          maximizeColor: AppTheme.green,
-                          width: w.width,
-                          height: w.height,
-                          titleBarHeight: AppSizes.windowTitleBarHeight,
-                          trafficLightSize: AppSizes.windowTrafficLightSize,
-                          trafficLightSpacing:
-                              AppSizes.windowTrafficLightSpacing,
-                          maximizeTopOffset: AppSizes.menuBarHeight,
-                          maximizeBottomOffset: AppSizes.desktopBottom,
-                          titleFontSize: AppSizes.fontXs,
-                          onClose: () {
-                            _trackWindowClose(w.id);
-                            _desktopVM.closeWindow(w.id);
-                          },
-                          onFocus: () => _desktopVM.focusWindow(w.id),
-                          child: w.content,
-                        ),
-                      )
-                      .toList(),
-                ),
+                builder:
+                    (context, _) => Stack(
+                      children:
+                          _desktopVM.windows
+                              .map(
+                                (w) => AppWindow(
+                                  key: ValueKey(w.id),
+                                  title: w.title,
+                                  initialPosition: w.position,
+                                  accentColor: w.accentColor,
+                                  titleBarColor: AppTheme.surface,
+                                  contentColor: AppTheme.background,
+                                  borderColor: AppTheme.surface0,
+                                  closeColor: AppTheme.red,
+                                  minimizeColor: AppTheme.yellow,
+                                  maximizeColor: AppTheme.green,
+                                  width: w.width,
+                                  height: w.height,
+                                  titleBarHeight: AppSizes.windowTitleBarHeight,
+                                  trafficLightSize:
+                                      AppSizes.windowTrafficLightSize,
+                                  trafficLightSpacing:
+                                      AppSizes.windowTrafficLightSpacing,
+                                  maximizeTopOffset: AppSizes.menuBarHeight,
+                                  maximizeBottomOffset: AppSizes.desktopBottom,
+                                  titleFontSize: AppSizes.fontXs,
+                                  onClose: () {
+                                    _trackWindowClose(w.id);
+                                    _desktopVM.closeWindow(w.id);
+                                  },
+                                  onFocus: () => _desktopVM.focusWindow(w.id),
+                                  child: w.content,
+                                ),
+                              )
+                              .toList(),
+                    ),
               ),
 
               // Notifications — rebuilt only when visibility changes.
@@ -563,10 +566,7 @@ class _DesktopPageState extends State<DesktopPage> {
                 valueListenable: _selectionNotifier,
                 builder: (context, sel, _) {
                   if (sel == null) return const SizedBox.shrink();
-                  return RubberBandSelection(
-                    origin: sel.$1,
-                    current: sel.$2,
-                  );
+                  return RubberBandSelection(origin: sel.$1, current: sel.$2);
                 },
               ),
 
