@@ -69,6 +69,7 @@ flutter:
   shaders:
     - shaders/wallpaper.frag
     - shaders/icons.frag
+    - shaders/pixelate.frag
 
   # To add assets to your application, add an assets section, like this:
   # assets:

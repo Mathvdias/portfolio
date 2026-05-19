@@ -10,6 +10,7 @@ import '../../theme/app_theme.dart';
 import '../constants/app_sizes.dart';
 import '../constants/app_strings.dart';
 import '../models/sdf_shape.dart';
+import 'pixelate_on_hover.dart';
 import 'sdf_icon.dart';
 
 class Dock extends StatelessWidget {
@@ -163,7 +164,11 @@ class _DockItemState extends State<_DockItem> {
                   SizedBox(
                     width: AppSizes.dockIconSize,
                     height: AppSizes.dockIconSize,
-                    child: Center(child: widget.data.iconWidget),
+                    child: Center(
+                      child: PixelateOnHover(
+                        child: widget.data.iconWidget,
+                      ),
+                    ),
                   ),
                   const SizedBox(height: AppSizes.spacingXs),
                   if (isWindowOpen)

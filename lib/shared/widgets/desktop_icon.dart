@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../theme/app_theme.dart';
 import '../constants/app_sizes.dart';
+import 'pixelate_on_hover.dart';
 
 class DesktopIcon extends StatefulWidget {
   const DesktopIcon({
@@ -51,12 +52,14 @@ class _DesktopIconState extends State<DesktopIcon> {
               SizedBox(
                 width: AppSizes.iconArtSize,
                 height: AppSizes.iconArtSize,
-                child: IconTheme(
-                  data: IconThemeData(
-                    color: widget.color,
-                    size: AppSizes.iconArtSize * 0.8,
+                child: PixelateOnHover(
+                  child: IconTheme(
+                    data: IconThemeData(
+                      color: widget.color,
+                      size: AppSizes.iconArtSize * 0.8,
+                    ),
+                    child: widget.iconWidget,
                   ),
-                  child: widget.iconWidget,
                 ),
               ),
               const SizedBox(height: AppSizes.spacingXs),
