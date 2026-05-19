@@ -60,9 +60,13 @@ float sdTri(vec2 p, vec2 a, vec2 b, vec2 c) {
 // Rules: (a) sequential min/max — no nested calls in return;
 //        (b) unused slots return sdCircle(p,0.40) to keep the switch flat.
 
-float s0(vec2 p) { // person
-  float d = sdCircle(p - vec2(0.0, 0.22), 0.16);
-  d = min(d, sdRBox(p - vec2(0.0, -0.10), vec2(0.18, 0.20), 0.08));
+float s0(vec2 p) { // person: head + shoulders silhouette
+  // head
+  float d = sdCircle(p - vec2(0.0, 0.20), 0.15);
+  // torso — wider rounded rect to suggest shoulders
+  d = min(d, sdRBox(p - vec2(0.0, -0.08), vec2(0.24, 0.22), 0.10));
+  // clip bottom so torso doesn't go too low
+  d = max(d, -(sdBox(p - vec2(0.0, -0.50), vec2(0.50, 0.20))));
   return d;
 }
 
@@ -204,42 +208,54 @@ float s15(vec2 p) { // globe
   return d;
 }
 
-float s16(vec2 p) { // bar chart
-  float d = sdBox(p - vec2(-0.24, -0.08), vec2(0.08, 0.22));
-  d = min(d, sdBox(p - vec2( 0.0,  -0.02), vec2(0.08, 0.28)));
-  d = min(d, sdBox(p - vec2( 0.24,  0.06), vec2(0.08, 0.20)));
-  d = min(d, sdBox(p - vec2( 0.0,  -0.40), vec2(0.38, 0.030)));
+float s16(vec2 p) { // bar chart — all bars rise from the same baseline
+  // baseline at y = -0.38; bars grow upward
+  float base = -0.38;
+  // left bar:   top y=0.02,  half-height 0.20, centre y = base + 0.20
+  float d = sdBox(p - vec2(-0.24, base + 0.20), vec2(0.075, 0.20));
+  // middle bar: top y=0.22,  half-height 0.30
+  d = min(d, sdBox(p - vec2( 0.00, base + 0.30), vec2(0.075, 0.30)));
+  // right bar:  top y=0.12,  half-height 0.25
+  d = min(d, sdBox(p - vec2( 0.24, base + 0.25), vec2(0.075, 0.25)));
+  // horizontal baseline
+  d = min(d, sdBox(p - vec2(0.0, base), vec2(0.38, 0.030)));
   return d;
 }
 
-float s17(vec2 p) { // wifi
-  vec2 ctr = vec2(0.0, -0.30);
-  vec2 sc  = vec2(sin(1.10), cos(1.10));
-  float d  = sdCircle(p - ctr, 0.055);
-  d = min(d, sdArc(p - ctr, sc, 0.14, 0.038));
-  d = min(d, sdArc(p - ctr, sc, 0.27, 0.038));
-  d = min(d, sdArc(p - ctr, sc, 0.42, 0.038));
+float s17(vec2 p) { // wifi — dot at bottom, three arcs opening upward
+  // After Y-flip: ctr is at screen-bottom; arcs (sc.y > 0) open toward screen-top
+  vec2 ctr = vec2(0.0, -0.32);
+  vec2 sc  = vec2(sin(0.85), cos(0.85));  // wider opening angle
+  float d  = sdCircle(p - ctr, 0.06);
+  d = min(d, sdArc(p - ctr, sc, 0.14, 0.040));
+  d = min(d, sdArc(p - ctr, sc, 0.28, 0.040));
+  d = min(d, sdArc(p - ctr, sc, 0.43, 0.040));
   return d;
 }
 
-float s21(vec2 p) { // rocket
-  float d = sdRBox(p, vec2(0.14, 0.30), 0.10);
-  d = min(d, sdTri(p, vec2(-0.14,  0.18), vec2( 0.14,  0.18), vec2( 0.0,  0.46)));
-  d = min(d, sdTri(p, vec2(-0.14, -0.16), vec2(-0.28, -0.38), vec2(-0.14,-0.38)));
-  d = min(d, sdTri(p, vec2( 0.14, -0.16), vec2( 0.28, -0.38), vec2( 0.14,-0.38)));
-  d = min(d, sdCircle(p - vec2(0.0, -0.38), 0.07));
+float s21(vec2 p) { // rocket — body + nose cone + side fins + nozzle
+  // body
+  float d = sdRBox(p, vec2(0.13, 0.28), 0.09);
+  // nose cone (tip at top)
+  d = min(d, sdTri(p, vec2(-0.13, 0.20), vec2(0.13, 0.20), vec2(0.0, 0.46)));
+  // left fin
+  d = min(d, sdTri(p, vec2(-0.13, -0.14), vec2(-0.30, -0.36), vec2(-0.13, -0.36)));
+  // right fin
+  d = min(d, sdTri(p, vec2( 0.13, -0.14), vec2( 0.30, -0.36), vec2( 0.13, -0.36)));
+  // nozzle
+  d = min(d, sdRBox(p - vec2(0.0, -0.36), vec2(0.065, 0.06), 0.03));
   return d;
 }
 
-float s23(vec2 p) { // github (simplified cat face)
-  float d  = sdCircle(p - vec2(0.0, -0.02), 0.28);
-  d = min(d, sdCircle(p - vec2(-0.20,  0.24), 0.12));
-  d = min(d, sdCircle(p - vec2( 0.20,  0.24), 0.12));
-  float e1 = sdCircle(p - vec2(-0.10, 0.04), 0.05);
-  float e2 = sdCircle(p - vec2( 0.10, 0.04), 0.05);
-  d = max(d, -e1);
-  d = max(d, -e2);
-  return d;
+float s23(vec2 p) { // github — outer ring + inner person silhouette
+  float ring = abs(sdCircle(p, 0.42)) - 0.038;
+  // head
+  float head = sdCircle(p - vec2(0.0, 0.10), 0.12);
+  // shoulders (clipped arc at bottom)
+  float body = sdRBox(p - vec2(0.0, -0.20), vec2(0.20, 0.12), 0.10);
+  float clip  = sdBox(p - vec2(0.0, -0.44), vec2(0.50, 0.16));
+  float inner = min(head, max(body, -clip));
+  return min(ring, inner);
 }
 
 float s25(vec2 p) { // fire
@@ -275,6 +291,7 @@ float s28(vec2 p) { // building / columns
 // switch → OpSwitch in SPIR-V → flat SkSL switch (no if-else nesting depth).
 void main() {
   vec2  p = (FlutterFragCoord().xy / uSize) - 0.5;
+  p.y = -p.y; // flip: FlutterFragCoord Y grows downward, SDFs expect Y up
   int   s = int(uShape + 0.5);
   float d;
 
