@@ -27,6 +27,7 @@ import '../../../../shared/widgets/responsive_layout.dart';
 import '../../../../shared/widgets/rubber_band_selection.dart';
 import '../../../../shared/widgets/spotlight_overlay.dart';
 import '../../../../shared/widgets/sticky_note.dart';
+import '../../../../shared/widgets/crt_overlay.dart';
 import '../../../../theme/app_theme.dart';
 
 // Window content — deferred so each chunk is downloaded only when the
@@ -611,6 +612,9 @@ class _DesktopPageState extends State<DesktopPage> {
                   );
                 },
               ),
+
+              // CRT post-process overlay — topmost, pointer-transparent.
+              const Positioned.fill(child: CrtOverlay()),
             ],
           ),
         ),
