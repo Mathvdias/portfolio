@@ -10,6 +10,7 @@ import '../../theme/app_theme.dart';
 import '../constants/app_sizes.dart';
 import '../constants/app_strings.dart';
 import '../models/sdf_shape.dart';
+import 'glow_on_hover.dart';
 import 'pixelate_on_hover.dart';
 import 'sdf_icon.dart';
 
@@ -165,8 +166,11 @@ class _DockItemState extends State<_DockItem> {
                     width: AppSizes.dockIconSize,
                     height: AppSizes.dockIconSize,
                     child: Center(
-                      child: PixelateOnHover(
-                        child: widget.data.iconWidget,
+                      child: GlowOnHover(
+                        color: widget.data.color,
+                        child: PixelateOnHover(
+                          child: widget.data.iconWidget,
+                        ),
                       ),
                     ),
                   ),
