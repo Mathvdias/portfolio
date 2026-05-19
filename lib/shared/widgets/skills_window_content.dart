@@ -4,7 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../theme/app_theme.dart';
 import '../constants/app_sizes.dart';
 import '../constants/app_strings.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../models/sdf_shape.dart';
+import 'sdf_icon.dart';
 
 class SkillsWindowContent extends StatelessWidget {
   const SkillsWindowContent({super.key});
@@ -20,50 +21,20 @@ class SkillsWindowContent extends StatelessWidget {
             _SkillSection(
               title: AppStrings.skillsMobile,
               skills: [
-                _Skill(
-                  'Flutter',
-                  Icon(Icons.flutter_dash),
-                  AppTheme.blue,
-                  0.95,
-                ),
-                _Skill(
-                  'Android',
-                  FaIcon(FontAwesomeIcons.android),
-                  AppTheme.green,
-                  0.85,
-                ),
-                _Skill('Dart', Icon(Icons.code), AppTheme.teal, 0.95),
-                _Skill(
-                  'Kotlin',
-                  Icon(Icons.integration_instructions),
-                  AppTheme.mauve,
-                  0.80,
-                ),
+                _Skill('Flutter', SdfIcon(SdfShape.rocket, color: AppTheme.blue), AppTheme.blue, 0.95),
+                _Skill('Android', SdfIcon(SdfShape.android, color: AppTheme.green), AppTheme.green, 0.85),
+                _Skill('Dart', SdfIcon(SdfShape.code, color: AppTheme.teal), AppTheme.teal, 0.95),
+                _Skill('Kotlin', SdfIcon(SdfShape.terminal, color: AppTheme.mauve), AppTheme.mauve, 0.80),
               ],
             ),
             SizedBox(height: AppSizes.spacingXxl),
             _SkillSection(
               title: AppStrings.skillsBackend,
               skills: [
-                _Skill('REST APIs', Icon(Icons.api), AppTheme.blue, 0.85),
-                _Skill(
-                  'Firebase',
-                  Icon(Icons.local_fire_department),
-                  AppTheme.yellow,
-                  0.75,
-                ),
-                _Skill(
-                  'Git / CI',
-                  FaIcon(FontAwesomeIcons.github),
-                  AppTheme.subtext,
-                  0.90,
-                ),
-                _Skill(
-                  'Fastlane',
-                  Icon(Icons.rocket_launch),
-                  AppTheme.peach,
-                  0.70,
-                ),
+                _Skill('REST APIs', SdfIcon(SdfShape.globe, color: AppTheme.blue), AppTheme.blue, 0.85),
+                _Skill('Firebase', SdfIcon(SdfShape.fire, color: AppTheme.yellow), AppTheme.yellow, 0.75),
+                _Skill('Git / CI', SdfIcon(SdfShape.github, color: AppTheme.subtext), AppTheme.subtext, 0.90),
+                _Skill('Fastlane', SdfIcon(SdfShape.rocket, color: AppTheme.peach), AppTheme.peach, 0.70),
               ],
             ),
           ],

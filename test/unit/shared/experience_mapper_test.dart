@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:portifolio/shared/mappers/experience_mapper.dart';
 import 'package:portifolio/shared/models/experience.dart';
+import 'package:portifolio/shared/models/sdf_shape.dart';
+import 'package:portifolio/shared/widgets/sdf_icon.dart';
 import 'package:portifolio/theme/app_theme.dart';
 
 void main() {
@@ -72,41 +73,41 @@ void main() {
   });
 
   group('ExperienceMapper.iconWidgetFor', () {
-    int cp(Widget w) => (w as FaIcon).icon!.codePoint;
+    SdfShape shape(Widget w) => (w as SdfIcon).shape;
 
-    test('returns briefcase for Zallpy', () {
-      expect(
-        cp(ExperienceMapper.iconWidgetFor('Zallpy')),
-        FontAwesomeIcons.briefcase.codePoint,
-      );
+    test('returns SdfIcon for every company', () {
+      expect(ExperienceMapper.iconWidgetFor('Zallpy'), isA<SdfIcon>());
+      expect(ExperienceMapper.iconWidgetFor('Banco Pan'), isA<SdfIcon>());
+      expect(ExperienceMapper.iconWidgetFor('Conecthus'), isA<SdfIcon>());
+      expect(ExperienceMapper.iconWidgetFor('Oi'), isA<SdfIcon>());
+      expect(ExperienceMapper.iconWidgetFor('Acme Corp'), isA<SdfIcon>());
     });
 
-    test('returns buildingColumns for Banco Pan', () {
-      expect(
-        cp(ExperienceMapper.iconWidgetFor('Banco Pan')),
-        FontAwesomeIcons.buildingColumns.codePoint,
-      );
+    test('returns briefcase shape for Zallpy', () {
+      expect(shape(ExperienceMapper.iconWidgetFor('Zallpy')), SdfShape.briefcase);
     });
 
-    test('returns wifi for Conecthus', () {
-      expect(
-        cp(ExperienceMapper.iconWidgetFor('Conecthus')),
-        FontAwesomeIcons.wifi.codePoint,
-      );
+    test('returns building shape for Banco Pan', () {
+      expect(shape(ExperienceMapper.iconWidgetFor('Banco Pan')), SdfShape.building);
     });
 
-    test('returns phone for Oi', () {
-      expect(
-        cp(ExperienceMapper.iconWidgetFor('Oi')),
-        FontAwesomeIcons.phone.codePoint,
-      );
+    test('returns wifi shape for Conecthus', () {
+      expect(shape(ExperienceMapper.iconWidgetFor('Conecthus')), SdfShape.wifi);
     });
 
-    test('returns buildingColumns for unknown', () {
-      expect(
-        cp(ExperienceMapper.iconWidgetFor('Acme Corp')),
-        FontAwesomeIcons.buildingColumns.codePoint,
-      );
+    test('returns phone shape for Oi', () {
+      expect(shape(ExperienceMapper.iconWidgetFor('Oi')), SdfShape.phone);
+    });
+
+    test('returns building shape for unknown company', () {
+      expect(shape(ExperienceMapper.iconWidgetFor('Acme Corp')), SdfShape.building);
+    });
+
+    test('correct color for each company', () {
+      expect((ExperienceMapper.iconWidgetFor('Zallpy') as SdfIcon).color, AppTheme.teal);
+      expect((ExperienceMapper.iconWidgetFor('Banco Pan') as SdfIcon).color, AppTheme.blue);
+      expect((ExperienceMapper.iconWidgetFor('Conecthus') as SdfIcon).color, AppTheme.green);
+      expect((ExperienceMapper.iconWidgetFor('Oi') as SdfIcon).color, AppTheme.peach);
     });
   });
 

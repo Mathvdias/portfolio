@@ -9,6 +9,8 @@ import '../../l10n/app_localizations.dart';
 import '../../theme/app_theme.dart';
 import '../constants/app_sizes.dart';
 import '../constants/app_strings.dart';
+import '../models/sdf_shape.dart';
+import 'sdf_icon.dart';
 
 class Dock extends StatelessWidget {
   const Dock({super.key});
@@ -17,46 +19,46 @@ class Dock extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    // Using Material Icons for maximum reliability on Flutter Web
+    const iconSize = AppSizes.dockIconSize * 0.8;
     final items = [
       _DockItemData(
-        icon: Icons.code,
+        iconWidget: const SdfIcon(SdfShape.code, size: iconSize, color: AppTheme.subtext),
         label: AppStrings.dockGitHub,
         color: AppTheme.subtext,
         url: AppStrings.urlGitHub,
       ),
       _DockItemData(
-        icon: Icons.language,
+        iconWidget: const SdfIcon(SdfShape.globe, size: iconSize, color: AppTheme.blue),
         label: AppStrings.dockPubDev,
         color: AppTheme.blue,
         url: AppStrings.urlPubDev,
       ),
       _DockItemData(
-        icon: Icons.article_outlined,
+        iconWidget: const SdfIcon(SdfShape.file, size: iconSize, color: AppTheme.yellow),
         label: AppStrings.dockMedium,
         color: AppTheme.yellow,
         url: AppStrings.urlMedium,
       ),
       _DockItemData(
-        icon: Icons.work_outline,
+        iconWidget: const SdfIcon(SdfShape.briefcase, size: iconSize, color: AppTheme.blue),
         label: AppStrings.dockLinkedIn,
         color: AppTheme.blue,
         url: AppStrings.urlLinkedIn,
       ),
       _DockItemData(
-        icon: Icons.email_outlined,
+        iconWidget: const SdfIcon(SdfShape.envelope, size: iconSize, color: AppTheme.peach),
         label: AppStrings.dockEmail,
         color: AppTheme.peach,
         url: AppStrings.emailAddress,
       ),
       _DockItemData(
-        icon: Icons.book_outlined,
+        iconWidget: const SdfIcon(SdfShape.book, size: iconSize, color: AppTheme.blue),
         label: l10n.guestbook,
         color: AppTheme.blue,
         windowId: AppStrings.winGuestbook,
       ),
       _DockItemData(
-        icon: Icons.analytics_outlined,
+        iconWidget: const SdfIcon(SdfShape.barChart, size: iconSize, color: AppTheme.yellow),
         label: l10n.projectStats,
         color: AppTheme.yellow,
         windowId: AppStrings.winProjectStats,
@@ -95,14 +97,14 @@ class Dock extends StatelessWidget {
 }
 
 class _DockItemData {
-  final IconData icon;
+  final Widget iconWidget;
   final String label;
   final Color color;
   final String? url;
   final String? windowId;
 
   const _DockItemData({
-    required this.icon,
+    required this.iconWidget,
     required this.label,
     required this.color,
     this.url,
@@ -161,12 +163,7 @@ class _DockItemState extends State<_DockItem> {
                   SizedBox(
                     width: AppSizes.dockIconSize,
                     height: AppSizes.dockIconSize,
-                    child: Icon(
-                      widget.data.icon,
-                      color: widget.data.color,
-                      size: AppSizes.dockIconSize * 0.8,
-                      semanticLabel: widget.data.label,
-                    ),
+                    child: Center(child: widget.data.iconWidget),
                   ),
                   const SizedBox(height: AppSizes.spacingXs),
                   if (isWindowOpen)

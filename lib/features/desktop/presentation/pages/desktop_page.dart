@@ -4,7 +4,8 @@ import 'package:app_window/app_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_lazy_load_web/flutter_lazy_load_web.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../../../shared/models/sdf_shape.dart';
+import '../../../../shared/widgets/sdf_icon.dart';
 
 import '../../../../core/di/app_dependencies.dart';
 import '../../../../core/services/analytics_service.dart';
@@ -155,7 +156,7 @@ class _DesktopPageState extends State<DesktopPage> {
       SpotlightItem(
         id: AppStrings.winAndroid,
         label: l10n.androidDev,
-        iconWidget: const FaIcon(FontAwesomeIcons.android),
+        iconWidget: const SdfIcon(SdfShape.android, color: AppTheme.green),
         color: AppTheme.green,
       ),
       SpotlightItem(
@@ -173,7 +174,7 @@ class _DesktopPageState extends State<DesktopPage> {
       SpotlightItem(
         id: AppStrings.winSnake,
         label: AppStrings.titleSnake,
-        iconWidget: const FaIcon(FontAwesomeIcons.gamepad),
+        iconWidget: const SdfIcon(SdfShape.gamepad, color: AppTheme.peach),
         color: AppTheme.peach,
       ),
       SpotlightItem(

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../theme/app_theme.dart';
@@ -11,6 +10,7 @@ import '../constants/app_sizes.dart';
 import '../../core/di/app_dependencies.dart';
 import '../mappers/experience_mapper.dart';
 import '../models/experience.dart';
+import '../models/sdf_shape.dart';
 import 'desktop_icon.dart';
 import 'experience_window_content.dart';
 import 'about_window_content.dart';
@@ -22,6 +22,7 @@ import 'snake_game_content.dart';
 import 'contact_form_content.dart';
 import 'project_window_content.dart';
 import 'android_dev_window_content.dart';
+import 'sdf_icon.dart';
 
 /// The right-aligned, vertically-wrapping grid of desktop icons.
 class DesktopIconsGrid extends StatelessWidget {
@@ -44,7 +45,7 @@ class DesktopIconsGrid extends StatelessWidget {
     final icons = <Widget>[
       DesktopIcon(
         label: l10n.about,
-        iconWidget: const Icon(Icons.person),
+        iconWidget: const SdfIcon(SdfShape.person, color: AppTheme.blue),
         color: AppTheme.blue,
         onTap:
             () => onOpenWindow(
@@ -56,7 +57,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconFinder,
-        iconWidget: const Icon(Icons.folder),
+        iconWidget: const SdfIcon(SdfShape.folder, color: AppTheme.red),
         color: AppTheme.red,
         onTap:
             () => onOpenWindow(
@@ -86,7 +87,7 @@ class DesktopIconsGrid extends StatelessWidget {
       }),
       DesktopIcon(
         label: AppStrings.iconSkills,
-        iconWidget: const Icon(Icons.star),
+        iconWidget: const SdfIcon(SdfShape.star, color: AppTheme.blue),
         color: AppTheme.blue,
         onTap:
             () => onOpenWindow(
@@ -98,7 +99,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconAndroid,
-        iconWidget: const FaIcon(FontAwesomeIcons.android),
+        iconWidget: const SdfIcon(SdfShape.android, color: AppTheme.green),
         color: AppTheme.green,
         onTap:
             () => onOpenWindow(
@@ -110,7 +111,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconTerminal,
-        iconWidget: const Icon(Icons.terminal),
+        iconWidget: const SdfIcon(SdfShape.terminal, color: AppTheme.green),
         color: AppTheme.green,
         onTap:
             () => onOpenWindow(
@@ -122,7 +123,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconCalculator,
-        iconWidget: const Icon(Icons.calculate),
+        iconWidget: const SdfIcon(SdfShape.calculator, color: AppTheme.peach),
         color: AppTheme.peach,
         onTap:
             () => onOpenWindow(
@@ -134,7 +135,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconSnake,
-        iconWidget: const FaIcon(FontAwesomeIcons.gamepad),
+        iconWidget: const SdfIcon(SdfShape.gamepad, color: AppTheme.peach),
         color: AppTheme.peach,
         onTap:
             () => onOpenWindow(
@@ -146,7 +147,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconContact,
-        iconWidget: const FaIcon(FontAwesomeIcons.envelope),
+        iconWidget: const SdfIcon(SdfShape.envelope, color: AppTheme.teal),
         color: AppTheme.teal,
         onTap:
             () => onOpenWindow(
@@ -158,7 +159,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconWhitepaper,
-        iconWidget: const FaIcon(FontAwesomeIcons.fileLines),
+        iconWidget: const SdfIcon(SdfShape.file, color: AppTheme.blue),
         color: AppTheme.blue,
         onTap: () async {
           unawaited(
@@ -173,7 +174,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconResume,
-        iconWidget: const FaIcon(FontAwesomeIcons.filePdf),
+        iconWidget: const SdfIcon(SdfShape.filePdf, color: AppTheme.red),
         color: AppTheme.red,
         onTap: () async {
           unawaited(
@@ -185,7 +186,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconInterceptedHttp,
-        iconWidget: const FaIcon(FontAwesomeIcons.shield),
+        iconWidget: const SdfIcon(SdfShape.shield, color: AppTheme.blue),
         color: AppTheme.blue,
         onTap:
             () => onOpenWindow(

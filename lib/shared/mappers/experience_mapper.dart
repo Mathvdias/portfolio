@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../theme/app_theme.dart';
 import '../models/experience.dart';
+import '../models/sdf_shape.dart';
+import '../widgets/sdf_icon.dart';
 
 /// Maps raw l10n experience data into [Experience] objects and resolves
 /// company-specific metadata (colour, pixel icon, short name).
@@ -32,17 +33,21 @@ abstract final class ExperienceMapper {
     return AppTheme.peach;
   }
 
-  // ── Resolve IconData ───────────────────────────────────
+  // ── Resolve icon widget ─────────────────────────────────
   static Widget iconWidgetFor(String company) {
     if (company.contains('Zallpy')) {
-      return const FaIcon(FontAwesomeIcons.briefcase);
+      return const SdfIcon(SdfShape.briefcase, color: AppTheme.teal);
     }
-    if (_isPan(company)) return const FaIcon(FontAwesomeIcons.buildingColumns);
+    if (_isPan(company)) {
+      return const SdfIcon(SdfShape.building, color: AppTheme.blue);
+    }
     if (company.contains('Conecthus')) {
-      return const FaIcon(FontAwesomeIcons.wifi);
+      return const SdfIcon(SdfShape.wifi, color: AppTheme.green);
     }
-    if (company.contains('Oi')) return const FaIcon(FontAwesomeIcons.phone);
-    return const FaIcon(FontAwesomeIcons.buildingColumns);
+    if (company.contains('Oi')) {
+      return const SdfIcon(SdfShape.phone, color: AppTheme.peach);
+    }
+    return const SdfIcon(SdfShape.building, color: AppTheme.blue);
   }
 
   // ── Resolve short display name ─────────────────────────────────
