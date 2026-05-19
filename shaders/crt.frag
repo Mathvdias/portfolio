@@ -1,53 +1,34 @@
 #include <flutter/runtime_effect.glsl>
 
-// uSampler: the composited desktop rendered as a texture.
-uniform sampler2D uSampler;
-// uWidth / uHeight: canvas dimensions in logical pixels.
+// Pure overlay — no image sampler needed.
+// Draws a dark semi-transparent layer with scanlines, vignette, and flicker
+// that composites on top of the desktop via Porter-Duff src-over.
 uniform float uWidth;
 uniform float uHeight;
-// uElapsed: seconds since start (drives scanline flicker).
 uniform float uElapsed;
-// uIntensity: overall CRT effect strength 0.0–1.0.
+// uIntensity: 0.0 = invisible, 1.0 = full CRT feel
 uniform float uIntensity;
 
 out vec4 fragColor;
 
 void main() {
-  vec2 fc    = FlutterFragCoord().xy;
-  vec2 uv    = fc / vec2(uWidth, uHeight);
+  vec2 fc = FlutterFragCoord().xy;
+  vec2 uv = fc / vec2(uWidth, uHeight);
 
-  // --- Slight barrel distortion ---
-  vec2 cUv = uv * 2.0 - 1.0;
-  float barrel = 0.03 * uIntensity;
-  cUv *= 1.0 + barrel * dot(cUv, cUv);
-  vec2 distUv = cUv * 0.5 + 0.5;
+  // --- Scanlines: alternating dark/light bands every 2 px ---
+  float line  = step(0.5, fract(fc.y * 0.5));   // 0 or 1, 2-px period
+  float dark  = 1.0 - 0.18 * uIntensity * line; // dim every other line
 
-  // Sample with mild chromatic aberration on the distorted UV.
-  float aberr = 0.003 * uIntensity;
-  float r = texture(uSampler, distUv + vec2( aberr,  0.0)).r;
-  float g = texture(uSampler, distUv).g;
-  float b = texture(uSampler, distUv + vec2(-aberr,  0.0)).b;
-  float a = texture(uSampler, distUv).a;
+  // --- Slow flicker ---
+  float flicker = 1.0 - 0.018 * uIntensity * sin(uElapsed * 31.7);
 
-  // Clamp: outside barrel distortion → black.
-  float inside = step(0.0, distUv.x) * step(distUv.x, 1.0)
-               * step(0.0, distUv.y) * step(distUv.y, 1.0);
-  vec4 src = vec4(r, g, b, a) * inside;
+  // --- Radial vignette ---
+  vec2 vp = uv * 2.0 - 1.0;
+  float vig = 1.0 - smoothstep(0.45, 1.1, length(vp) * (1.0 + 0.3 * uIntensity));
 
-  // --- Scanlines ---
-  float lineFreq  = 2.0;
-  float lineDark  = 0.12 * uIntensity;
-  float scanline  = sin(fc.y * lineFreq * 3.14159) * 0.5 + 0.5;
-  float lineAlpha = 1.0 - lineDark * (1.0 - scanline);
+  // darkness = how much we darken; 0 = transparent, 1 = fully black
+  float darkness = (1.0 - dark * flicker * vig) * uIntensity;
 
-  // Slow flicker: subtle brightness pulse.
-  float flicker = 1.0 - 0.015 * uIntensity * sin(uElapsed * 37.3);
-
-  // --- Vignette ---
-  vec2 vUv = uv * 2.0 - 1.0;
-  float vignette = 1.0 - smoothstep(0.55, 1.05, length(vUv) * (1.0 + 0.25 * uIntensity));
-
-  // Compose: source * scanline * flicker * vignette.
-  vec3 col = src.rgb * lineAlpha * flicker * vignette;
-  fragColor = vec4(col, src.a);
+  // Premultiplied black overlay: composites via src-over on top of desktop.
+  fragColor = vec4(0.0, 0.0, 0.0, darkness);
 }
