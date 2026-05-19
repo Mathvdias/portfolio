@@ -17,16 +17,24 @@ abstract final class ShaderRegistry {
   /// Fire all known shaders in parallel.  Safe to call before any widget
   /// mounts — errors are swallowed per-shader so one failure doesn't block
   /// the rest (e.g. shader unavailable in a minimal test environment).
-  static Future<void> preloadAll() async {
-    await Future.wait(
-      [
-        'shaders/icons.frag',
-        'shaders/wallpaper.frag',
-        'shaders/pixelate.frag',
-        'shaders/glow.frag',
-        'shaders/crt.frag',
-      ].map((path) => get(path).catchError((Object _) {})),
-      eagerError: false,
-    );
+  static Future<void> preloadAll() => Future.wait(
+        [
+          'shaders/icons.frag',
+          'shaders/wallpaper.frag',
+          'shaders/pixelate.frag',
+          'shaders/glow.frag',
+          'shaders/crt.frag',
+        ].map(_tryGet),
+        eagerError: false,
+      );
+
+  /// Loads one shader and silently swallows errors so a missing shader in
+  /// a test or restricted environment never blocks the others.
+  static Future<void> _tryGet(String path) async {
+    try {
+      await get(path);
+    } catch (_) {
+      // Unavailable (test host, no GPU) — widget will use its fallback.
+    }
   }
 }

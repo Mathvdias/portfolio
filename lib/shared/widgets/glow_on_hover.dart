@@ -90,6 +90,13 @@ class _GlowOnHoverState extends State<GlowOnHover>
   }
 }
 
+// PaintingContext.stopRecordingIfNeeded is @protected; expose it via a
+// subclass so RenderBox helpers can finalise the picture recording.
+class _CapturePaintingContext extends PaintingContext {
+  _CapturePaintingContext(super.containerLayer, super.estimatedBounds);
+  void stopRecording() => stopRecordingIfNeeded();
+}
+
 class _GlowShaderBox extends SingleChildRenderObjectWidget {
   const _GlowShaderBox({
     required this.shader,
@@ -176,9 +183,9 @@ class _GlowRenderBox extends RenderProxyBox {
     if (_capturing) return;
     _capturing = true;
     final offscreen = OffsetLayer();
-    final childCtx = PaintingContext(offscreen, Offset.zero & size);
+    final childCtx = _CapturePaintingContext(offscreen, Offset.zero & size);
     super.paint(childCtx, Offset.zero);
-    childCtx.stopRecordingIfNeeded();
+    childCtx.stopRecording();
     final image = await offscreen.toImage(Offset.zero & size);
     offscreen.dispose();
     final old = _cachedImage;
