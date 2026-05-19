@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
+import '../../core/bootstrap/shader_registry.dart';
 import '../models/sdf_shape.dart';
 
 /// A GPU-rendered scalable icon drawn by a fragment-shader SDF.
@@ -29,10 +30,6 @@ class SdfIcon extends StatefulWidget {
 }
 
 class _SdfIconState extends State<SdfIcon> {
-  // One FragmentProgram shared across all SdfIcon instances.
-  static ui.FragmentProgram? _program;
-  static Future<ui.FragmentProgram>? _loading;
-
   ui.FragmentShader? _shader;
 
   @override
@@ -43,9 +40,8 @@ class _SdfIconState extends State<SdfIcon> {
 
   Future<void> _loadShader() async {
     try {
-      _loading ??= ui.FragmentProgram.fromAsset('shaders/icons.frag');
-      _program ??= await _loading!;
-      if (mounted) setState(() => _shader = _program!.fragmentShader());
+      final program = await ShaderRegistry.get('shaders/icons.frag');
+      if (mounted) setState(() => _shader = program.fragmentShader());
     } catch (e, st) {
       // Shader unavailable (e.g. test environment) — keep placeholder.
       assert(() {

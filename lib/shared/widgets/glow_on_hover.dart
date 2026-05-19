@@ -3,6 +3,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+import '../../core/bootstrap/shader_registry.dart';
+
 /// Wraps [child] with a GPU glow halo effect that fades in on hover.
 ///
 /// On mouse enter the glow animates to [radius] pixels; on leave it fades out.
@@ -36,9 +38,6 @@ class GlowOnHover extends StatefulWidget {
 
 class _GlowOnHoverState extends State<GlowOnHover>
     with SingleTickerProviderStateMixin {
-  static ui.FragmentProgram? _program;
-  static Future<ui.FragmentProgram>? _loading;
-
   ui.FragmentShader? _shader;
   late final AnimationController _ctrl;
   late final Animation<double> _anim;
@@ -53,9 +52,8 @@ class _GlowOnHoverState extends State<GlowOnHover>
 
   Future<void> _loadShader() async {
     try {
-      _loading ??= ui.FragmentProgram.fromAsset('shaders/glow.frag');
-      _program ??= await _loading!;
-      if (mounted) setState(() => _shader = _program!.fragmentShader());
+      final program = await ShaderRegistry.get('shaders/glow.frag');
+      if (mounted) setState(() => _shader = program.fragmentShader());
     } catch (_) {
       // Shader unavailable — render child as-is.
     }
@@ -140,6 +138,8 @@ class _GlowRenderBox extends RenderProxyBox {
   Color _color;
   double _radius;
   double _intensity;
+  ui.Image? _cachedImage;
+  bool _capturing = false;
 
   set shader(ui.FragmentShader v) {
     if (_shader == v) return;
@@ -166,37 +166,55 @@ class _GlowRenderBox extends RenderProxyBox {
   }
 
   @override
-  void paint(PaintingContext context, Offset offset) {
-    if (_radius <= 0.0) {
-      super.paint(context, offset);
-      return;
-    }
+  void detach() {
+    _cachedImage?.dispose();
+    _cachedImage = null;
+    super.detach();
+  }
 
-    final w = size.width;
-    final h = size.height;
-
+  Future<void> _captureAsync() async {
+    if (_capturing) return;
+    _capturing = true;
     final offscreen = OffsetLayer();
     final childCtx = PaintingContext(offscreen, Offset.zero & size);
     super.paint(childCtx, Offset.zero);
     childCtx.stopRecordingIfNeeded();
-    final image = offscreen.toImageSync(Offset.zero & size);
+    final image = await offscreen.toImage(Offset.zero & size);
+    offscreen.dispose();
+    final old = _cachedImage;
+    _cachedImage = image;
+    old?.dispose();
+    _capturing = false;
+    markNeedsPaint();
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    if (_radius <= 0.0) {
+      super.paint(context, offset);
+      _cachedImage?.dispose();
+      _cachedImage = null;
+      return;
+    }
+
+    if (_cachedImage == null) {
+      super.paint(context, offset);
+      _captureAsync();
+      return;
+    }
 
     _shader
-      ..setImageSampler(0, image)
-      ..setFloat(0, w)
-      ..setFloat(1, h)
+      ..setImageSampler(0, _cachedImage!)
+      ..setFloat(0, size.width)
+      ..setFloat(1, size.height)
       ..setFloat(2, _color.r)
       ..setFloat(3, _color.g)
       ..setFloat(4, _color.b)
       ..setFloat(5, _radius)
       ..setFloat(6, _intensity);
 
-    context.canvas.drawRect(
-      offset & size,
-      Paint()..shader = _shader,
-    );
+    context.canvas.drawRect(offset & size, Paint()..shader = _shader);
 
-    image.dispose();
-    offscreen.dispose();
+    _captureAsync();
   }
 }

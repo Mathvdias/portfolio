@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import '../../core/bootstrap/shader_registry.dart';
 import '../../theme/app_theme.dart';
 
 const _kColors = [
@@ -79,9 +80,7 @@ class _PixelWallpaperState extends State<PixelWallpaper>
 
   Future<void> _loadShader() async {
     try {
-      final program = await ui.FragmentProgram.fromAsset(
-        'shaders/wallpaper.frag',
-      );
+      final program = await ShaderRegistry.get('shaders/wallpaper.frag');
       if (mounted) setState(() => _shader = program.fragmentShader());
     } catch (_) {
       // Shader unavailable — CPU fallback stays active.

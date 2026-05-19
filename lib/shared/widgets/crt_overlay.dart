@@ -3,6 +3,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
+import '../../core/bootstrap/shader_registry.dart';
+
 /// Fullscreen CRT scanline + vignette overlay.
 ///
 /// Drawn as a pure transparent black quad on top of the desktop — no
@@ -22,9 +24,6 @@ class CrtOverlay extends StatefulWidget {
 
 class _CrtOverlayState extends State<CrtOverlay>
     with SingleTickerProviderStateMixin {
-  static ui.FragmentProgram? _program;
-  static Future<ui.FragmentProgram>? _loading;
-
   ui.FragmentShader? _shader;
   late final Ticker _ticker;
   final ValueNotifier<double> _elapsed = ValueNotifier(0.0);
@@ -44,9 +43,8 @@ class _CrtOverlayState extends State<CrtOverlay>
 
   Future<void> _loadShader() async {
     try {
-      _loading ??= ui.FragmentProgram.fromAsset('shaders/crt.frag');
-      _program ??= await _loading!;
-      if (mounted) setState(() => _shader = _program!.fragmentShader());
+      final program = await ShaderRegistry.get('shaders/crt.frag');
+      if (mounted) setState(() => _shader = program.fragmentShader());
     } catch (_) {
       // Shader unavailable — overlay is invisible (graceful).
     }

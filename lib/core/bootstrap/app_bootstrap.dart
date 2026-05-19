@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../firebase_options.dart';
 import '../services/analytics_service.dart';
 import '../services/firebase_analytics_service.dart';
+import 'shader_registry.dart';
 
 final class AppConfig {
   const AppConfig({required this.prefs, required this.analytics});
@@ -21,8 +22,14 @@ final class AppConfig {
 abstract final class AppBootstrap {
   static Future<AppConfig> init() async {
     WidgetsFlutterBinding.ensureInitialized();
-    await _initFirebase();
-    final prefs = await SharedPreferences.getInstance();
+    // Run Firebase init, prefs, and shader compilation in parallel.
+    // Shaders are ready before the first widget mounts — no fallback flash.
+    final results = await Future.wait<Object?>([
+      _initFirebase(),
+      SharedPreferences.getInstance(),
+      ShaderRegistry.preloadAll(),
+    ]);
+    final prefs = results[1] as SharedPreferences;
     final analytics = FirebaseAnalyticsService(FirebaseAnalytics.instance);
     _registerErrorHandlers(analytics);
     return AppConfig(prefs: prefs, analytics: analytics);

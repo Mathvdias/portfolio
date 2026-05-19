@@ -3,6 +3,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+import '../../core/bootstrap/shader_registry.dart';
+
 /// Wraps [child] with a GPU pixelation effect that animates on hover.
 ///
 /// On mouse enter the image is quantised to [pixelGridSize] cells; on leave it
@@ -29,9 +31,6 @@ class PixelateOnHover extends StatefulWidget {
 
 class _PixelateOnHoverState extends State<PixelateOnHover>
     with SingleTickerProviderStateMixin {
-  static ui.FragmentProgram? _program;
-  static Future<ui.FragmentProgram>? _loading;
-
   ui.FragmentShader? _shader;
   late final AnimationController _ctrl;
   late final Animation<double> _anim;
@@ -46,9 +45,8 @@ class _PixelateOnHoverState extends State<PixelateOnHover>
 
   Future<void> _loadShader() async {
     try {
-      _loading ??= ui.FragmentProgram.fromAsset('shaders/pixelate.frag');
-      _program ??= await _loading!;
-      if (mounted) setState(() => _shader = _program!.fragmentShader());
+      final program = await ShaderRegistry.get('shaders/pixelate.frag');
+      if (mounted) setState(() => _shader = program.fragmentShader());
     } catch (_) {
       // Shader unavailable (test host, fallback mode) — render child as-is.
     }
@@ -119,6 +117,9 @@ class _PixelateRenderBox extends RenderProxyBox {
 
   ui.FragmentShader _shader;
   double _pixels;
+  // Async-captured image reused across frames; refreshed whenever pixels > 1.
+  ui.Image? _cachedImage;
+  bool _capturing = false;
 
   set shader(ui.FragmentShader v) {
     if (_shader == v) return;
@@ -133,34 +134,55 @@ class _PixelateRenderBox extends RenderProxyBox {
   }
 
   @override
-  void paint(PaintingContext context, Offset offset) {
-    if (_pixels <= 1.0) {
-      super.paint(context, offset);
-      return;
-    }
+  void detach() {
+    _cachedImage?.dispose();
+    _cachedImage = null;
+    super.detach();
+  }
 
-    final w = size.width;
-    final h = size.height;
-
-    // Render child into an offscreen layer, then snapshot to a ui.Image.
+  // Capture child into an offscreen image asynchronously to avoid blocking
+  // the raster thread (toImage vs toImageSync).
+  Future<void> _captureAsync() async {
+    if (_capturing) return;
+    _capturing = true;
     final offscreen = OffsetLayer();
     final childCtx = PaintingContext(offscreen, Offset.zero & size);
     super.paint(childCtx, Offset.zero);
     childCtx.stopRecordingIfNeeded();
-    final image = offscreen.toImageSync(Offset.zero & size);
+    final image = await offscreen.toImage(Offset.zero & size);
+    offscreen.dispose();
+    final old = _cachedImage;
+    _cachedImage = image;
+    old?.dispose();
+    _capturing = false;
+    markNeedsPaint();
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    if (_pixels <= 1.0) {
+      super.paint(context, offset);
+      _cachedImage?.dispose();
+      _cachedImage = null;
+      return;
+    }
+
+    // Kick off async capture; paint child directly on the first frame.
+    if (_cachedImage == null) {
+      super.paint(context, offset);
+      _captureAsync();
+      return;
+    }
 
     _shader
-      ..setImageSampler(0, image)
+      ..setImageSampler(0, _cachedImage!)
       ..setFloat(0, _pixels)
-      ..setFloat(1, w)
-      ..setFloat(2, h);
+      ..setFloat(1, size.width)
+      ..setFloat(2, size.height);
 
-    context.canvas.drawRect(
-      offset & size,
-      Paint()..shader = _shader,
-    );
+    context.canvas.drawRect(offset & size, Paint()..shader = _shader);
 
-    image.dispose();
-    offscreen.dispose();
+    // Refresh the snapshot every other paint so the effect stays in sync.
+    _captureAsync();
   }
 }
