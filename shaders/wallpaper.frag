@@ -3,6 +3,9 @@
 uniform float uElapsed;
 uniform float uWidth;
 uniform float uHeight;
+// Cursor position in logical pixels (-1,-1 when mouse is off-screen).
+uniform float uMouseX;
+uniform float uMouseY;
 
 out vec4 fragColor;
 
@@ -25,6 +28,10 @@ void main() {
   vec2 fc = FlutterFragCoord().xy;
   fragColor = vec4(0.0);
 
+  // Mouse influence radius in pixels; negative X sentinel means off-screen.
+  float mouseActive = step(0.0, uMouseX);
+  float mouseRadius = 80.0;
+
   for (int i = 0; i < 70; i++) {
     float fi = float(i);
 
@@ -36,7 +43,18 @@ void main() {
 
     float py = mod(phase + uElapsed * speed, 1.0) * uHeight;
 
-    if (fc.x >= px && fc.x < px + sz && fc.y >= py && fc.y < py + sz) {
+    // Mouse repulsion: push particle away from cursor.
+    vec2 particlePos = vec2(px, py);
+    vec2 mousePos    = vec2(uMouseX, uMouseY);
+    vec2 delta       = particlePos - mousePos;
+    float dist       = length(delta);
+    float repulsion  = mouseActive * max(0.0, 1.0 - dist / mouseRadius);
+    vec2 displaced   = particlePos + normalize(delta + vec2(0.001)) * repulsion * mouseRadius * 0.6;
+
+    float dpx = displaced.x;
+    float dpy = displaced.y;
+
+    if (fc.x >= dpx && fc.x < dpx + sz && fc.y >= dpy && fc.y < dpy + sz) {
       vec3 col = palette(h1(fi * 9.7 + 0.5));
       // Premultiplied alpha output (required by CanvasKit).
       fragColor = vec4(col * alpha, alpha);

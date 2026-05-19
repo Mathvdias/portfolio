@@ -40,6 +40,8 @@ class _PixelWallpaperState extends State<PixelWallpaper>
     with SingleTickerProviderStateMixin {
   late final Ticker _ticker;
   late final ValueNotifier<double> _elapsed;
+  // Mouse position in logical pixels; Offset(-1,-1) when off-screen.
+  final ValueNotifier<Offset> _mouse = ValueNotifier(const Offset(-1, -1));
   Duration _lastElapsed = Duration.zero;
   final _particles = <_Particle>[];
   ui.FragmentShader? _shader;
@@ -89,27 +91,34 @@ class _PixelWallpaperState extends State<PixelWallpaper>
   @override
   void dispose() {
     _elapsed.dispose();
+    _mouse.dispose();
     _ticker.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return RepaintBoundary(
-      child: CustomPaint(
-        painter: _WallpaperPainter(_particles, _elapsed, _shader),
-        child: const SizedBox.expand(),
+    return MouseRegion(
+      onHover: (event) => _mouse.value = event.localPosition,
+      onExit: (_) => _mouse.value = const Offset(-1, -1),
+      child: RepaintBoundary(
+        child: CustomPaint(
+          painter: _WallpaperPainter(_particles, _elapsed, _mouse, _shader),
+          child: const SizedBox.expand(),
+        ),
       ),
     );
   }
 }
 
 class _WallpaperPainter extends CustomPainter {
-  _WallpaperPainter(this._particles, this._elapsed, this._shader)
-    : super(repaint: _elapsed);
+  _WallpaperPainter(
+      this._particles, this._elapsed, this._mouse, this._shader)
+      : super(repaint: Listenable.merge([_elapsed, _mouse]));
 
   final List<_Particle> _particles;
   final ValueNotifier<double> _elapsed;
+  final ValueNotifier<Offset> _mouse;
   final ui.FragmentShader? _shader;
 
   // Single Paint reused for both GPU and CPU paths — no per-frame allocations.
@@ -118,10 +127,14 @@ class _WallpaperPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final shader = _shader;
+    final mouse = _mouse.value;
     if (shader != null) {
-      shader.setFloat(0, _elapsed.value);
-      shader.setFloat(1, size.width);
-      shader.setFloat(2, size.height);
+      shader
+        ..setFloat(0, _elapsed.value)
+        ..setFloat(1, size.width)
+        ..setFloat(2, size.height)
+        ..setFloat(3, mouse.dx)
+        ..setFloat(4, mouse.dy);
       _paint.shader = shader;
       canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), _paint);
     } else {
