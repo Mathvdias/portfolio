@@ -46,8 +46,12 @@ class _SdfIconState extends State<SdfIcon> {
       _loading ??= ui.FragmentProgram.fromAsset('shaders/icons.frag');
       _program ??= await _loading!;
       if (mounted) setState(() => _shader = _program!.fragmentShader());
-    } catch (_) {
+    } catch (e, st) {
       // Shader unavailable (e.g. test environment) — keep placeholder.
+      assert(() {
+        debugPrint('SdfIcon: shader load failed: $e\n$st');
+        return true;
+      }());
     }
   }
 

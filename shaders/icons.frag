@@ -378,7 +378,9 @@ void main() {
   else if (s == 31) d = s31(p);
   else              d = sdCircle(p, 0.40);  // fallback
 
-  float aa    = fwidth(d);
+  // fwidth() requires the derivatives extension which Flutter/CanvasKit does
+  // not expose.  Use a fixed-width AA of ~1.5 logical pixels instead.
+  float aa    = 1.5 / uSize;
   float alpha = 1.0 - smoothstep(-aa, aa, d);
 
   // Premultiplied alpha — required by Flutter CanvasKit / skwasm.
