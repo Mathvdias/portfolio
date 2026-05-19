@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -15,10 +17,13 @@ class NotificationCenter extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    return Container(
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
       width: AppSizes.notificationCenterWidth,
       decoration: BoxDecoration(
-        color: AppTheme.surface.withValues(alpha: 0.95),
+        color: AppTheme.surface.withValues(alpha: 0.75),
         border: const Border(left: BorderSide(color: AppTheme.surface0)),
       ),
       child: Column(
@@ -75,6 +80,8 @@ class NotificationCenter extends StatelessWidget {
                     ),
           ),
         ],
+        ),
+        ),
       ),
     );
   }

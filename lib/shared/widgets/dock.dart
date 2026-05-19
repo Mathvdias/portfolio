@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -67,13 +68,17 @@ class Dock extends StatelessWidget {
       ),
     ];
 
-    return Container(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppSizes.radiusDock),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+        child: Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSizes.dockPaddingH,
         vertical: AppSizes.dockPaddingV,
       ),
       decoration: BoxDecoration(
-        color: AppTheme.surface.withValues(alpha: 0.90),
+        color: AppTheme.surface.withValues(alpha: 0.70),
         borderRadius: BorderRadius.circular(AppSizes.radiusDock),
         border: Border.all(color: AppTheme.surface0, width: 1),
       ),
@@ -93,6 +98,8 @@ class Dock extends StatelessWidget {
             _DockItem(data: items[i]),
           ],
         ],
+      ),
+        ),
       ),
     );
   }

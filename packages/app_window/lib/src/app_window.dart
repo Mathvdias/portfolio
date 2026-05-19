@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -170,9 +172,12 @@ class _AppWindowState extends State<AppWindow>
           _positionNotifier.value += details.delta;
         }
       },
-      child: Container(
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+          child: Container(
         height: widget.titleBarHeight,
-        color: widget.titleBarColor,
+        color: widget.titleBarColor.withValues(alpha: 0.80),
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Row(
           children: [
@@ -220,6 +225,8 @@ class _AppWindowState extends State<AppWindow>
             ),
             const SizedBox(width: 42),
           ],
+          ),
+        ),
         ),
       ),
     );
