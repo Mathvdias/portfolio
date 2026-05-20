@@ -2,29 +2,27 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/constants/app_svgs.dart';
-
-import '../../theme/app_theme.dart';
-import '../../l10n/app_localizations.dart';
-import '../constants/app_strings.dart';
-import '../constants/app_sizes.dart';
 import '../../core/di/app_dependencies.dart';
+import '../../l10n/app_localizations.dart';
+import '../../theme/app_theme.dart';
+import '../constants/app_sizes.dart';
+import '../constants/app_strings.dart';
 import '../mappers/experience_mapper.dart';
 import '../models/experience.dart';
+import 'about_window_content.dart';
+import 'android_dev_window_content.dart';
+import 'calculator_content.dart';
+import 'contact_form_content.dart';
 import 'desktop_icon.dart';
 import 'experience_window_content.dart';
-import 'about_window_content.dart';
 import 'finder_content.dart';
-import 'skills_window_content.dart';
-import 'terminal_content.dart';
-import 'calculator_content.dart';
-import 'snake_game_content.dart';
-import 'contact_form_content.dart';
 import 'project_window_content.dart';
-import 'android_dev_window_content.dart';
+import 'skills_window_content.dart';
+import 'snake_game_content.dart';
+import 'terminal_content.dart';
 
 /// The right-aligned, vertically-wrapping grid of desktop icons.
 class DesktopIconsGrid extends StatelessWidget {
@@ -47,7 +45,7 @@ class DesktopIconsGrid extends StatelessWidget {
     final icons = <Widget>[
       DesktopIcon(
         label: l10n.about,
-        iconWidget: const Icon(Icons.person),
+        iconWidgetPath: AppSvgs.person,
         color: AppTheme.blue,
         onTap:
             () => onOpenWindow(
@@ -59,7 +57,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconFinder,
-        iconWidget: const Icon(Icons.folder),
+        iconWidgetPath: AppSvgs.file,
         color: AppTheme.red,
         onTap:
             () => onOpenWindow(
@@ -76,7 +74,7 @@ class DesktopIconsGrid extends StatelessWidget {
         final shortName = ExperienceMapper.shortNameFor(exp.company);
         return DesktopIcon(
           label: shortName,
-          iconWidget: ExperienceMapper.iconWidgetFor(exp.company),
+          iconWidgetPath: ExperienceMapper.iconWidgetFor(exp.company),
           color: color,
           onTap:
               () => onOpenWindow(
@@ -89,7 +87,7 @@ class DesktopIconsGrid extends StatelessWidget {
       }),
       DesktopIcon(
         label: AppStrings.iconSkills,
-        iconWidget: const Icon(Icons.star),
+        iconWidgetPath: const Icon(Icons.star),
         color: AppTheme.blue,
         onTap:
             () => onOpenWindow(
@@ -101,7 +99,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconAndroid,
-        iconWidget: const FaIcon(FontAwesomeIcons.android),
+        iconWidgetPath: const FaIcon(FontAwesomeIcons.android),
         color: AppTheme.green,
         onTap:
             () => onOpenWindow(
@@ -113,7 +111,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconTerminal,
-        iconWidget: const Icon(Icons.terminal),
+        iconWidgetPath: const Icon(Icons.terminal),
         color: AppTheme.green,
         onTap:
             () => onOpenWindow(
@@ -125,7 +123,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconCalculator,
-        iconWidget: const Icon(Icons.calculate),
+        iconWidgetPath: const Icon(Icons.calculate),
         color: AppTheme.peach,
         onTap:
             () => onOpenWindow(
@@ -137,7 +135,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconSnake,
-        iconWidget: const FaIcon(FontAwesomeIcons.gamepad),
+        iconWidgetPath: AppSvgs.game,
         color: AppTheme.peach,
         onTap:
             () => onOpenWindow(
@@ -149,7 +147,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconContact,
-        iconWidget: const FaIcon(FontAwesomeIcons.envelope),
+        iconWidgetPath: AppSvgs.email,
         color: AppTheme.teal,
         onTap:
             () => onOpenWindow(
@@ -161,7 +159,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconWhitepaper,
-        iconWidget: const FaIcon(FontAwesomeIcons.fileLines),
+        iconWidgetPath: AppSvgs.gitbook,
         color: AppTheme.blue,
         onTap: () async {
           unawaited(
@@ -176,7 +174,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconResume,
-        iconWidget: const FaIcon(FontAwesomeIcons.filePdf),
+        iconWidgetPath: AppSvgs.pdf,
         color: AppTheme.red,
         onTap: () async {
           unawaited(
@@ -188,12 +186,7 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconInterceptedHttp,
-        iconWidget: SvgPicture.asset(
-          AppSvgs.shield,
-          colorFilter: const ColorFilter.mode(AppTheme.blue, BlendMode.srcIn),
-          width: 24,
-          height: 24,
-        ),
+        iconWidgetPath: AppSvgs.flutter,
         color: AppTheme.blue,
         onTap:
             () => onOpenWindow(

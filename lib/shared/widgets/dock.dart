@@ -49,7 +49,7 @@ class Dock extends StatelessWidget {
       const _DockItemData(
         svgPath: AppSvgs.email,
         label: AppStrings.dockEmail,
-        color: AppTheme.peach,
+        color: AppTheme.red,
         url: AppStrings.emailAddress,
       ),
       _DockItemData(
@@ -166,7 +166,10 @@ class _DockItemState extends State<_DockItem> {
                     height: AppSizes.dockIconSize,
                     child: SvgPicture.asset(
                       widget.data.svgPath,
-                      colorFilter: ColorFilter.mode(widget.data.color, BlendMode.srcIn),
+                      colorFilter: ColorFilter.mode(
+                        widget.data.color,
+                        BlendMode.srcIn,
+                      ),
                       width: AppSizes.dockIconSize * 0.8,
                       height: AppSizes.dockIconSize * 0.8,
                       semanticsLabel: widget.data.label,

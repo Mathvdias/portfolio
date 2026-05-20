@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../core/constants/app_svgs.dart';
 import '../../theme/app_theme.dart';
 import '../models/experience.dart';
 
@@ -31,30 +29,6 @@ abstract final class ExperienceMapper {
     if (_isPan(company)) return AppTheme.blue;
     if (company.contains('Conecthus')) return AppTheme.green;
     return AppTheme.peach;
-  }
-
-  // ── Resolve IconData ───────────────────────────────────
-  static Widget iconWidgetFor(String company) {
-    final color = colorFor(company);
-    String svgPath;
-    if (company.contains('Zallpy')) {
-      svgPath = AppSvgs.briefcase;
-    } else if (_isPan(company)) {
-      svgPath = AppSvgs.buildingColumns;
-    } else if (company.contains('Conecthus')) {
-      svgPath = AppSvgs.wifi;
-    } else if (company.contains('Oi')) {
-      svgPath = AppSvgs.phone;
-    } else {
-      svgPath = AppSvgs.buildingColumns;
-    }
-
-    return SvgPicture.asset(
-      svgPath,
-      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-      width: 24,
-      height: 24,
-    );
   }
 
   // ── Resolve short display name ─────────────────────────────────

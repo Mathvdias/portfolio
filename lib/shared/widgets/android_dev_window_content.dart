@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../theme/app_theme.dart';
+import 'package:portifolio/core/constants/app_svgs.dart';
+
 import '../../l10n/app_localizations.dart';
+import '../../theme/app_theme.dart';
 import '../constants/app_sizes.dart';
 
 class AndroidDevWindowContent extends StatelessWidget {
@@ -21,10 +23,12 @@ class AndroidDevWindowContent extends StatelessWidget {
             children: [
               Semantics(
                 label: 'Android',
-                child: const FaIcon(
-                  FontAwesomeIcons.android,
-                  color: AppTheme.green,
-                  size: 48,
+                child: SvgPicture.asset(
+                  AppSvgs.android,
+                  colorFilter: const ColorFilter.mode(
+                    AppTheme.green,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
               const SizedBox(width: AppSizes.spacingMd),

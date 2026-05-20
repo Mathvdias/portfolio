@@ -3,19 +3,27 @@ abstract final class AppSvgs {
 
   // Ícones da Dock (Material Icons migrados)
   static const String github = '$_base/github.svg';
-  static const String pubDev = '$_base/pub_dev.svg';
+  static const String pubDev = '$_base/dart.svg';
   static const String medium = '$_base/medium.svg';
   static const String linkedin = '$_base/linkedin.svg';
-  static const String email = '$_base/email.svg';
+  static const String email = '$_base/gmail.svg';
   static const String guestbook = '$_base/guestbook.svg';
-  static const String projectStats = '$_base/project_stats.svg';
+  static const String projectStats = '$_base/stats.svg';
 
   // Ícones de Experiências (FontAwesome migrados)
-  static const String briefcase = '$_base/briefcase.svg';
-  static const String buildingColumns = '$_base/building_columns.svg';
-  static const String wifi = '$_base/wifi.svg';
-  static const String phone = '$_base/phone.svg';
+  static const String zallpy = '$_base/zallpy.svg';
+  static const String pan = '$_base/pan.svg';
+  static const String conecthus = '$_base/conecthus.svg';
+  static const String oi = '$_base/oi.svg';
 
-  // Projetos na Área de Trabalho (FontAwesome migrados)
-  static const String shield = '$_base/shield.svg';
+  // Tecnologias e Ferramentas
+  static const String flutter = '$_base/flutter.svg';
+  static const String android = '$_base/android.svg';
+  static const String kotlin = '$_base/kotlin.svg';
+  static const String firebase = '$_base/firebase.svg';
+  static const String fastlane = '$_base/fastlane.svg';
+  static const String gitbook = '$_base/gitbook.svg';
+
+  // Outros
+  static const String person = '$_base/person.svg';
 }

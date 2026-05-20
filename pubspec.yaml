@@ -43,7 +43,6 @@ dependencies:
   # Internal packages
   app_window:
     path: packages/app_window
-  font_awesome_flutter: ^11.0.0
   flutter_lazy_load_web: ^0.1.2
   flutter_svg: ^2.3.0
 
