@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../features/desktop/domain/models/desktop_notification.dart';
 import '../../features/desktop/presentation/viewmodels/desktop_viewmodel.dart';
 import '../../l10n/app_localizations.dart';
 import '../../theme/app_theme.dart';
@@ -37,42 +38,47 @@ class NotificationCenter extends StatelessWidget {
           ),
           const Divider(height: 1, color: AppTheme.surface0),
           Expanded(
-            child:
-                desktopVM.notifications.isEmpty
-                    ? Center(
-                      child: Text(
-                        'No new notifications',
-                        style: GoogleFonts.spaceMono(
-                          color: AppTheme.subtext,
-                          fontSize: 14,
-                        ),
+            child: ValueListenableBuilder<List<DesktopNotification>>(
+              valueListenable: desktopVM.notificationsNotifier,
+              builder: (context, notifications, _) {
+                if (notifications.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'No new notifications',
+                      style: GoogleFonts.spaceMono(
+                        color: AppTheme.subtext,
+                        fontSize: 14,
                       ),
-                    )
-                    : ListView.separated(
-                      padding: const EdgeInsets.all(AppSizes.spacingLg),
-                      itemCount: desktopVM.notifications.length,
-                      separatorBuilder:
-                          (_, _) => const SizedBox(height: AppSizes.spacingMd),
-                      itemBuilder: (context, index) {
-                        final notif = desktopVM.notifications[index];
-                        // Format time dynamically
-                        final diff = DateTime.now().difference(notif.time);
-                        final timeStr =
-                            diff.inMinutes < 60
-                                ? '${diff.inMinutes}m ago'
-                                : diff.inHours < 24
-                                ? '${diff.inHours}h ago'
-                                : '${diff.inDays}d ago';
-
-                        return _NotificationItem(
-                          title: notif.title,
-                          message: notif.message,
-                          time: timeStr,
-                          icon: notif.icon,
-                          color: notif.color,
-                        );
-                      },
                     ),
+                  );
+                }
+                return ListView.separated(
+                  padding: const EdgeInsets.all(AppSizes.spacingLg),
+                  itemCount: notifications.length,
+                  separatorBuilder:
+                      (_, _) => const SizedBox(height: AppSizes.spacingMd),
+                  itemBuilder: (context, index) {
+                    final notif = notifications[index];
+                    // Format time dynamically
+                    final diff = DateTime.now().difference(notif.time);
+                    final timeStr =
+                        diff.inMinutes < 60
+                            ? '${diff.inMinutes}m ago'
+                            : diff.inHours < 24
+                            ? '${diff.inHours}h ago'
+                            : '${diff.inDays}d ago';
+
+                    return _NotificationItem(
+                      title: notif.title,
+                      message: notif.message,
+                      time: timeStr,
+                      icon: notif.icon,
+                      color: notif.color,
+                    );
+                  },
+                );
+              },
+            ),
           ),
         ],
       ),

@@ -140,16 +140,16 @@ class _DesktopPageState extends State<DesktopPage> {
         iconWidget: const Icon(Icons.person),
         color: AppTheme.blue,
       ),
-      SpotlightItem(
+      const SpotlightItem(
         id: AppStrings.winFinder,
         label: AppStrings.titleFinder,
-        iconWidget: const Icon(Icons.folder),
+        iconWidget: Icon(Icons.folder),
         color: AppTheme.red,
       ),
-      SpotlightItem(
+      const SpotlightItem(
         id: AppStrings.winSkills,
         label: AppStrings.titleSkills,
-        iconWidget: const Icon(Icons.star),
+        iconWidget: Icon(Icons.star),
         color: AppTheme.blue,
       ),
       SpotlightItem(
@@ -158,28 +158,28 @@ class _DesktopPageState extends State<DesktopPage> {
         iconWidget: const FaIcon(FontAwesomeIcons.android),
         color: AppTheme.green,
       ),
-      SpotlightItem(
+      const SpotlightItem(
         id: AppStrings.winTerminal,
         label: AppStrings.titleTerminal,
-        iconWidget: const Icon(Icons.terminal),
+        iconWidget: Icon(Icons.terminal),
         color: AppTheme.green,
       ),
-      SpotlightItem(
+      const SpotlightItem(
         id: AppStrings.winCalculator,
         label: AppStrings.titleCalculator,
-        iconWidget: const Icon(Icons.calculate),
+        iconWidget: Icon(Icons.calculate),
         color: AppTheme.peach,
       ),
-      SpotlightItem(
+      const SpotlightItem(
         id: AppStrings.winSnake,
         label: AppStrings.titleSnake,
-        iconWidget: const FaIcon(FontAwesomeIcons.gamepad),
+        iconWidget: FaIcon(FontAwesomeIcons.gamepad),
         color: AppTheme.peach,
       ),
-      SpotlightItem(
+      const SpotlightItem(
         id: AppStrings.winContact,
         label: AppStrings.titleContact,
-        iconWidget: const Icon(Icons.mail),
+        iconWidget: Icon(Icons.mail),
         color: AppTheme.teal,
       ),
       SpotlightItem(
@@ -450,22 +450,24 @@ class _DesktopPageState extends State<DesktopPage> {
               Positioned.fill(
                 top: AppSizes.menuBarOffset,
                 bottom: AppSizes.desktopBottom,
-                child: DesktopIconsGrid(
-                  experiences: experiences,
-                  onOpenWindow: (id, title, content, accent) {
-                    _trackWindowOpen(id);
-                    _desktopVM.openWindow(id, title, content, accent);
-                  },
+                child: RepaintBoundary(
+                  child: DesktopIconsGrid(
+                    experiences: experiences,
+                    onOpenWindow: (id, title, content, accent) {
+                      _trackWindowOpen(id);
+                      _desktopVM.openWindow(id, title, content, accent);
+                    },
+                  ),
                 ),
               ),
 
               // Windows — rebuilt only when window list changes.
-              ListenableBuilder(
-                listenable: _desktopVM,
+              ValueListenableBuilder<List<WindowEntry>>(
+                valueListenable: _desktopVM.windowsNotifier,
                 builder:
-                    (context, _) => Stack(
+                    (context, windows, _) => Stack(
                       children:
-                          _desktopVM.windows
+                          windows
                               .map(
                                 (w) => AppWindow(
                                   key: ValueKey(w.id),
@@ -501,10 +503,10 @@ class _DesktopPageState extends State<DesktopPage> {
               ),
 
               // Notifications — rebuilt only when visibility changes.
-              ListenableBuilder(
-                listenable: _desktopVM,
-                builder: (context, _) {
-                  if (!_desktopVM.showNotifications) {
+              ValueListenableBuilder<bool>(
+                valueListenable: _desktopVM.showNotificationsNotifier,
+                builder: (context, showNotifications, _) {
+                  if (!showNotifications) {
                     return const SizedBox.shrink();
                   }
                   return Positioned(
@@ -582,14 +584,14 @@ class _DesktopPageState extends State<DesktopPage> {
               ),
 
               // Context menu — rebuilt only when menu open/close changes.
-              ListenableBuilder(
-                listenable: _desktopVM,
-                builder: (context, _) {
-                  if (!_desktopVM.showContextMenu) {
+              ValueListenableBuilder<Offset?>(
+                valueListenable: _desktopVM.contextMenuPositionNotifier,
+                builder: (context, contextMenuPosition, _) {
+                  if (contextMenuPosition == null) {
                     return const SizedBox.shrink();
                   }
                   return DesktopContextMenu(
-                    position: _desktopVM.contextMenuPosition!,
+                    position: contextMenuPosition,
                     onAction: (action) => _onContextAction(action, l10n),
                     onDismiss: _desktopVM.closeContextMenu,
                   );
@@ -597,10 +599,10 @@ class _DesktopPageState extends State<DesktopPage> {
               ),
 
               // Spotlight — rebuilt only when visibility changes.
-              ListenableBuilder(
-                listenable: _desktopVM,
-                builder: (context, _) {
-                  if (!_desktopVM.showSpotlight) {
+              ValueListenableBuilder<bool>(
+                valueListenable: _desktopVM.showSpotlightNotifier,
+                builder: (context, showSpotlight, _) {
+                  if (!showSpotlight) {
                     return const SizedBox.shrink();
                   }
                   return SpotlightOverlay(

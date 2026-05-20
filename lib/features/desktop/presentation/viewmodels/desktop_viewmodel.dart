@@ -20,6 +20,9 @@ class DesktopViewModel extends ChangeNotifier {
 
   List<WindowEntry> get windows => List.unmodifiable(_windows);
 
+  late final ValueNotifier<List<WindowEntry>> windowsNotifier =
+      ValueNotifier(List.unmodifiable(_windows));
+
   void openWindow(
     String id,
     String title,
@@ -49,11 +52,13 @@ class DesktopViewModel extends ChangeNotifier {
         height: height,
       ),
     );
+    windowsNotifier.value = List.unmodifiable(_windows);
     notifyListeners();
   }
 
   void closeWindow(String id) {
     _windows.removeWhere((w) => w.id == id);
+    windowsNotifier.value = List.unmodifiable(_windows);
     notifyListeners();
   }
 
@@ -62,6 +67,7 @@ class DesktopViewModel extends ChangeNotifier {
     if (idx == -1 || idx == _windows.length - 1) return;
     final entry = _windows.removeAt(idx);
     _windows.add(entry);
+    windowsNotifier.value = List.unmodifiable(_windows);
     notifyListeners();
   }
 
@@ -73,13 +79,21 @@ class DesktopViewModel extends ChangeNotifier {
   List<DesktopNotification> get notifications =>
       List.unmodifiable(_notifications);
 
+  late final ValueNotifier<bool> showNotificationsNotifier =
+      ValueNotifier(false);
+
+  late final ValueNotifier<List<DesktopNotification>> notificationsNotifier =
+      ValueNotifier(List.unmodifiable(_notifications));
+
   void toggleNotifications() {
     _showNotifications = !_showNotifications;
+    showNotificationsNotifier.value = _showNotifications;
     notifyListeners();
   }
 
   void addNotification(DesktopNotification notification) {
     _notifications.insert(0, notification);
+    notificationsNotifier.value = List.unmodifiable(_notifications);
     notifyListeners();
   }
 
@@ -88,14 +102,19 @@ class DesktopViewModel extends ChangeNotifier {
   Offset? get contextMenuPosition => _contextMenuPosition;
   bool get showContextMenu => _contextMenuPosition != null;
 
+  late final ValueNotifier<Offset?> contextMenuPositionNotifier =
+      ValueNotifier(null);
+
   void openContextMenu(Offset position) {
     _contextMenuPosition = position;
+    contextMenuPositionNotifier.value = position;
     notifyListeners();
   }
 
   void closeContextMenu() {
     if (_contextMenuPosition == null) return;
     _contextMenuPosition = null;
+    contextMenuPositionNotifier.value = null;
     notifyListeners();
   }
 
@@ -103,14 +122,19 @@ class DesktopViewModel extends ChangeNotifier {
   bool _showSpotlight = false;
   bool get showSpotlight => _showSpotlight;
 
+  late final ValueNotifier<bool> showSpotlightNotifier =
+      ValueNotifier(false);
+
   void openSpotlight() {
     _showSpotlight = true;
+    showSpotlightNotifier.value = true;
     notifyListeners();
   }
 
   void closeSpotlight() {
     if (!_showSpotlight) return;
     _showSpotlight = false;
+    showSpotlightNotifier.value = false;
     notifyListeners();
   }
 
@@ -137,5 +161,15 @@ class DesktopViewModel extends ChangeNotifier {
     _rubberBandOrigin = null;
     _rubberBandCurrent = null;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    windowsNotifier.dispose();
+    showNotificationsNotifier.dispose();
+    notificationsNotifier.dispose();
+    contextMenuPositionNotifier.dispose();
+    showSpotlightNotifier.dispose();
+    super.dispose();
   }
 }

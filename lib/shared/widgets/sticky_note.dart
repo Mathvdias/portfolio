@@ -41,18 +41,20 @@ class _StickyNoteState extends State<StickyNote> {
       builder:
           (context, pos, child) =>
               Positioned(left: pos.dx, top: pos.dy, child: child!),
-      child: GestureDetector(
-        onPanUpdate: (details) {
-          _positionNotifier.value += details.delta;
-        },
-        child: _NoteContainer(
-          color: widget.color,
-          child: Text(
-            widget.text,
-            style: GoogleFonts.indieFlower(
-              fontSize: AppSizes.font3xl,
-              color: Colors.black87,
-              fontWeight: FontWeight.w600,
+      child: RepaintBoundary(
+        child: GestureDetector(
+          onPanUpdate: (details) {
+            _positionNotifier.value += details.delta;
+          },
+          child: _NoteContainer(
+            color: widget.color,
+            child: Text(
+              widget.text,
+              style: GoogleFonts.indieFlower(
+                fontSize: AppSizes.font3xl,
+                color: Colors.black87,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ),
@@ -99,37 +101,39 @@ class _VisitorStickyNoteState extends State<VisitorStickyNote> {
       builder:
           (context, pos, child) =>
               Positioned(left: pos.dx, top: pos.dy, child: child!),
-      child: GestureDetector(
-        onPanUpdate: (details) {
-          _positionNotifier.value += details.delta;
-        },
-        child: _NoteContainer(
-          color: widget.color,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                AppStrings.visitorsLabel,
-                style: TextStyle(
-                  fontSize: AppSizes.fontBase,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.2,
-                  color: Colors.black54,
+      child: RepaintBoundary(
+        child: GestureDetector(
+          onPanUpdate: (details) {
+            _positionNotifier.value += details.delta;
+          },
+          child: _NoteContainer(
+            color: widget.color,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  AppStrings.visitorsLabel,
+                  style: TextStyle(
+                    fontSize: AppSizes.fontBase,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                    color: Colors.black54,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Expanded(
-                child: Center(
-                  child: Text(
-                    '${widget.visitorCount}',
-                    style: GoogleFonts.pressStart2p(
-                      fontSize: 20,
-                      color: Colors.black87,
+                const SizedBox(height: 4),
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      '${widget.visitorCount}',
+                      style: GoogleFonts.pressStart2p(
+                        fontSize: 20,
+                        color: Colors.black87,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
