@@ -40,7 +40,9 @@ class ProjectStats {
   outputFile.parent.createSync(recursive: true);
   outputFile.writeAsStringSync(content);
 
-  print('Project stats updated: ${coverage.toStringAsFixed(2)}% coverage, $testCount tests found.');
+  print(
+    'Project stats updated: ${coverage.toStringAsFixed(2)}% coverage, $testCount tests found.',
+  );
 }
 
 int _countTests() {

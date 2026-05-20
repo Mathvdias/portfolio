@@ -20,8 +20,9 @@ class DesktopViewModel extends ChangeNotifier {
 
   List<WindowEntry> get windows => List.unmodifiable(_windows);
 
-  late final ValueNotifier<List<WindowEntry>> windowsNotifier =
-      ValueNotifier(List.unmodifiable(_windows));
+  late final ValueNotifier<List<WindowEntry>> windowsNotifier = ValueNotifier(
+    List.unmodifiable(_windows),
+  );
 
   void openWindow(
     String id,
@@ -79,8 +80,9 @@ class DesktopViewModel extends ChangeNotifier {
   List<DesktopNotification> get notifications =>
       List.unmodifiable(_notifications);
 
-  late final ValueNotifier<bool> showNotificationsNotifier =
-      ValueNotifier(false);
+  late final ValueNotifier<bool> showNotificationsNotifier = ValueNotifier(
+    false,
+  );
 
   late final ValueNotifier<List<DesktopNotification>> notificationsNotifier =
       ValueNotifier(List.unmodifiable(_notifications));
@@ -102,8 +104,9 @@ class DesktopViewModel extends ChangeNotifier {
   Offset? get contextMenuPosition => _contextMenuPosition;
   bool get showContextMenu => _contextMenuPosition != null;
 
-  late final ValueNotifier<Offset?> contextMenuPositionNotifier =
-      ValueNotifier(null);
+  late final ValueNotifier<Offset?> contextMenuPositionNotifier = ValueNotifier(
+    null,
+  );
 
   void openContextMenu(Offset position) {
     _contextMenuPosition = position;
@@ -122,8 +125,7 @@ class DesktopViewModel extends ChangeNotifier {
   bool _showSpotlight = false;
   bool get showSpotlight => _showSpotlight;
 
-  late final ValueNotifier<bool> showSpotlightNotifier =
-      ValueNotifier(false);
+  late final ValueNotifier<bool> showSpotlightNotifier = ValueNotifier(false);
 
   void openSpotlight() {
     _showSpotlight = true;

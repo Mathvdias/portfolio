@@ -48,9 +48,7 @@ Widget buildApp(GuestbookViewModel vm) {
     supportedLocales: const [Locale('en'), Locale('pt')],
     locale: const Locale('en'),
     theme: ThemeData.dark(),
-    home: Scaffold(
-      body: GuestbookContent(viewModel: vm),
-    ),
+    home: Scaffold(body: GuestbookContent(viewModel: vm)),
   );
 }
 
@@ -97,7 +95,7 @@ void main() {
       });
 
       await tester.pumpWidget(buildApp(vm));
-      
+
       repo.messages = [
         GuestbookMessage(
           id: '1',
