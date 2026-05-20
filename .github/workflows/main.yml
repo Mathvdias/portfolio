@@ -51,7 +51,7 @@ jobs:
         run: flutter pub get
 
       - name: Build Web
-        run: flutter build web --release --wasm
+        run: flutter build web --release --wasm --no-tree-shake-icons
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v7
