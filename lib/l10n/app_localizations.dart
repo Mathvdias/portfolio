@@ -12,6 +12,10 @@ class AppLocalizations {
   static final Map<String, Map<String, dynamic>> _localizedValues = {
     "en": {
       "guestbook": "Guestbook",
+      "guestbookBannerTitle": "Leave your mark! ✍️",
+      "guestbookBannerSubtitle":
+          "Your feedback makes this portfolio better. Share a message or just say hi!",
+      "retryConnection": "Retry Connection",
       "signGuestbook": "Sign the Guestbook",
       "yourName": "Your Name",
       "yourMessage": "Your Message",
@@ -147,6 +151,10 @@ class AppLocalizations {
       "name": "Matheus Dias",
       "location": "Manaus, AM",
       "guestbook": "Libro de Visitas",
+      "guestbookBannerTitle": "¡Deja tu huella! ✍️",
+      "guestbookBannerSubtitle":
+          "Tus comentarios mejoran este portafolio. ¡Comparte un mensaje o simplemente di hola!",
+      "retryConnection": "Reintentar Conexión",
       "signGuestbook": "Firmar el Libro de Visitas",
       "yourName": "Tu Nombre",
       "yourMessage": "Tu Mensaje",
@@ -275,6 +283,10 @@ class AppLocalizations {
       "name": "Matheus Dias",
       "location": "Manaus, AM",
       "guestbook": "Livre d'Or",
+      "guestbookBannerTitle": "Laissez votre empreinte ! ✍️",
+      "guestbookBannerSubtitle":
+          "Vos commentaires améliorent ce portfolio. Partagez un message ou dites simplement bonjour !",
+      "retryConnection": "Réessayer la connexion",
       "signGuestbook": "Signer le Livre d'Or",
       "yourName": "Votre Nom",
       "yourMessage": "Votre Message",
@@ -403,6 +415,10 @@ class AppLocalizations {
       "name": "Matheus Dias",
       "location": "Manaus, AM",
       "guestbook": "Libro degli Ospiti",
+      "guestbookBannerTitle": "Lascia il tuo segno! ✍️",
+      "guestbookBannerSubtitle":
+          "Il tuo feedback rende migliore questo portfolio. Condividi un messaggio o saluta e basta!",
+      "retryConnection": "Riprova Connessione",
       "signGuestbook": "Firma il Libro degli Ospiti",
       "yourName": "Il tuo Nome",
       "yourMessage": "Il tuo Messaggio",
@@ -524,6 +540,10 @@ class AppLocalizations {
     },
     "pt": {
       "guestbook": "Livro de Visitas",
+      "guestbookBannerTitle": "Deixe sua marca! ✍️",
+      "guestbookBannerSubtitle":
+          "Seu feedback torna este portfólio melhor. Compartilhe uma mensagem ou apenas diga oi!",
+      "retryConnection": "Repetir Conexão",
       "signGuestbook": "Assine o Livro",
       "yourName": "Seu Nome",
       "yourMessage": "Sua Mensagem",
@@ -730,6 +750,15 @@ class AppLocalizations {
       'New Guestbook Message';
   String get leftReview =>
       _localizedValues[locale.languageCode]?['leftReview'] ?? 'left a review!';
+  String get guestbookBannerTitle =>
+      _localizedValues[locale.languageCode]?['guestbookBannerTitle'] ??
+      'Leave your mark! ✍️';
+  String get guestbookBannerSubtitle =>
+      _localizedValues[locale.languageCode]?['guestbookBannerSubtitle'] ??
+      'Your feedback makes this portfolio better. Share a message or just say hi!';
+  String get retryConnection =>
+      _localizedValues[locale.languageCode]?['retryConnection'] ??
+      'Retry Connection';
 
   String get androidDev =>
       _localizedValues[locale.languageCode]?['androidDev'] ??

@@ -90,7 +90,7 @@ void main() {
           timestamp: DateTime.now(),
         ),
       ]);
-      await Future.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
       expect(notified, false);
 
       // New message arrival
@@ -110,7 +110,7 @@ void main() {
           timestamp: DateTime.now().add(const Duration(seconds: 1)),
         ),
       ]);
-      await Future.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
       expect(notified, true);
     });
 
@@ -118,7 +118,7 @@ void main() {
       final vm = GuestbookViewModel(repo, prefs);
 
       repo.emitError();
-      await Future.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
       expect(vm.lastError, contains('Stream Error'));
 
       vm.retry();
@@ -214,7 +214,7 @@ void main() {
 class HangingGuestbookRepository extends MockGuestbookRepository {
   @override
   Future<void> addMessage(String name, String message, int rating) async {
-    await Future.delayed(const Duration(seconds: 15));
+    await Future<void>.delayed(const Duration(seconds: 15));
   }
 }
 

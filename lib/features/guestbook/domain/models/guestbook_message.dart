@@ -21,9 +21,9 @@ class GuestbookMessage {
   ) {
     return GuestbookMessage(
       id: id,
-      name: data?['name'] ?? 'Anonymous',
-      message: data?['message'] ?? '',
-      rating: data?['rating'] ?? 5,
+      name: (data?['name'] as String?) ?? 'Anonymous',
+      message: (data?['message'] as String?) ?? '',
+      rating: (data?['rating'] as int?) ?? 5,
       timestamp: (data?['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }

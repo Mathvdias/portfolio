@@ -95,7 +95,7 @@ class _GuestbookContentState extends State<GuestbookContent> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Leave your mark! ✍️',
+                      l10n.guestbookBannerTitle,
                       style: GoogleFonts.outfit(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -104,7 +104,7 @@ class _GuestbookContentState extends State<GuestbookContent> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Your feedback makes this portfolio better. Share a message or just say hi!',
+                      l10n.guestbookBannerSubtitle,
                       style: GoogleFonts.spaceMono(
                         fontSize: 12,
                         color: AppTheme.subtext,
@@ -239,7 +239,7 @@ class _GuestbookContentState extends State<GuestbookContent> {
                                     color: AppTheme.blue,
                                   ),
                                   label: Text(
-                                    'Retry Connection',
+                                    l10n.retryConnection,
                                     style: GoogleFonts.spaceMono(
                                       color: AppTheme.blue,
                                     ),

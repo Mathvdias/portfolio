@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:app_window/app_window.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -19,31 +20,31 @@ class Dock extends StatelessWidget {
 
     // Using Material Icons for maximum reliability on Flutter Web
     final items = [
-      _DockItemData(
+      const _DockItemData(
         icon: Icons.code,
         label: AppStrings.dockGitHub,
         color: AppTheme.subtext,
         url: AppStrings.urlGitHub,
       ),
-      _DockItemData(
+      const _DockItemData(
         icon: Icons.language,
         label: AppStrings.dockPubDev,
         color: AppTheme.blue,
         url: AppStrings.urlPubDev,
       ),
-      _DockItemData(
+      const _DockItemData(
         icon: Icons.article_outlined,
         label: AppStrings.dockMedium,
         color: AppTheme.yellow,
         url: AppStrings.urlMedium,
       ),
-      _DockItemData(
+      const _DockItemData(
         icon: Icons.work_outline,
         label: AppStrings.dockLinkedIn,
         color: AppTheme.blue,
         url: AppStrings.urlLinkedIn,
       ),
-      _DockItemData(
+      const _DockItemData(
         icon: Icons.email_outlined,
         label: AppStrings.dockEmail,
         color: AppTheme.peach,
@@ -148,12 +149,12 @@ class _DockItemState extends State<_DockItem> {
         child: AnimatedScale(
           scale: _hovered ? AppSizes.dockHoverScale : 1.0,
           duration: const Duration(milliseconds: 150),
-          child: ListenableBuilder(
-            listenable: desktopVM,
-            builder: (context, _) {
+          child: ValueListenableBuilder<List<WindowEntry>>(
+            valueListenable: desktopVM.windowsNotifier,
+            builder: (context, windows, _) {
               final isWindowOpen =
                   widget.data.windowId != null &&
-                  desktopVM.windows.any((w) => w.id == widget.data.windowId);
+                  windows.any((w) => w.id == widget.data.windowId);
 
               return Column(
                 mainAxisSize: MainAxisSize.min,
