@@ -14,22 +14,22 @@ Widget buildSpotlight(SpotlightOverlay overlay) => MaterialApp(
 
 void main() {
   final items = [
-    SpotlightItem(
+    const SpotlightItem(
       id: 'terminal',
       label: 'Terminal',
-      iconWidget: const Icon(Icons.terminal),
+      iconWidget: Icon(Icons.terminal),
       color: AppTheme.green,
     ),
-    SpotlightItem(
+    const SpotlightItem(
       id: 'calculator',
       label: 'Calculator',
-      iconWidget: const Icon(Icons.calculate),
+      iconWidget: Icon(Icons.calculate),
       color: AppTheme.peach,
     ),
-    SpotlightItem(
+    const SpotlightItem(
       id: 'contact',
       label: 'Contact',
-      iconWidget: const Icon(Icons.mail),
+      iconWidget: Icon(Icons.mail),
       color: AppTheme.teal,
     ),
   ];
@@ -194,10 +194,10 @@ void main() {
 
   group('SpotlightItem', () {
     test('stores all fields', () {
-      final item = SpotlightItem(
+      final item = const SpotlightItem(
         id: 'test',
         label: 'Test',
-        iconWidget: const Icon(Icons.person),
+        iconWidget: Icon(Icons.person),
         color: Colors.blue,
       );
 

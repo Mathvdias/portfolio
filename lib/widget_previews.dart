@@ -296,7 +296,7 @@ Widget previewExperience() => const ExperienceWindowContent(
 // ── StickyNote ────────────────────────────────────────────────────────────────
 
 @Preview(name: 'StickyNote', wrapper: previewWrapper, size: Size(260, 200))
-Widget previewStickyNote() => StickyNote(
+Widget previewStickyNote() => const StickyNote(
   initialPosition: Offset.zero,
   text: '✨ Welcome to my portfolio!\nFeel free to explore.',
 );
@@ -307,7 +307,7 @@ Widget previewStickyNote() => StickyNote(
   size: Size(260, 160),
 )
 Widget previewVisitorStickyNote() =>
-    VisitorStickyNote(initialPosition: Offset.zero, visitorCount: 1337);
+    const VisitorStickyNote(initialPosition: Offset.zero, visitorCount: 1337);
 
 // ── DesktopIcon ───────────────────────────────────────────────────────────────
 

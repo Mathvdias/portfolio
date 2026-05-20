@@ -33,7 +33,7 @@ class GuestbookViewModel extends ChangeNotifier {
   bool _success = false;
   bool get success => _success;
 
-  StreamSubscription? _subscription;
+  StreamSubscription<List<GuestbookMessage>>? _subscription;
   Timer? _loadingTimer;
   final DateTime _initTime = DateTime.now();
 
@@ -85,7 +85,7 @@ class GuestbookViewModel extends ChangeNotifier {
         _isLoading = false;
         notifyListeners();
       },
-      onError: (e) {
+      onError: (Object e) {
         _isLoading = false;
         _lastError = 'Error loading messages: $e';
         notifyListeners();
