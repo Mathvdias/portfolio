@@ -7,6 +7,7 @@ import '../../l10n/app_localizations.dart';
 import '../../theme/app_theme.dart';
 import '../constants/app_sizes.dart';
 import '../constants/app_strings.dart';
+import '../utils/renderer_detector.dart';
 
 const _kLanguages = [
   ('en', '🇺🇸', 'English'),
@@ -192,6 +193,29 @@ class _AppNameMenu extends StatelessWidget {
               AppStrings.menuLinkedIn,
               Icons.link,
             ),
+            const PopupMenuDivider(),
+            PopupMenuItem<AppMenuAction>(
+              enabled: false,
+              height: 36,
+              child: Row(
+                children: [
+                  Icon(
+                    _isGpuActive() ? Icons.developer_board : Icons.html,
+                    size: AppSizes.font2xl,
+                    color: _isGpuActive() ? AppTheme.green : AppTheme.subtext,
+                  ),
+                  const SizedBox(width: AppSizes.spacingBase),
+                  Text(
+                    'Engine: ${_getRendererName()}',
+                    style: GoogleFonts.spaceMono(
+                      fontSize: AppSizes.fontXl,
+                      color: AppTheme.subtext,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
       child: Padding(
         padding: const EdgeInsets.only(
@@ -248,6 +272,14 @@ class _AppNameMenu extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  bool _isGpuActive() {
+    return isGpuRenderer();
+  }
+
+  String _getRendererName() {
+    return getRendererText();
   }
 }
 
