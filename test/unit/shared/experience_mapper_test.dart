@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:portifolio/core/constants/app_svgs.dart';
 import 'package:portifolio/shared/mappers/experience_mapper.dart';
 import 'package:portifolio/shared/models/experience.dart';
 import 'package:portifolio/theme/app_theme.dart';
@@ -72,40 +73,40 @@ void main() {
   });
 
   group('ExperienceMapper.iconWidgetFor', () {
-    int cp(Widget w) => (w as FaIcon).icon!.codePoint;
+    String assetName(Widget w) => ((w as SvgPicture).bytesLoader as SvgAssetLoader).assetName;
 
     test('returns briefcase for Zallpy', () {
       expect(
-        cp(ExperienceMapper.iconWidgetFor('Zallpy')),
-        FontAwesomeIcons.briefcase.codePoint,
+        assetName(ExperienceMapper.iconWidgetFor('Zallpy')),
+        AppSvgs.briefcase,
       );
     });
 
     test('returns buildingColumns for Banco Pan', () {
       expect(
-        cp(ExperienceMapper.iconWidgetFor('Banco Pan')),
-        FontAwesomeIcons.buildingColumns.codePoint,
+        assetName(ExperienceMapper.iconWidgetFor('Banco Pan')),
+        AppSvgs.buildingColumns,
       );
     });
 
     test('returns wifi for Conecthus', () {
       expect(
-        cp(ExperienceMapper.iconWidgetFor('Conecthus')),
-        FontAwesomeIcons.wifi.codePoint,
+        assetName(ExperienceMapper.iconWidgetFor('Conecthus')),
+        AppSvgs.wifi,
       );
     });
 
     test('returns phone for Oi', () {
       expect(
-        cp(ExperienceMapper.iconWidgetFor('Oi')),
-        FontAwesomeIcons.phone.codePoint,
+        assetName(ExperienceMapper.iconWidgetFor('Oi')),
+        AppSvgs.phone,
       );
     });
 
     test('returns buildingColumns for unknown', () {
       expect(
-        cp(ExperienceMapper.iconWidgetFor('Acme Corp')),
-        FontAwesomeIcons.buildingColumns.codePoint,
+        assetName(ExperienceMapper.iconWidgetFor('Acme Corp')),
+        AppSvgs.buildingColumns,
       );
     });
   });

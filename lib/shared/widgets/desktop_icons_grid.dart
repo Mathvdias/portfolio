@@ -1,8 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../core/constants/app_svgs.dart';
 
 import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
@@ -185,7 +188,12 @@ class DesktopIconsGrid extends StatelessWidget {
       ),
       DesktopIcon(
         label: AppStrings.iconInterceptedHttp,
-        iconWidget: const FaIcon(FontAwesomeIcons.shield),
+        iconWidget: SvgPicture.asset(
+          AppSvgs.shield,
+          colorFilter: const ColorFilter.mode(AppTheme.blue, BlendMode.srcIn),
+          width: 24,
+          height: 24,
+        ),
         color: AppTheme.blue,
         onTap:
             () => onOpenWindow(
