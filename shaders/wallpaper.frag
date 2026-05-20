@@ -3,6 +3,8 @@
 uniform float uElapsed;
 uniform float uWidth;
 uniform float uHeight;
+uniform float uMouseX;
+uniform float uMouseY;
 
 out vec4 fragColor;
 
@@ -25,6 +27,10 @@ void main() {
   vec2 fc = FlutterFragCoord().xy;
   fragColor = vec4(0.0);
 
+  vec2 mouse = vec2(uMouseX, uMouseY);
+  float radius = 100.0;
+  float maxPush = 40.0;
+
   for (int i = 0; i < 70; i++) {
     float fi = float(i);
 
@@ -35,6 +41,18 @@ void main() {
     float alpha = 0.15 + h1(fi * 7.3 + 0.5) * 0.3;
 
     float py = mod(phase + uElapsed * speed, 1.0) * uHeight;
+
+    vec2 pPos = vec2(px + sz / 2.0, py + sz / 2.0);
+    vec2 diff = pPos - mouse;
+    float d = length(diff) + 0.0001;
+
+    if (d < radius) {
+      float force = 1.0 - (d / radius);
+      float smoothForce = force * force * (3.0 - 2.0 * force);
+      pPos += (diff / d) * smoothForce * maxPush;
+      px = pPos.x - sz / 2.0;
+      py = pPos.y - sz / 2.0;
+    }
 
     if (fc.x >= px && fc.x < px + sz && fc.y >= py && fc.y < py + sz) {
       vec3 col = palette(h1(fi * 9.7 + 0.5));
