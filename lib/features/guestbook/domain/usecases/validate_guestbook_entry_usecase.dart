@@ -6,7 +6,7 @@ import '../../../../core/result/result.dart';
 /// Returns [Success] when all rules pass, or [Failure] with a
 /// [ValidationFailure] containing the l10n error key.
 class ValidateGuestbookEntryUseCase {
-  const ValidateGuestbookEntryUseCase(); // coverage:ignore-line
+  const ValidateGuestbookEntryUseCase();
 
   static const int maxNameLength = 30;
   static const int maxMessageLength = 500;

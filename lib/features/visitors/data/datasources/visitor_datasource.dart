@@ -1,14 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../../../core/errors/app_failure.dart';
 import '../../../../core/result/result.dart';
 
+typedef _WriteVisit = Future<void> Function();
+
 class VisitorDatasource {
-  VisitorDatasource({FirebaseFirestore? firestore, bool? isDebug})
-    : _firestore =
-          firestore ?? FirebaseFirestore.instance, // coverage:ignore-line
-      _isDebug = isDebug ?? kDebugMode;
+  VisitorDatasource({
+    required FirebaseFirestore firestore,
+    bool? isDebug,
+    @visibleForTesting _WriteVisit? writeOverride,
+  }) : _firestore = firestore,
+       _isDebug = isDebug ?? kDebugMode,
+       _writeOverride = writeOverride;
 
   static const _collection = 'stats';
   static const _document = 'visitors';
@@ -16,20 +22,18 @@ class VisitorDatasource {
 
   final FirebaseFirestore _firestore;
   final bool _isDebug;
+  final _WriteVisit? _writeOverride;
 
-  @visibleForTesting
   static bool _sessionRecorded = false;
 
-  /// Resets the in-process session flag. For use in tests only.
   @visibleForTesting
   static void resetSessionForTesting() => _sessionRecorded = false;
 
-  /// Exposes session flag for assertion in tests.
   @visibleForTesting
   static bool get sessionRecordedForTesting => _sessionRecorded;
 
   Future<Result<void>> recordVisit() async {
-    if (_isDebug) return const Success(null); // Don't count debug/test runs.
+    if (_isDebug) return const Success(null);
     if (_sessionRecorded) return const Success(null);
     _sessionRecorded = true;
 
@@ -38,9 +42,12 @@ class VisitorDatasource {
       final hasVisited = prefs.getBool(_hasVisitedKey) ?? false;
 
       if (!hasVisited) {
-        await _firestore.collection(_collection).doc(_document).set({
-          'count': FieldValue.increment(1),
-        }, SetOptions(merge: true));
+        final write =
+            _writeOverride ??
+            () => _firestore.collection(_collection).doc(_document).set({
+              'count': FieldValue.increment(1),
+            }, SetOptions(merge: true));
+        await write();
         await prefs.setBool(_hasVisitedKey, true);
       }
       return const Success(null);

@@ -4,7 +4,7 @@ import 'package:portifolio/core/result/result.dart';
 import 'package:portifolio/features/guestbook/domain/usecases/validate_guestbook_entry_usecase.dart';
 
 void main() {
-  const usecase = ValidateGuestbookEntryUseCase();
+  final usecase = ValidateGuestbookEntryUseCase();
 
   group('ValidateGuestbookEntryUseCase', () {
     test('returns Success for valid name and message', () {

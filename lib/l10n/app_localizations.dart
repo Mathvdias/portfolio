@@ -782,167 +782,118 @@ class AppLocalizations {
     },
   };
 
-  String get hello => _localizedValues[locale.languageCode]?['hello'] ?? '';
-  String get role => _localizedValues[locale.languageCode]?['role'] ?? '';
-  String get about => _localizedValues[locale.languageCode]?['about'] ?? '';
-  String get experience =>
-      _localizedValues[locale.languageCode]?['experience'] ?? '';
-  String get projects =>
-      _localizedValues[locale.languageCode]?['projects'] ?? '';
-  String get bio => _localizedValues[locale.languageCode]?['bio'] ?? '';
-  String get companyName =>
-      _localizedValues[locale.languageCode]?['companyName'] ?? '';
-  String get experienceDescription =>
-      _localizedValues[locale.languageCode]?['experienceDescription'] ?? '';
-  String get name => _localizedValues[locale.languageCode]?['name'] ?? '';
-  String get location =>
-      _localizedValues[locale.languageCode]?['location'] ?? '';
+  String _str(String key, [String fallback = '']) =>
+      (_localizedValues[locale.languageCode]?[key] as String?) ?? fallback;
 
-  String get stickyNoteTodo =>
-      _localizedValues[locale.languageCode]?['stickyNoteTodo'] ?? '';
-  String get notificationCenter =>
-      _localizedValues[locale.languageCode]?['notificationCenter'] ?? '';
-  String get dailyVerse =>
-      _localizedValues[locale.languageCode]?['dailyVerse'] ?? '';
-  String get dailyVerseText =>
-      _localizedValues[locale.languageCode]?['dailyVerseText'] ?? '';
-  String get system => _localizedValues[locale.languageCode]?['system'] ?? '';
-  String get portfolioUpdated =>
-      _localizedValues[locale.languageCode]?['portfolioUpdated'] ?? '';
-  String get musicPlaying =>
-      _localizedValues[locale.languageCode]?['musicPlaying'] ?? '';
-  String get github => _localizedValues[locale.languageCode]?['github'] ?? '';
-  String get githubUpdate =>
-      _localizedValues[locale.languageCode]?['githubUpdate'] ?? '';
-  String get timeNow => _localizedValues[locale.languageCode]?['timeNow'] ?? '';
-  String get time2hAgo =>
-      _localizedValues[locale.languageCode]?['time2hAgo'] ?? '';
-  String get time1dAgo =>
-      _localizedValues[locale.languageCode]?['time1dAgo'] ?? '';
-  String get guestbook =>
-      _localizedValues[locale.languageCode]?['guestbook'] ?? 'Guestbook';
-  String get signGuestbook =>
-      _localizedValues[locale.languageCode]?['signGuestbook'] ??
-      'Sign the Guestbook';
-  String get yourName =>
-      _localizedValues[locale.languageCode]?['yourName'] ?? 'Your Name';
-  String get yourMessage =>
-      _localizedValues[locale.languageCode]?['yourMessage'] ?? 'Your Message';
-  String get post => _localizedValues[locale.languageCode]?['post'] ?? 'Post';
-  String get rating =>
-      _localizedValues[locale.languageCode]?['rating'] ?? 'Rating: ';
-  String get noMessages =>
-      _localizedValues[locale.languageCode]?['noMessages'] ??
-      'No messages yet. Be the first!';
-  String get messagePosted =>
-      _localizedValues[locale.languageCode]?['messagePosted'] ??
-      'Message posted!';
+  String get hello => _str('hello');
+  String get role => _str('role');
+  String get about => _str('about');
+  String get experience => _str('experience');
+  String get projects => _str('projects');
+  String get bio => _str('bio');
+  String get companyName => _str('companyName');
+  String get experienceDescription => _str('experienceDescription');
+  String get name => _str('name');
+  String get location => _str('location');
+
+  String get stickyNoteTodo => _str('stickyNoteTodo');
+  String get notificationCenter => _str('notificationCenter');
+  String get dailyVerse => _str('dailyVerse');
+  String get dailyVerseText => _str('dailyVerseText');
+  String get system => _str('system');
+  String get portfolioUpdated => _str('portfolioUpdated');
+  String get musicPlaying => _str('musicPlaying');
+  String get github => _str('github');
+  String get githubUpdate => _str('githubUpdate');
+  String get timeNow => _str('timeNow');
+  String get time2hAgo => _str('time2hAgo');
+  String get time1dAgo => _str('time1dAgo');
+  String get guestbook => _str('guestbook', 'Guestbook');
+  String get signGuestbook => _str('signGuestbook', 'Sign the Guestbook');
+  String get yourName => _str('yourName', 'Your Name');
+  String get yourMessage => _str('yourMessage', 'Your Message');
+  String get post => _str('post', 'Post');
+  String get rating => _str('rating', 'Rating: ');
+  String get noMessages => _str('noMessages', 'No messages yet. Be the first!');
+  String get messagePosted => _str('messagePosted', 'Message posted!');
   String get nameMessageEmpty =>
-      _localizedValues[locale.languageCode]?['nameMessageEmpty'] ??
-      'Name and message cannot be empty';
+      _str('nameMessageEmpty', 'Name and message cannot be empty');
   String get waitToPost =>
-      _localizedValues[locale.languageCode]?['waitToPost'] ??
-      'Please wait a minute before posting again.';
-  String get accessDenied =>
-      _localizedValues[locale.languageCode]?['accessDenied'] ?? 'Access Denied';
-  String get adminActivated =>
-      _localizedValues[locale.languageCode]?['adminActivated'] ??
-      'Admin mode activated.';
+      _str('waitToPost', 'Please wait a minute before posting again.');
+  String get accessDenied => _str('accessDenied', 'Access Denied');
+  String get adminActivated => _str('adminActivated', 'Admin mode activated.');
   String get adminDeactivated =>
-      _localizedValues[locale.languageCode]?['adminDeactivated'] ??
-      'Admin mode deactivated.';
+      _str('adminDeactivated', 'Admin mode deactivated.');
   String get noNewNotifications =>
-      _localizedValues[locale.languageCode]?['noNewNotifications'] ??
-      'No new notifications';
+      _str('noNewNotifications', 'No new notifications');
   String get newGuestbookMessage =>
-      _localizedValues[locale.languageCode]?['newGuestbookMessage'] ??
-      'New Guestbook Message';
-  String get leftReview =>
-      _localizedValues[locale.languageCode]?['leftReview'] ?? 'left a review!';
+      _str('newGuestbookMessage', 'New Guestbook Message');
+  String get leftReview => _str('leftReview', 'left a review!');
   String get guestbookBannerTitle =>
-      _localizedValues[locale.languageCode]?['guestbookBannerTitle'] ??
-      'Leave your mark! ✍️';
-  String get guestbookBannerSubtitle =>
-      _localizedValues[locale.languageCode]?['guestbookBannerSubtitle'] ??
-      'Your feedback makes this portfolio better. Share a message or just say hi!';
-  String get retryConnection =>
-      _localizedValues[locale.languageCode]?['retryConnection'] ??
-      'Retry Connection';
-
-  String get androidDev =>
-      _localizedValues[locale.languageCode]?['androidDev'] ??
-      'Android Development';
-  String get androidDevSubtitle =>
-      _localizedValues[locale.languageCode]?['androidDevSubtitle'] ?? '';
-  String get projectStats =>
-      _localizedValues[locale.languageCode]?['projectStats'] ?? 'Project Stats';
-  String get projectMetrics =>
-      _localizedValues[locale.languageCode]?['projectMetrics'] ??
-      'PROJECT METRICS';
-  String get coverageLabel =>
-      _localizedValues[locale.languageCode]?['coverageLabel'] ?? 'COVERAGE';
-  String get unitTests =>
-      _localizedValues[locale.languageCode]?['unitTests'] ?? 'Unit Tests';
-  String get codeQuality =>
-      _localizedValues[locale.languageCode]?['codeQuality'] ?? 'Code Quality';
-  String get buildStatus =>
-      _localizedValues[locale.languageCode]?['buildStatus'] ?? 'Build Status';
-  String get passing =>
-      _localizedValues[locale.languageCode]?['passing'] ?? 'Passing';
+      _str('guestbookBannerTitle', 'Leave your mark! ✍️');
+  String get guestbookBannerSubtitle => _str(
+    'guestbookBannerSubtitle',
+    'Your feedback makes this portfolio better. Share a message or just say hi!',
+  );
+  String get retryConnection => _str('retryConnection', 'Retry Connection');
+  String get androidDev => _str('androidDev', 'Android Development');
+  String get androidDevSubtitle => _str('androidDevSubtitle');
+  String get projectStats => _str('projectStats', 'Project Stats');
+  String get projectMetrics => _str('projectMetrics', 'PROJECT METRICS');
+  String get coverageLabel => _str('coverageLabel', 'COVERAGE');
+  String get unitTests => _str('unitTests', 'Unit Tests');
+  String get codeQuality => _str('codeQuality', 'Code Quality');
+  String get buildStatus => _str('buildStatus', 'Build Status');
+  String get passing => _str('passing', 'Passing');
   String get keepBuilding =>
-      _localizedValues[locale.languageCode]?['keepBuilding'] ??
-      'Keep building, keep testing.';
-  String get techQAHeader =>
-      _localizedValues[locale.languageCode]?['techQAHeader'] ?? 'TECH Q&A';
+      _str('keepBuilding', 'Keep building, keep testing.');
+  String get techQAHeader => _str('techQAHeader', 'TECH Q&A');
   String get techQAQ1 =>
-      _localizedValues[locale.languageCode]?['techQAQ1'] ??
-      'Is Flutter Web compatible across all browsers?';
+      _str('techQAQ1', 'Is Flutter Web compatible across all browsers?');
   String get techQAA1p1Title =>
-      _localizedValues[locale.languageCode]?['techQAA1p1Title'] ??
-      'Modern WasmGC Support';
-  String get techQAA1p1Body =>
-      _localizedValues[locale.languageCode]?['techQAA1p1Body'] ??
-      'All major browsers natively support WasmGC — Chrome/Chromium (v119+), Firefox (v120+), Safari (v17.4+). Skwasm runs beautifully across all of them.';
+      _str('techQAA1p1Title', 'Modern WasmGC Support');
+  String get techQAA1p1Body => _str(
+    'techQAA1p1Body',
+    'All major browsers natively support WasmGC — Chrome/Chromium (v119+), Firefox (v120+), Safari (v17.4+). Skwasm runs beautifully across all of them.',
+  );
   String get techQAA1p2Title =>
-      _localizedValues[locale.languageCode]?['techQAA1p2Title'] ??
-      'COOP/COEP — credentialless policy';
-  String get techQAA1p2Body =>
-      _localizedValues[locale.languageCode]?['techQAA1p2Body'] ??
-      'The credentialless COEP policy lets Firefox and Safari load public third-party resources without breaking layout, while still enabling GPU multithreading via SharedArrayBuffer.';
+      _str('techQAA1p2Title', 'COOP/COEP — credentialless policy');
+  String get techQAA1p2Body => _str(
+    'techQAA1p2Body',
+    'The credentialless COEP policy lets Firefox and Safari load public third-party resources without breaking layout, while still enabling GPU multithreading via SharedArrayBuffer.',
+  );
   String get techQAA1p3Title =>
-      _localizedValues[locale.languageCode]?['techQAA1p3Title'] ??
-      'Seamless Fallback System';
-  String get techQAA1p3Body =>
-      _localizedValues[locale.languageCode]?['techQAA1p3Body'] ??
-      'If a browser lacks WasmGC or has strict privacy settings, Flutter Web silently falls back to CanvasKit (JS) or HTML (DOM) — 100% uptime on any device.';
-  String get techQAQ2 =>
-      _localizedValues[locale.languageCode]?['techQAQ2'] ??
-      'How are the wallpaper particles and mouse effect rendered?';
+      _str('techQAA1p3Title', 'Seamless Fallback System');
+  String get techQAA1p3Body => _str(
+    'techQAA1p3Body',
+    'If a browser lacks WasmGC or has strict privacy settings, Flutter Web silently falls back to CanvasKit (JS) or HTML (DOM) — 100% uptime on any device.',
+  );
+  String get techQAQ2 => _str(
+    'techQAQ2',
+    'How are the wallpaper particles and mouse effect rendered?',
+  );
   String get techQAA2p1Title =>
-      _localizedValues[locale.languageCode]?['techQAA2p1Title'] ??
-      'dart:ui FragmentShader — pure GPU';
-  String get techQAA2p1Body =>
-      _localizedValues[locale.languageCode]?['techQAA2p1Body'] ??
-      'The wallpaper is a GLSL fragment shader loaded with ui.FragmentProgram.fromAsset. On Impeller (native) it compiles to Metal/Vulkan; on the web it runs via CanvasKit/WebGL. ~140M operations per frame execute in parallel on the GPU — near-zero CPU cost.';
+      _str('techQAA2p1Title', 'dart:ui FragmentShader — pure GPU');
+  String get techQAA2p1Body => _str(
+    'techQAA2p1Body',
+    'The wallpaper is a GLSL fragment shader loaded with ui.FragmentProgram.fromAsset. On Impeller (native) it compiles to Metal/Vulkan; on the web it runs via CanvasKit/WebGL. ~140M operations per frame execute in parallel on the GPU — near-zero CPU cost.',
+  );
   String get techQAA2p2Title =>
-      _localizedValues[locale.languageCode]?['techQAA2p2Title'] ??
-      'Mouse repulsion as a shader uniform';
-  String get techQAA2p2Body =>
-      _localizedValues[locale.languageCode]?['techQAA2p2Body'] ??
-      'The cursor position is sent to the shader every frame as uMouseX/uMouseY uniforms. The repulsion force uses a smoothstep curve (force² × (3 − 2 × force)) computed per-pixel on the GPU — no CPU physics loop at all.';
+      _str('techQAA2p2Title', 'Mouse repulsion as a shader uniform');
+  String get techQAA2p2Body => _str(
+    'techQAA2p2Body',
+    'The cursor position is sent to the shader every frame as uMouseX/uMouseY uniforms. The repulsion force uses a smoothstep curve (force² × (3 − 2 × force)) computed per-pixel on the GPU — no CPU physics loop at all.',
+  );
   String get techQAA2p3Title =>
-      _localizedValues[locale.languageCode]?['techQAA2p3Title'] ??
-      'Native vsync Ticker + zero-allocation hot path';
-  String get techQAA2p3Body =>
-      _localizedValues[locale.languageCode]?['techQAA2p3Body'] ??
-      'A Ticker tied to the engine\'s vsync runs at the screen\'s native refresh rate (120 fps on ProMotion, 60 fps otherwise). One Paint is reused every frame, RepaintBoundary isolates repaints, and a ValueNotifier avoids setState — zero garbage per frame. A Dart CustomPainter activates automatically as a CPU fallback.';
-  String get expertise =>
-      _localizedValues[locale.languageCode]?['expertise'] ?? 'Expertise';
-  String get core => _localizedValues[locale.languageCode]?['core'] ?? 'Core';
-  String get tools =>
-      _localizedValues[locale.languageCode]?['tools'] ?? 'Tools';
-  String get architecture =>
-      _localizedValues[locale.languageCode]?['architecture'] ?? 'Architecture';
+      _str('techQAA2p3Title', 'Native vsync Ticker + zero-allocation hot path');
+  String get techQAA2p3Body => _str(
+    'techQAA2p3Body',
+    "A Ticker tied to the engine's vsync runs at the screen's native refresh rate (120 fps on ProMotion, 60 fps otherwise). One Paint is reused every frame, RepaintBoundary isolates repaints, and a ValueNotifier avoids setState — zero garbage per frame. A Dart CustomPainter activates automatically as a CPU fallback.",
+  );
+  String get expertise => _str('expertise', 'Expertise');
+  String get core => _str('core', 'Core');
+  String get tools => _str('tools', 'Tools');
+  String get architecture => _str('architecture', 'Architecture');
 
   List<Map<String, dynamic>> get experiences {
     final list =
@@ -951,38 +902,23 @@ class AppLocalizations {
     return list.map((e) => e as Map<String, dynamic>).toList();
   }
 
-  String get semNotifications =>
-      _localizedValues[locale.languageCode]?['semNotifications'] ??
-      'Notifications';
-  String get semWifi =>
-      _localizedValues[locale.languageCode]?['semWifi'] ?? 'Wi-Fi connected';
-  String get semNowPlaying =>
-      _localizedValues[locale.languageCode]?['semNowPlaying'] ?? 'Now playing';
-  String get semAppMenu =>
-      _localizedValues[locale.languageCode]?['semAppMenu'] ?? 'App menu';
-  String get semSearch =>
-      _localizedValues[locale.languageCode]?['semSearch'] ?? 'Search';
-  String get semDeleteMessage =>
-      _localizedValues[locale.languageCode]?['semDeleteMessage'] ??
-      'Delete message';
+  String get semNotifications => _str('semNotifications', 'Notifications');
+  String get semWifi => _str('semWifi', 'Wi-Fi connected');
+  String get semNowPlaying => _str('semNowPlaying', 'Now playing');
+  String get semAppMenu => _str('semAppMenu', 'App menu');
+  String get semSearch => _str('semSearch', 'Search');
+  String get semDeleteMessage => _str('semDeleteMessage', 'Delete message');
 
   String semBattery(int percent) =>
-      (_localizedValues[locale.languageCode]?['semBattery'] ?? 'Battery %d%')
-          .replaceFirst('%d', '$percent');
+      _str('semBattery', 'Battery %d%').replaceFirst('%d', '$percent');
 
   String semRateStar(int n) =>
       n == 1
-          ? (_localizedValues[locale.languageCode]?['semRateStar'] ??
-                  'Rate %d star')
-              .replaceFirst('%d', '$n')
-          : (_localizedValues[locale.languageCode]?['semRateStars'] ??
-                  'Rate %d stars')
-              .replaceFirst('%d', '$n');
+          ? _str('semRateStar', 'Rate %d star').replaceFirst('%d', '$n')
+          : _str('semRateStars', 'Rate %d stars').replaceFirst('%d', '$n');
 
   String semStarsOutOf5(int n) =>
-      (_localizedValues[locale.languageCode]?['semStarsOutOf5'] ??
-              '%d out of 5 stars')
-          .replaceFirst('%d', '$n');
+      _str('semStarsOutOf5', '%d out of 5 stars').replaceFirst('%d', '$n');
 
   String getSection(String section) {
     switch (section) {

@@ -17,6 +17,7 @@ class GuestbookViewModel extends ChangeNotifier {
   final SharedPreferences _prefs;
   final ValidateGuestbookEntryUseCase _validateEntry;
   final CheckPostCooldownUseCase _checkCooldown;
+  final Duration _submitTimeout;
 
   void Function(DesktopNotification)? onNotification;
   AnalyticsService? analytics;
@@ -48,8 +49,10 @@ class GuestbookViewModel extends ChangeNotifier {
     this._prefs, {
     ValidateGuestbookEntryUseCase? validateEntry,
     CheckPostCooldownUseCase? checkCooldown,
+    @visibleForTesting Duration? submitTimeout,
   }) : _validateEntry = validateEntry ?? const ValidateGuestbookEntryUseCase(),
-       _checkCooldown = checkCooldown ?? CheckPostCooldownUseCase(_prefs) {
+       _checkCooldown = checkCooldown ?? CheckPostCooldownUseCase(_prefs),
+       _submitTimeout = submitTimeout ?? const Duration(seconds: 10) {
     _isAdmin = _prefs.getBool('isAdmin') ?? false;
     _subscribe();
   }
@@ -131,14 +134,12 @@ class GuestbookViewModel extends ChangeNotifier {
       await _repository
           .addMessage(name, message, rating)
           .timeout(
-            const Duration(seconds: 10),
-            // coverage:ignore-start
+            _submitTimeout,
             onTimeout:
                 () =>
                     throw TimeoutException(
                       'Connection timed out. Check your internet or Firebase rules.',
                     ),
-            // coverage:ignore-end
           );
       _success = true;
       unawaited(analytics?.logGuestbookPost(rating));

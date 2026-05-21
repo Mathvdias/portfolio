@@ -7,7 +7,6 @@ import '../constants/app_sizes.dart';
 
 class ProjectStatsWindowContent extends StatelessWidget {
   const ProjectStatsWindowContent({
-    // coverage:ignore-line
     super.key,
     @visibleForTesting this.coverageOverride,
   });

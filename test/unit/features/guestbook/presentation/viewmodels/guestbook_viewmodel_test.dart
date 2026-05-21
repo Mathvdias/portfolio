@@ -208,6 +208,26 @@ void main() {
       vm.dispose();
       timeout.dispose();
     });
+
+    test('onTimeout callback fires when future hangs past deadline', () async {
+      when(() => prefs.getBool('isAdmin')).thenReturn(false);
+      when(() => prefs.getInt(any())).thenReturn(null);
+      when(() => prefs.setInt(any(), any())).thenAnswer((_) async => true);
+
+      final hanging = HangingGuestbookRepository();
+      final vm = GuestbookViewModel(
+        hanging,
+        prefs,
+        submitTimeout: const Duration(milliseconds: 1),
+      );
+
+      await vm.submitMessage('Name', 'Message', 5);
+
+      expect(vm.lastError, contains('timed out'));
+      expect(vm.isSubmitting, false);
+      vm.dispose();
+      hanging.dispose();
+    });
   });
 }
 

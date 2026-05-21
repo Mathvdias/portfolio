@@ -11,7 +11,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        MaterialApp(
           localizationsDelegates: [AppLocalizationsDelegate()],
           home: Scaffold(body: AndroidDevWindowContent()),
         ),
@@ -28,7 +28,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        MaterialApp(
           localizationsDelegates: [AppLocalizationsDelegate()],
           home: Scaffold(body: FlutterDevWindowContent()),
         ),
@@ -46,7 +46,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        MaterialApp(
           localizationsDelegates: [AppLocalizationsDelegate()],
           home: Scaffold(body: ProjectStatsWindowContent()),
         ),
@@ -99,7 +99,7 @@ void main() {
       'ProjectStatsWindowContent expands Q&A card and shows answer points',
       (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             localizationsDelegates: [AppLocalizationsDelegate()],
             home: Scaffold(body: ProjectStatsWindowContent()),
           ),
@@ -122,7 +122,7 @@ void main() {
       'ProjectStatsWindowContent expands GPU shader Q&A card and shows answer points',
       (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             localizationsDelegates: [AppLocalizationsDelegate()],
             home: Scaffold(body: ProjectStatsWindowContent()),
           ),
@@ -147,7 +147,7 @@ void main() {
       'ProjectStatsWindowContent renders yellow for 60-79% coverage',
       (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             localizationsDelegates: [AppLocalizationsDelegate()],
             home: Scaffold(
               body: ProjectStatsWindowContent(coverageOverride: 70.0),
@@ -164,7 +164,7 @@ void main() {
       'ProjectStatsWindowContent renders red for below 60% coverage',
       (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             localizationsDelegates: [AppLocalizationsDelegate()],
             home: Scaffold(
               body: ProjectStatsWindowContent(coverageOverride: 50.0),
