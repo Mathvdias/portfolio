@@ -196,22 +196,39 @@ class _AppNameMenu extends StatelessWidget {
             const PopupMenuDivider(),
             PopupMenuItem<AppMenuAction>(
               enabled: false,
-              height: 36,
+              height: 52,
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Icon(
-                    _isGpuActive() ? Icons.developer_board : Icons.html,
+                    _isGpuActive()
+                        ? Icons.developer_board
+                        : Icons.html_outlined,
                     size: AppSizes.font2xl,
-                    color: _isGpuActive() ? AppTheme.green : AppTheme.subtext,
+                    color: _isGpuActive() ? AppTheme.green : AppTheme.yellow,
                   ),
                   const SizedBox(width: AppSizes.spacingBase),
-                  Text(
-                    'Engine: ${_getRendererName()}',
-                    style: GoogleFonts.spaceMono(
-                      fontSize: AppSizes.fontXl,
-                      color: AppTheme.subtext,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _getRendererName(),
+                        style: GoogleFonts.spaceMono(
+                          fontSize: AppSizes.fontXl,
+                          color:
+                              _isGpuActive() ? AppTheme.green : AppTheme.yellow,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        _getRendererSubtitle(),
+                        style: GoogleFonts.spaceMono(
+                          fontSize: 9,
+                          color: AppTheme.subtext,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -274,13 +291,11 @@ class _AppNameMenu extends StatelessWidget {
     );
   }
 
-  bool _isGpuActive() {
-    return isGpuRenderer();
-  }
+  bool _isGpuActive() => isGpuRenderer();
 
-  String _getRendererName() {
-    return getRendererText();
-  }
+  String _getRendererName() => getRendererText();
+
+  String _getRendererSubtitle() => getRendererSubtitle();
 }
 
 // ── Shared widgets ─────────────────────────────────────────────────────────

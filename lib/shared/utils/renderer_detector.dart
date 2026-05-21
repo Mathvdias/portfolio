@@ -8,3 +8,7 @@ bool isGpuRenderer() {
 String getRendererText() {
   return getRendererName();
 }
+
+String getRendererSubtitle() {
+  return getRendererDescription();
+}

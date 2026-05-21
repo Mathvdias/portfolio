@@ -6,9 +6,17 @@ bool isCanvasKitActive() {
 }
 
 String getRendererName() {
-  final isCanvasKit = js.context['flutterCanvasKit'] != null;
   final isSkwasm = js.context['flutterSkwasm'] != null;
-  if (isSkwasm) return 'Skwasm (GPU)';
-  if (isCanvasKit) return 'CanvasKit (GPU)';
-  return 'HTML (DOM)';
+  final isCanvasKit = js.context['flutterCanvasKit'] != null;
+  if (isSkwasm) return 'Skwasm GPU';
+  if (isCanvasKit) return 'CanvasKit GPU';
+  return 'HTML Renderer';
+}
+
+String getRendererDescription() {
+  final isSkwasm = js.context['flutterSkwasm'] != null;
+  final isCanvasKit = js.context['flutterCanvasKit'] != null;
+  if (isSkwasm) return 'Dart WASM + Skia → WebGL → GPU';
+  if (isCanvasKit) return 'Skia WASM → WebGL → GPU';
+  return 'DOM · CSS · Canvas2D — no GPU shaders';
 }
