@@ -1,0 +1,13 @@
+[package]
+name = "mathos_engine"
+version = "0.1.0"
+edition = "2021"
+description = "Core physics and math engine for MathOS, compiled to Wasm"
+
+[lib]
+crate-type = ["cdylib"]
+
+[profile.release]
+lto = true
+opt-level = "s" # Optimize for size
+strip = true

@@ -88,6 +88,7 @@ flutter:
   assets:
     - assets/fonts/
     - assets/icons/
+    - assets/wasm/
 
   fonts:
     - family: Noto Sans
