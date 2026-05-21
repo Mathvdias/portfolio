@@ -2,11 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:app_window/app_window.dart';
 
 import '../../../../shared/constants/app_sizes.dart';
+import '../../../../core/services/web_notification_service.dart';
 import '../../domain/models/desktop_notification.dart';
 
 /// Manages all mutable desktop state: open windows, notifications,
 /// context menu, spotlight visibility, and rubber-band selection.
 class DesktopViewModel extends ChangeNotifier {
+  DesktopViewModel({WebNotificationService? webNotificationService})
+      : _webNotificationService = webNotificationService ?? WebNotificationService();
+
+  final WebNotificationService _webNotificationService;
+
   // ─── Window ID Handler ──────────────────────────────────────────
   void Function(String id, BuildContext context)? onOpenWindowById;
 
@@ -97,6 +103,12 @@ class DesktopViewModel extends ChangeNotifier {
     _notifications.insert(0, notification);
     notificationsNotifier.value = List.unmodifiable(_notifications);
     notifyListeners();
+
+    // Trigger native browser notification
+    _webNotificationService.showNotification(
+      title: notification.title,
+      body: notification.message,
+    );
   }
 
   // ─── Context menu ───────────────────────────────────────────────
