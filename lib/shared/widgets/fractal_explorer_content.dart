@@ -14,6 +14,20 @@ class FractalExplorerContent extends StatefulWidget {
   State<FractalExplorerContent> createState() => _FractalExplorerContentState();
 }
 
+class FractalScenario {
+  final String name;
+  final double targetX;
+  final double targetY;
+  final double zoomSpeed;
+
+  const FractalScenario({
+    required this.name,
+    required this.targetX,
+    required this.targetY,
+    this.zoomSpeed = 0.12,
+  });
+}
+
 class _FractalExplorerContentState extends State<FractalExplorerContent>
     with SingleTickerProviderStateMixin {
   late final WasmEngineService _engineService;
@@ -29,10 +43,34 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
   late final Ticker _ticker;
   bool _autoAnimating = true;
 
-  // Interesting point in the Mandelbrot set for the auto-zoom journey
-  static const double _targetX = -0.7435;
-  static const double _targetY = 0.1314;
-  static const double _zoomSpeed = 0.12; // zoom multiplier per second
+  static const List<FractalScenario> _scenarios = [
+    FractalScenario(
+      name: 'Seahorse Valley',
+      targetX: -0.7435,
+      targetY: 0.1314,
+    ),
+    FractalScenario(
+      name: 'Triple Spiral',
+      targetX: -0.088,
+      targetY: 0.654,
+      zoomSpeed: 0.15,
+    ),
+    FractalScenario(
+      name: 'Mini Mandelbrot',
+      targetX: -1.768,
+      targetY: 0.0,
+      zoomSpeed: 0.1,
+    ),
+    FractalScenario(
+      name: 'Elephant Valley',
+      targetX: 0.28,
+      targetY: 0.008,
+      zoomSpeed: 0.08,
+    ),
+  ];
+
+  int _currentScenarioIndex = 0;
+  FractalScenario get _currentScenario => _scenarios[_currentScenarioIndex];
 
   // Resolution of the fractal rendering
   static const int renderWidth = 800;
@@ -58,10 +96,10 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
 
   void _startAutoAnimation() {
     _autoAnimating = true;
-    // Reset to the interesting point
+    // Reset to the current scenario's target
     _zoom = 1.0;
-    _offsetX = _targetX;
-    _offsetY = _targetY;
+    _offsetX = _currentScenario.targetX;
+    _offsetY = _currentScenario.targetY;
     if (!_ticker.isActive) {
       _ticker.start();
     }
@@ -77,9 +115,9 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
   void _onTick(Duration elapsed) {
     if (!_autoAnimating || !_engineService.isReady || !mounted) return;
 
-    // Smooth exponential zoom — increases by _zoomSpeed per second
+    // Smooth exponential zoom — increases by zoomSpeed per second
     final seconds = elapsed.inMicroseconds / 1e6;
-    final newZoom = math.pow(1.0 + _zoomSpeed, seconds).toDouble();
+    final newZoom = math.pow(1.0 + _currentScenario.zoomSpeed, seconds).toDouble();
 
     // Cap zoom to avoid precision loss
     if (newZoom > 1e12) {
@@ -154,8 +192,15 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
       _offsetY = 0.0;
     });
     _renderFractal();
-    // Restart the auto-animation from the interesting point
+    // Restart the auto-animation from the current point
     _startAutoAnimation();
+  }
+
+  void _nextScenario() {
+    setState(() {
+      _currentScenarioIndex = (_currentScenarioIndex + 1) % _scenarios.length;
+    });
+    _handleReset();
   }
 
   @override
@@ -192,11 +237,24 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
             Positioned(
               bottom: 16,
               right: 16,
-              child: FloatingActionButton.small(
-                onPressed: _handleReset,
-                backgroundColor: Colors.white24,
-                elevation: 0,
-                child: const Icon(Icons.refresh, color: Colors.white),
+              child: Row(
+                children: [
+                  FloatingActionButton.small(
+                    onPressed: _nextScenario,
+                    backgroundColor: Colors.white24,
+                    elevation: 0,
+                    tooltip: 'Change Scenario',
+                    child: const Icon(Icons.auto_fix_high, color: Colors.white),
+                  ),
+                  const SizedBox(width: 8),
+                  FloatingActionButton.small(
+                    onPressed: _handleReset,
+                    backgroundColor: Colors.white24,
+                    elevation: 0,
+                    tooltip: 'Reset',
+                    child: const Icon(Icons.refresh, color: Colors.white),
+                  ),
+                ],
               ),
             ),
             Positioned(
@@ -232,18 +290,18 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
                       color: Colors.black54,
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.auto_awesome,
                           color: Colors.white70,
                           size: 14,
                         ),
-                        SizedBox(width: 4),
+                        const SizedBox(width: 4),
                         Text(
-                          'Auto-exploring • Tap to navigate',
-                          style: TextStyle(color: Colors.white70, fontSize: 11),
+                          'Auto-exploring: ${_currentScenario.name}',
+                          style: const TextStyle(color: Colors.white70, fontSize: 11),
                         ),
                       ],
                     ),
