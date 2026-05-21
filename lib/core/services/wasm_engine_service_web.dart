@@ -1,6 +1,6 @@
 import 'dart:js_interop';
 import 'dart:js_interop_unsafe';
-
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 
 import 'wasm_engine_service.dart';
@@ -84,7 +84,19 @@ class WasmEngineServiceImpl implements WasmEngineService {
     if (!_isReady) return;
     final exports = _instance!.exports;
 
-    exports.callMethod('generate_fractal'.toJS, width.toJS, height.toJS);
+    exports.callMethod(
+      'generate_fractal'.toJS,
+      width.toJS,
+      height.toJS,
+      zoom.toJS,
+      offsetX.toJS,
+      offsetY.toJS,
+      maxIterations.toJS,
+      isJulia.toJS,
+      cxJulia.toJS,
+      cyJulia.toJS,
+      time.toJS,
+    );
   }
 
   @override
