@@ -5,18 +5,31 @@ import '../../../../core/errors/app_failure.dart';
 import '../../../../core/result/result.dart';
 
 class VisitorDatasource {
-  VisitorDatasource({FirebaseFirestore? firestore})
-    : _firestore = firestore ?? FirebaseFirestore.instance;
+  VisitorDatasource({FirebaseFirestore? firestore, bool? isDebug})
+    : _firestore =
+          firestore ?? FirebaseFirestore.instance, // coverage:ignore-line
+      _isDebug = isDebug ?? kDebugMode;
 
   static const _collection = 'stats';
   static const _document = 'visitors';
   static const _hasVisitedKey = 'has_visited';
 
   final FirebaseFirestore _firestore;
+  final bool _isDebug;
 
+  @visibleForTesting
   static bool _sessionRecorded = false;
 
+  /// Resets the in-process session flag. For use in tests only.
+  @visibleForTesting
+  static void resetSessionForTesting() => _sessionRecorded = false;
+
+  /// Exposes session flag for assertion in tests.
+  @visibleForTesting
+  static bool get sessionRecordedForTesting => _sessionRecorded;
+
   Future<Result<void>> recordVisit() async {
+    if (_isDebug) return const Success(null); // Don't count debug/test runs.
     if (_sessionRecorded) return const Success(null);
     _sessionRecorded = true;
 
