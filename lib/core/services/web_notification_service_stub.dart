@@ -2,9 +2,7 @@ import 'web_notification_service.dart';
 
 class WebNotificationServiceImpl implements WebNotificationService {
   @override
-  Future<void> requestPermission() async {
-    // No-op
-  }
+  Future<bool> requestPermission() async => false;
 
   @override
   Future<void> showNotification({

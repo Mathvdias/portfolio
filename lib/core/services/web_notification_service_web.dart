@@ -23,14 +23,18 @@ extension type WebNotificationOptions._(JSObject _) implements JSObject {
 
 class WebNotificationServiceImpl implements WebNotificationService {
   @override
-  Future<void> requestPermission() async {
+  Future<bool> requestPermission() async {
     final hasNotification = window.hasProperty('Notification'.toJS);
-    if (!hasNotification.toDart) return;
+    if (!hasNotification.toDart) return false;
 
     final permission = WebNotification.permission.toDart;
+    if (permission == 'granted') return true;
+
     if (permission == 'default' || permission == '') {
-      await WebNotification.requestPermission().toDart;
+      final result = await WebNotification.requestPermission().toDart;
+      return result.toDart == 'granted';
     }
+    return false;
   }
 
   @override
