@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:app_window/app_window.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_lazy_load_web/flutter_lazy_load_web.dart';
 
 import '../../../../core/di/app_dependencies.dart';
@@ -373,45 +372,6 @@ class _DesktopPageState extends State<DesktopPage> {
     }
   }
 
-  // ── Keyboard shortcut handler ────────────────────────────────────
-  KeyEventResult _onKey(FocusNode _, KeyEvent event) {
-    if (event is! KeyDownEvent) return KeyEventResult.ignored;
-    final meta = HardwareKeyboard.instance.isMetaPressed;
-
-    if (meta && event.logicalKey == LogicalKeyboardKey.keyK) {
-      if (_desktopVM.showSpotlight) {
-        _desktopVM.closeSpotlight();
-      } else {
-        _desktopVM.openSpotlight();
-        unawaited(_analytics.logSpotlightOpen());
-      }
-      return KeyEventResult.handled;
-    }
-    if (meta && event.logicalKey == LogicalKeyboardKey.keyW) {
-      if (_desktopVM.windows.isNotEmpty) {
-        final id = _desktopVM.windows.last.id;
-        _trackWindowClose(id);
-        _desktopVM.closeWindow(id);
-      }
-      return KeyEventResult.handled;
-    }
-    if (event.logicalKey == LogicalKeyboardKey.escape) {
-      if (_desktopVM.showSpotlight) {
-        _desktopVM.closeSpotlight();
-        return KeyEventResult.handled;
-      }
-      if (_desktopVM.showContextMenu) {
-        _desktopVM.closeContextMenu();
-        return KeyEventResult.handled;
-      }
-      if (_desktopVM.showNotifications) {
-        _desktopVM.toggleNotifications();
-        return KeyEventResult.handled;
-      }
-    }
-    return KeyEventResult.ignored;
-  }
-
   @override
   Widget build(BuildContext context) {
     if (ResponsiveLayout.isMobile(context)) return const MobileFallbackPage();
@@ -420,9 +380,12 @@ class _DesktopPageState extends State<DesktopPage> {
     final localeVM = AppDependencies.of(context).localeViewModel;
     final experiences = ExperienceMapper.fromL10n(l10n.experiences);
 
+    // Focus(autofocus: true) ensures the desktop receives keyboard events
+    // when no text field or button is focused. The actual shortcut dispatch
+    // is handled by MaterialApp.shortcuts + MaterialApp.actions (AppShortcuts /
+    // AppActions) so no onKeyEvent callback is needed here.
     return Focus(
       autofocus: true,
-      onKeyEvent: _onKey,
       child: Scaffold(
         backgroundColor: AppTheme.background,
         body: GestureDetector(
