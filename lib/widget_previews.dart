@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:portifolio/core/constants/app_svgs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/di/app_dependencies.dart';
@@ -314,7 +315,7 @@ Widget previewVisitorStickyNote() =>
 @Preview(name: 'DesktopIcon', wrapper: previewWrapper, size: Size(120, 120))
 Widget previewDesktopIcon() => DesktopIcon(
   label: 'Terminal',
-  iconWidget: const Icon(Icons.terminal, color: Colors.white, size: 36),
+  iconWidgetPath: AppSvgs.android,
   color: AppTheme.green,
   onTap: () {},
 );

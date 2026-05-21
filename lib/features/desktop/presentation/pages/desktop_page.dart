@@ -5,55 +5,53 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_lazy_load_web/flutter_lazy_load_web.dart';
 
-
 import '../../../../core/di/app_dependencies.dart';
 import '../../../../core/services/analytics_service.dart';
 import '../../../../features/desktop/presentation/viewmodels/desktop_viewmodel.dart';
+import '../../../../features/guestbook/presentation/widgets/guestbook_content.dart'
+    deferred as guestbook_content;
 import '../../../../features/visitors/presentation/viewmodels/visitor_viewmodel.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/constants/app_sizes.dart';
 import '../../../../shared/constants/app_strings.dart';
 import '../../../../shared/mappers/experience_mapper.dart';
-// Shell widgets — always visible, kept as eager imports.
-import '../../../../shared/widgets/desktop_context_menu.dart';
-import '../../../../shared/widgets/desktop_icons_grid.dart';
-import '../../../../shared/widgets/dock.dart';
-import '../../../../shared/widgets/mac_menu_bar.dart';
-import '../../../../shared/widgets/mobile_fallback_page.dart';
-import '../../../../shared/widgets/notification_center.dart';
-import '../../../../shared/widgets/pixel_wallpaper.dart';
-import '../../../../shared/widgets/responsive_layout.dart';
-import '../../../../shared/widgets/rubber_band_selection.dart';
-import '../../../../shared/widgets/spotlight_overlay.dart';
-import '../../../../shared/widgets/sticky_note.dart';
-import '../../../../theme/app_theme.dart';
-
 // Window content — deferred so each chunk is downloaded only when the
 // user opens that window for the first time.
 import '../../../../shared/widgets/about_window_content.dart'
     deferred as about_content;
-import '../../../../shared/widgets/calculator_content.dart'
-    deferred as calculator_content;
-import '../../../../shared/widgets/contact_form_content.dart'
-    deferred as contact_content;
-import '../../../../shared/widgets/finder_content.dart'
-    deferred as finder_content;
-import '../../../../shared/widgets/licenses_window_content.dart'
-    deferred as licenses_content;
-import '../../../../shared/widgets/skills_window_content.dart'
-    deferred as skills_content;
-import '../../../../shared/widgets/terminal_content.dart'
-    deferred as terminal_content;
 import '../../../../shared/widgets/android_dev_window_content.dart'
     deferred as android_content;
 import '../../../../shared/widgets/flutter_dev_window_content.dart'
     deferred as flutter_content;
+import '../../../../shared/widgets/calculator_content.dart'
+    deferred as calculator_content;
+import '../../../../shared/widgets/contact_form_content.dart'
+    deferred as contact_content;
+// Shell widgets — always visible, kept as eager imports.
+import '../../../../shared/widgets/desktop_context_menu.dart';
+import '../../../../shared/widgets/desktop_icons_grid.dart';
+import '../../../../shared/widgets/dock.dart';
+import '../../../../shared/widgets/finder_content.dart'
+    deferred as finder_content;
+import '../../../../shared/widgets/licenses_window_content.dart'
+    deferred as licenses_content;
+import '../../../../shared/widgets/mac_menu_bar.dart';
+import '../../../../shared/widgets/mobile_fallback_page.dart';
+import '../../../../shared/widgets/notification_center.dart';
+import '../../../../shared/widgets/pixel_wallpaper.dart';
 import '../../../../shared/widgets/project_stats_window_content.dart'
     deferred as stats_content;
+import '../../../../shared/widgets/responsive_layout.dart';
+import '../../../../shared/widgets/rubber_band_selection.dart';
+import '../../../../shared/widgets/skills_window_content.dart'
+    deferred as skills_content;
 import '../../../../shared/widgets/snake_game_content.dart'
     deferred as snake_content;
-import '../../../../features/guestbook/presentation/widgets/guestbook_content.dart'
-    deferred as guestbook_content;
+import '../../../../shared/widgets/spotlight_overlay.dart';
+import '../../../../shared/widgets/sticky_note.dart';
+import '../../../../shared/widgets/terminal_content.dart'
+    deferred as terminal_content;
+import '../../../../theme/app_theme.dart';
 
 class DesktopPage extends StatefulWidget {
   const DesktopPage({super.key});
@@ -181,7 +179,7 @@ class _DesktopPageState extends State<DesktopPage> {
       const SpotlightItem(
         id: AppStrings.winSnake,
         label: AppStrings.titleSnake,
-        iconWidget: Icon(Icons.videogame_asset),
+        iconWidget: Icon(Icons.gamepad_rounded),
         color: AppTheme.peach,
       ),
       const SpotlightItem(

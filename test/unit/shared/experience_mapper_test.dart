@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:portifolio/shared/mappers/experience_mapper.dart';
 import 'package:portifolio/shared/models/experience.dart';
 import 'package:portifolio/theme/app_theme.dart';
@@ -71,45 +69,6 @@ void main() {
     });
   });
 
-  group('ExperienceMapper.iconWidgetFor', () {
-    int cp(Widget w) => (w as FaIcon).icon!.codePoint;
-
-    test('returns briefcase for Zallpy', () {
-      expect(
-        cp(ExperienceMapper.iconWidgetFor('Zallpy')),
-        FontAwesomeIcons.briefcase.codePoint,
-      );
-    });
-
-    test('returns buildingColumns for Banco Pan', () {
-      expect(
-        cp(ExperienceMapper.iconWidgetFor('Banco Pan')),
-        FontAwesomeIcons.buildingColumns.codePoint,
-      );
-    });
-
-    test('returns wifi for Conecthus', () {
-      expect(
-        cp(ExperienceMapper.iconWidgetFor('Conecthus')),
-        FontAwesomeIcons.wifi.codePoint,
-      );
-    });
-
-    test('returns phone for Oi', () {
-      expect(
-        cp(ExperienceMapper.iconWidgetFor('Oi')),
-        FontAwesomeIcons.phone.codePoint,
-      );
-    });
-
-    test('returns buildingColumns for unknown', () {
-      expect(
-        cp(ExperienceMapper.iconWidgetFor('Acme Corp')),
-        FontAwesomeIcons.buildingColumns.codePoint,
-      );
-    });
-  });
-
   group('ExperienceMapper.shortNameFor', () {
     test('returns Zallpy for Zallpy Digital', () {
       expect(ExperienceMapper.shortNameFor('Zallpy Digital'), 'Zallpy');
@@ -133,6 +92,36 @@ void main() {
 
     test('returns first word for unknown', () {
       expect(ExperienceMapper.shortNameFor('Acme Corp'), 'Acme');
+    });
+  });
+
+  group('ExperienceMapper.iconAssetFor', () {
+    test('returns zallpy asset for Zallpy', () {
+      expect(
+        ExperienceMapper.iconAssetFor('Zallpy Digital'),
+        contains('zallpy.svg'),
+      );
+    });
+
+    test('returns pan asset for Banco Pan', () {
+      expect(
+        ExperienceMapper.iconAssetFor('Banco Pan'),
+        contains('pan.svg'),
+      );
+    });
+
+    test('returns conecthus asset for Conecthus', () {
+      expect(
+        ExperienceMapper.iconAssetFor('Instituto Conecthus'),
+        contains('conecthus.svg'),
+      );
+    });
+
+    test('returns oi asset for unknown company', () {
+      expect(
+        ExperienceMapper.iconAssetFor('Oi'),
+        contains('oi.svg'),
+      );
     });
   });
 

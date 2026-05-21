@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import '../../core/constants/app_svgs.dart';
 import '../../theme/app_theme.dart';
 import '../models/experience.dart';
 
@@ -32,25 +32,20 @@ abstract final class ExperienceMapper {
     return AppTheme.peach;
   }
 
-  // ── Resolve IconData ───────────────────────────────────
-  static Widget iconWidgetFor(String company) {
-    if (company.contains('Zallpy')) {
-      return const FaIcon(FontAwesomeIcons.briefcase);
-    }
-    if (_isPan(company)) return const FaIcon(FontAwesomeIcons.buildingColumns);
-    if (company.contains('Conecthus')) {
-      return const FaIcon(FontAwesomeIcons.wifi);
-    }
-    if (company.contains('Oi')) return const FaIcon(FontAwesomeIcons.phone);
-    return const FaIcon(FontAwesomeIcons.buildingColumns);
-  }
-
   // ── Resolve short display name ─────────────────────────────────
   static String shortNameFor(String company) {
     if (company.contains('Zallpy')) return 'Zallpy';
     if (_isPan(company)) return 'Banco Pan';
     if (company.contains('Conecthus')) return 'Conecthus';
     return company.split(' ').first;
+  }
+
+  // ── Resolve SVG icon asset path ───────────────────────────────
+  static String iconAssetFor(String company) {
+    if (company.contains('Zallpy')) return AppSvgs.zallpy;
+    if (_isPan(company)) return AppSvgs.pan;
+    if (company.contains('Conecthus')) return AppSvgs.conecthus;
+    return AppSvgs.oi;
   }
 
   // ── Helper ─────────────────────────────────────────────────────

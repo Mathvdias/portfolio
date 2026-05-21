@@ -2,6 +2,6 @@
 // Do not edit manually.
 class ProjectStats {
   static const double coverage = 100.00;
-  static const String lastUpdate = '2026-05-20T21:14:08.056153';
-  static const int totalTests = 227;
+  static const String lastUpdate = '2026-05-20T21:30:22.945845';
+  static const int totalTests = 217;
 }

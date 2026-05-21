@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:portifolio/shared/constants/app_svgs.dart';
+import 'package:portifolio/core/constants/app_svgs.dart';
 
 import '../../theme/app_theme.dart';
 import '../constants/app_sizes.dart';

@@ -1,7 +1,7 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter/gestures.dart';
-
+import 'package:portifolio/core/constants/app_svgs.dart';
 import 'package:portifolio/shared/widgets/desktop_icon.dart';
 
 void main() {
@@ -11,7 +11,7 @@ void main() {
         home: Scaffold(
           body: DesktopIcon(
             label: 'About',
-            iconWidget: Icon(Icons.person),
+            iconWidgetPath: AppSvgs.person,
             color: Colors.blue,
             onTap: null,
           ),
@@ -28,7 +28,7 @@ void main() {
         home: Scaffold(
           body: DesktopIcon(
             label: 'Test',
-            iconWidget: const Icon(Icons.person),
+            iconWidgetPath: AppSvgs.person,
             color: Colors.blue,
             onTap: () => tapped = true,
           ),
@@ -48,7 +48,7 @@ void main() {
           body: Center(
             child: DesktopIcon(
               label: 'Hover',
-              iconWidget: Icon(Icons.star),
+              iconWidgetPath: AppSvgs.flutter,
               color: Colors.blue,
               onTap: null,
             ),
@@ -58,16 +58,13 @@ void main() {
     );
 
     final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
-    // Start pointer far from widget
     await gesture.addPointer(location: const Offset(1, 1));
     addTearDown(gesture.removePointer);
     await tester.pump();
 
-    // Move into widget — triggers onEnter
     await gesture.moveTo(tester.getCenter(find.byType(DesktopIcon)));
     await tester.pump();
 
-    // Move away — triggers onExit
     await gesture.moveTo(const Offset(1, 1));
     await tester.pump();
 

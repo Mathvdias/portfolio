@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../core/constants/app_svgs.dart';
 import '../../theme/app_theme.dart';
 import '../constants/app_sizes.dart';
 import '../constants/app_strings.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SkillsWindowContent extends StatelessWidget {
   const SkillsWindowContent({super.key});
@@ -20,50 +21,20 @@ class SkillsWindowContent extends StatelessWidget {
             _SkillSection(
               title: AppStrings.skillsMobile,
               skills: [
-                _Skill(
-                  'Flutter',
-                  Icon(Icons.flutter_dash),
-                  AppTheme.blue,
-                  0.95,
-                ),
-                _Skill(
-                  'Android',
-                  FaIcon(FontAwesomeIcons.android),
-                  AppTheme.green,
-                  0.85,
-                ),
-                _Skill('Dart', Icon(Icons.code), AppTheme.teal, 0.95),
-                _Skill(
-                  'Kotlin',
-                  Icon(Icons.integration_instructions),
-                  AppTheme.mauve,
-                  0.80,
-                ),
+                _Skill('Flutter', AppSvgs.flutter, AppTheme.blue, 0.95),
+                _Skill('Android', AppSvgs.android, AppTheme.green, 0.85),
+                _Skill('Dart', AppSvgs.dart, AppTheme.teal, 0.95),
+                _Skill('Kotlin', AppSvgs.kotlin, AppTheme.mauve, 0.80),
               ],
             ),
             SizedBox(height: AppSizes.spacingXxl),
             _SkillSection(
               title: AppStrings.skillsBackend,
               skills: [
-                _Skill('REST APIs', Icon(Icons.api), AppTheme.blue, 0.85),
-                _Skill(
-                  'Firebase',
-                  Icon(Icons.local_fire_department),
-                  AppTheme.yellow,
-                  0.75,
-                ),
-                _Skill(
-                  'Git / CI',
-                  FaIcon(FontAwesomeIcons.github),
-                  AppTheme.subtext,
-                  0.90,
-                ),
-                _Skill(
-                  'Fastlane',
-                  Icon(Icons.rocket_launch),
-                  AppTheme.peach,
-                  0.70,
-                ),
+                _Skill('REST APIs', AppSvgs.api, AppTheme.blue, 0.85),
+                _Skill('Firebase', AppSvgs.firebase, AppTheme.yellow, 0.75),
+                _Skill('Git / CI', AppSvgs.github, AppTheme.subtext, 0.90),
+                _Skill('Fastlane', AppSvgs.fastlane, AppTheme.peach, 0.70),
               ],
             ),
           ],
@@ -75,10 +46,10 @@ class SkillsWindowContent extends StatelessWidget {
 
 class _Skill {
   final String name;
-  final Widget iconWidget;
+  final String iconAsset;
   final Color color;
   final double level;
-  const _Skill(this.name, this.iconWidget, this.color, this.level);
+  const _Skill(this.name, this.iconAsset, this.color, this.level);
 }
 
 class _SkillSection extends StatelessWidget {
@@ -121,9 +92,11 @@ class _SkillRow extends StatelessWidget {
           SizedBox(
             width: 28,
             height: 28,
-            child: IconTheme(
-              data: IconThemeData(color: skill.color, size: 24),
-              child: skill.iconWidget,
+            child: SvgPicture.asset(
+              skill.iconAsset,
+              width: 24,
+              height: 24,
+              colorFilter: ColorFilter.mode(skill.color, BlendMode.srcIn),
             ),
           ),
           const SizedBox(width: AppSizes.spacingLg),
