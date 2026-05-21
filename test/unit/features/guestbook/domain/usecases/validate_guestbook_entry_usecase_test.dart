@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+// The usecase is instantiated non-const so coverage tracks the constructor call.
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portifolio/core/errors/app_failure.dart';
 import 'package:portifolio/core/result/result.dart';

@@ -1,3 +1,6 @@
+// ignore_for_file: prefer_const_constructors
+// Const constructors are intentionally omitted in this file so that widget
+// constructors execute at runtime and are tracked by the coverage tool.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portifolio/l10n/app_localizations.dart';

@@ -5,13 +5,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/errors/app_failure.dart';
 import '../../../../core/result/result.dart';
 
-typedef _WriteVisit = Future<void> Function();
+typedef WriteVisit = Future<void> Function();
 
 class VisitorDatasource {
   VisitorDatasource({
     required FirebaseFirestore firestore,
     bool? isDebug,
-    @visibleForTesting _WriteVisit? writeOverride,
+    @visibleForTesting WriteVisit? writeOverride,
   }) : _firestore = firestore,
        _isDebug = isDebug ?? kDebugMode,
        _writeOverride = writeOverride;
@@ -22,7 +22,7 @@ class VisitorDatasource {
 
   final FirebaseFirestore _firestore;
   final bool _isDebug;
-  final _WriteVisit? _writeOverride;
+  final WriteVisit? _writeOverride;
 
   static bool _sessionRecorded = false;
 

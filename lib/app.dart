@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -10,8 +9,6 @@ import 'features/desktop/presentation/viewmodels/desktop_viewmodel.dart';
 import 'features/guestbook/data/repositories/guestbook_repository.dart';
 import 'features/guestbook/presentation/viewmodels/guestbook_viewmodel.dart';
 import 'features/localization/presentation/viewmodels/locale_viewmodel.dart';
-import 'features/visitors/data/datasources/visitor_datasource.dart';
-import 'features/visitors/data/repositories/visitor_repository_impl.dart';
 import 'l10n/app_localizations.dart';
 import 'shared/constants/app_strings.dart';
 import 'shared/widgets/scroll_behavior.dart';
@@ -31,10 +28,6 @@ class _AppState extends State<App> {
   late final DesktopViewModel _desktopVM;
   late final GuestbookViewModel _guestbookVM;
   late final JankMonitor _jankMonitor;
-
-  final _visitorRepository = VisitorRepositoryImpl(
-    VisitorDatasource(firestore: FirebaseFirestore.instance),
-  );
 
   @override
   void initState() {
@@ -64,7 +57,7 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return AppDependencies(
       localeViewModel: _localeVM,
-      visitorRepository: _visitorRepository,
+      visitorRepository: widget.config.visitorRepository,
       guestbookViewModel: _guestbookVM,
       desktopViewModel: _desktopVM,
       analyticsService: widget.config.analytics,

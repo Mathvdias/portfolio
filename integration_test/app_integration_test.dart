@@ -3,8 +3,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:portifolio/app.dart';
 import 'package:portifolio/core/bootstrap/app_bootstrap.dart';
+import 'package:portifolio/core/result/result.dart';
 import 'package:portifolio/core/services/analytics_service.dart';
+import 'package:portifolio/features/visitors/domain/repositories/visitor_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+class _NoOpVisitorRepository implements VisitorRepository {
+  @override
+  Future<Result<void>> recordVisit() async => const Success(null);
+
+  @override
+  Stream<int> watchVisitorCount() => const Stream.empty();
+}
 
 class _NoOpAnalytics implements AnalyticsService {
   @override
@@ -63,7 +73,11 @@ void main() {
   testWidgets('App boots and renders desktop scaffold', (tester) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
-    final config = AppConfig(prefs: prefs, analytics: _NoOpAnalytics());
+    final config = AppConfig(
+      prefs: prefs,
+      analytics: _NoOpAnalytics(),
+      visitorRepository: _NoOpVisitorRepository(),
+    );
 
     await tester.pumpWidget(App(config: config));
     await tester.pumpAndSettle(const Duration(seconds: 2));
