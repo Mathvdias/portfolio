@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../theme/app_theme.dart';
 import '../constants/app_sizes.dart';
 
+/// A macOS-style desktop icon.
 class DesktopIcon extends StatefulWidget {
   const DesktopIcon({
     super.key,
     required this.label,
-    required this.iconWidget,
+    required this.iconAsset,
     required this.color,
     required this.onTap,
   });
 
   final String label;
-  final Widget iconWidget;
+  final String iconAsset;
   final Color color;
   final VoidCallback? onTap;
 
@@ -51,12 +54,11 @@ class _DesktopIconState extends State<DesktopIcon> {
               SizedBox(
                 width: AppSizes.iconArtSize,
                 height: AppSizes.iconArtSize,
-                child: IconTheme(
-                  data: IconThemeData(
-                    color: widget.color,
-                    size: AppSizes.iconArtSize * 0.8,
-                  ),
-                  child: widget.iconWidget,
+                child: SvgPicture.asset(
+                  widget.iconAsset,
+                  colorFilter: ColorFilter.mode(widget.color, BlendMode.srcIn),
+                  width: AppSizes.iconArtSize * 0.8,
+                  height: AppSizes.iconArtSize * 0.8,
                 ),
               ),
               const SizedBox(height: AppSizes.spacingXs),

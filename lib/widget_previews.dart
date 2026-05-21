@@ -314,7 +314,7 @@ Widget previewVisitorStickyNote() =>
 @Preview(name: 'DesktopIcon', wrapper: previewWrapper, size: Size(120, 120))
 Widget previewDesktopIcon() => DesktopIcon(
   label: 'Terminal',
-  iconWidget: const Icon(Icons.terminal, color: Colors.white, size: 36),
+  iconAsset: 'assets/icons/terminal.svg',
   color: AppTheme.green,
   onTap: () {},
 );

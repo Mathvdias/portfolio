@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:app_window/app_window.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -10,6 +11,7 @@ import '../../l10n/app_localizations.dart';
 import '../../theme/app_theme.dart';
 import '../constants/app_sizes.dart';
 import '../constants/app_strings.dart';
+import '../constants/app_svgs.dart';
 
 class Dock extends StatelessWidget {
   const Dock({super.key});
@@ -21,43 +23,43 @@ class Dock extends StatelessWidget {
     // Using Material Icons for maximum reliability on Flutter Web
     final items = [
       const _DockItemData(
-        icon: Icons.code,
+        iconAsset: AppSvgs.github,
         label: AppStrings.dockGitHub,
         color: AppTheme.subtext,
         url: AppStrings.urlGitHub,
       ),
       const _DockItemData(
-        icon: Icons.language,
+        iconAsset: AppSvgs.dart,
         label: AppStrings.dockPubDev,
         color: AppTheme.blue,
         url: AppStrings.urlPubDev,
       ),
       const _DockItemData(
-        icon: Icons.article_outlined,
+        iconAsset: AppSvgs.medium,
         label: AppStrings.dockMedium,
-        color: AppTheme.yellow,
+        color: AppTheme.text,
         url: AppStrings.urlMedium,
       ),
       const _DockItemData(
-        icon: Icons.work_outline,
+        iconAsset: AppSvgs.linkedin,
         label: AppStrings.dockLinkedIn,
         color: AppTheme.blue,
         url: AppStrings.urlLinkedIn,
       ),
       const _DockItemData(
-        icon: Icons.email_outlined,
+        iconAsset: AppSvgs.contact,
         label: AppStrings.dockEmail,
-        color: AppTheme.peach,
+        color: AppTheme.red,
         url: AppStrings.emailAddress,
       ),
       _DockItemData(
-        icon: Icons.book_outlined,
+        iconAsset: AppSvgs.guestbook,
         label: l10n.guestbook,
         color: AppTheme.blue,
         windowId: AppStrings.winGuestbook,
       ),
       _DockItemData(
-        icon: Icons.analytics_outlined,
+        iconAsset: AppSvgs.projectStats,
         label: l10n.projectStats,
         color: AppTheme.yellow,
         windowId: AppStrings.winProjectStats,
@@ -96,14 +98,14 @@ class Dock extends StatelessWidget {
 }
 
 class _DockItemData {
-  final IconData icon;
+  final String iconAsset;
   final String label;
   final Color color;
   final String? url;
   final String? windowId;
 
   const _DockItemData({
-    required this.icon,
+    required this.iconAsset,
     required this.label,
     required this.color,
     this.url,
@@ -162,11 +164,14 @@ class _DockItemState extends State<_DockItem> {
                   SizedBox(
                     width: AppSizes.dockIconSize,
                     height: AppSizes.dockIconSize,
-                    child: Icon(
-                      widget.data.icon,
-                      color: widget.data.color,
-                      size: AppSizes.dockIconSize * 0.8,
-                      semanticLabel: widget.data.label,
+                    child: SvgPicture.asset(
+                      widget.data.iconAsset,
+                      colorFilter: ColorFilter.mode(
+                        widget.data.color,
+                        BlendMode.srcIn,
+                      ),
+                      width: AppSizes.dockIconSize * 0.8,
+                      height: AppSizes.dockIconSize * 0.8,
                     ),
                   ),
                   const SizedBox(height: AppSizes.spacingXs),

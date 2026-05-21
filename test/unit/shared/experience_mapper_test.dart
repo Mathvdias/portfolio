@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 import 'package:portifolio/shared/mappers/experience_mapper.dart';
 import 'package:portifolio/shared/models/experience.dart';
 import 'package:portifolio/theme/app_theme.dart';
@@ -66,46 +66,105 @@ void main() {
       expect(ExperienceMapper.colorFor('Instituto Conecthus'), AppTheme.green);
     });
 
+    test('returns peach for Oi', () {
+      expect(ExperienceMapper.colorFor('Oi'), AppTheme.peach);
+    });
+
     test('returns peach for unknown', () {
       expect(ExperienceMapper.colorFor('Acme Corp'), AppTheme.peach);
     });
   });
 
   group('ExperienceMapper.iconWidgetFor', () {
-    int cp(Widget w) => (w as FaIcon).icon!.codePoint;
+    int cp(Widget w) => (w as Icon).icon!.codePoint;
 
-    test('returns briefcase for Zallpy', () {
+    // Zallpy — Mobile Software Engineer (B2B, cross-platform)
+    test('returns mobileScreen for Zallpy', () {
       expect(
         cp(ExperienceMapper.iconWidgetFor('Zallpy')),
-        FontAwesomeIcons.briefcase.codePoint,
+        Icons.smartphone.codePoint,
       );
     });
 
+    // Banco Pan — Mobile Software Engineer (banking)
     test('returns buildingColumns for Banco Pan', () {
       expect(
         cp(ExperienceMapper.iconWidgetFor('Banco Pan')),
-        FontAwesomeIcons.buildingColumns.codePoint,
+        Icons.account_balance.codePoint,
       );
     });
 
-    test('returns wifi for Conecthus', () {
+    test('returns buildingColumns for PAN', () {
+      expect(
+        cp(ExperienceMapper.iconWidgetFor('PAN')),
+        Icons.account_balance.codePoint,
+      );
+    });
+
+    // Conecthus — Mobile Developer PL (AI/ML, POS kiosks)
+    test('returns microchip for Conecthus', () {
       expect(
         cp(ExperienceMapper.iconWidgetFor('Conecthus')),
-        FontAwesomeIcons.wifi.codePoint,
+        Icons.memory.codePoint,
       );
     });
 
-    test('returns phone for Oi', () {
+    // Oi — Maintenance Technician (fiber optic, networking)
+    test('returns networkWired for Oi', () {
       expect(
         cp(ExperienceMapper.iconWidgetFor('Oi')),
-        FontAwesomeIcons.phone.codePoint,
+        Icons.router.codePoint,
       );
     });
 
     test('returns buildingColumns for unknown', () {
       expect(
         cp(ExperienceMapper.iconWidgetFor('Acme Corp')),
-        FontAwesomeIcons.buildingColumns.codePoint,
+        Icons.account_balance.codePoint,
+      );
+    });
+  });
+
+  group('ExperienceMapper.iconAssetFor', () {
+    test('returns zallpy path for Zallpy', () {
+      expect(
+        ExperienceMapper.iconAssetFor('Zallpy Digital'),
+        'assets/icons/zallpy.svg',
+      );
+    });
+
+    test('returns bancoPan path for Banco Pan', () {
+      expect(
+        ExperienceMapper.iconAssetFor('Banco Pan'),
+        'assets/icons/pan.svg',
+      );
+    });
+
+    test('returns bancoPan path for PAN', () {
+      expect(
+        ExperienceMapper.iconAssetFor('PAN'),
+        'assets/icons/pan.svg',
+      );
+    });
+
+    test('returns conecthus path for Conecthus', () {
+      expect(
+        ExperienceMapper.iconAssetFor('Instituto Conecthus'),
+        'assets/icons/conecthus.svg',
+      );
+    });
+
+    test('returns oi path for Oi', () {
+      expect(
+        ExperienceMapper.iconAssetFor('Oi'),
+        'assets/icons/oi.svg',
+      );
+    });
+
+    test('returns fallback bancoPan path for unknown', () {
+      expect(
+        ExperienceMapper.iconAssetFor('Acme Corp'),
+        'assets/icons/pan.svg',
       );
     });
   });
@@ -129,6 +188,10 @@ void main() {
 
     test('returns Conecthus for Instituto Conecthus', () {
       expect(ExperienceMapper.shortNameFor('Instituto Conecthus'), 'Conecthus');
+    });
+
+    test('returns Oi for Oi', () {
+      expect(ExperienceMapper.shortNameFor('Oi'), 'Oi');
     });
 
     test('returns first word for unknown', () {

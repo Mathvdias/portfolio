@@ -1,76 +1,73 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 import 'package:portifolio/shared/widgets/desktop_icon.dart';
 
 void main() {
-  testWidgets('DesktopIcon renders label', (tester) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
-          body: DesktopIcon(
-            label: 'About',
-            iconWidget: Icon(Icons.person),
-            color: Colors.blue,
-            onTap: null,
-          ),
-        ),
-      ),
-    );
-    expect(find.text('About'), findsOneWidget);
-  });
-
-  testWidgets('DesktopIcon calls onTap', (tester) async {
-    bool tapped = false;
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: DesktopIcon(
-            label: 'Test',
-            iconWidget: const Icon(Icons.person),
-            color: Colors.blue,
-            onTap: () => tapped = true,
-          ),
-        ),
-      ),
-    );
-    await tester.tap(find.byType(DesktopIcon));
-    expect(tapped, isTrue);
-  });
-
-  testWidgets('DesktopIcon changes appearance on hover enter and exit', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: DesktopIcon(
-              label: 'Hover',
-              iconWidget: Icon(Icons.star),
+  group('DesktopIcon', () {
+    testWidgets('renders label', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: DesktopIcon(
+              label: 'About',
+              iconAsset: 'assets/icons/person.svg',
               color: Colors.blue,
               onTap: null,
             ),
           ),
         ),
-      ),
-    );
+      );
+      expect(find.text('About'), findsOneWidget);
+    });
 
-    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
-    // Start pointer far from widget
-    await gesture.addPointer(location: const Offset(1, 1));
-    addTearDown(gesture.removePointer);
-    await tester.pump();
+    testWidgets('calls onTap', (tester) async {
+      bool tapped = false;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: DesktopIcon(
+              label: 'Test',
+              iconAsset: 'assets/icons/person.svg',
+              color: Colors.blue,
+              onTap: () => tapped = true,
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.byType(DesktopIcon));
+      expect(tapped, isTrue);
+    });
 
-    // Move into widget — triggers onEnter
-    await gesture.moveTo(tester.getCenter(find.byType(DesktopIcon)));
-    await tester.pump();
+    testWidgets('changes appearance on hover enter and exit', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: DesktopIcon(
+                label: 'Hover',
+                iconAsset: 'assets/icons/star.svg',
+                color: Colors.blue,
+                onTap: null,
+              ),
+            ),
+          ),
+        ),
+      );
 
-    // Move away — triggers onExit
-    await gesture.moveTo(const Offset(1, 1));
-    await tester.pump();
+      final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await gesture.addPointer(location: const Offset(1, 1));
+      addTearDown(gesture.removePointer);
+      await tester.pump();
 
-    expect(find.text('Hover'), findsOneWidget);
+      await gesture.moveTo(tester.getCenter(find.byType(DesktopIcon)));
+      await tester.pump();
+
+      await gesture.moveTo(const Offset(1, 1));
+      await tester.pump();
+
+      expect(find.text('Hover'), findsOneWidget);
+    });
   });
 }

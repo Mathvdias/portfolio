@@ -25,7 +25,7 @@ abstract final class AppSizes {
 
   // ─── Desktop icon ───────────────────────────────────────────────
   static const double iconWidth = 88.0;
-  static const double iconArtSize = 56.0;
+  static const double iconArtSize = 48.0;
   static const double iconLabelWidth = 72.0;
 
   // ─── Dock ───────────────────────────────────────────────────────
