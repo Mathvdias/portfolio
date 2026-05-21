@@ -45,18 +45,18 @@ class WasmEngineServiceImpl implements WasmEngineService {
       Object? lastError;
       for (final path in paths) {
         try {
-          debugPrint('Attempting to load Wasm from: \$path');
+          debugPrint('Attempting to load Wasm from: $path');
           final fetchPromise = _fetch(path.toJS);
           final instantiatePromise = _instantiateStreaming(fetchPromise);
           final jsResult =
               await instantiatePromise.toDart as WebAssemblyInstanceResult;
           _instance = jsResult.instance;
           _isReady = true;
-          debugPrint('Wasm loaded successfully from: \$path');
+          debugPrint('Wasm loaded successfully from: $path');
           break;
         } catch (e) {
           lastError = e;
-          debugPrint('Failed to load Wasm from \$path: \$e');
+          debugPrint('Failed to load Wasm from $path: $e');
         }
       }
 
@@ -64,7 +64,7 @@ class WasmEngineServiceImpl implements WasmEngineService {
         throw lastError ?? 'Unknown error';
       }
     } catch (e) {
-      debugPrint('Wasm initialization failed entirely: \$e');
+      debugPrint('Wasm initialization failed entirely: $e');
     }
   }
 
