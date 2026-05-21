@@ -4,8 +4,11 @@ import 'web_notification_service_stub.dart'
 abstract class WebNotificationService {
   factory WebNotificationService() => getService();
   
+  Future<void> requestPermission();
+
   Future<void> showNotification({
     required String title,
     required String body,
   });
 }
+

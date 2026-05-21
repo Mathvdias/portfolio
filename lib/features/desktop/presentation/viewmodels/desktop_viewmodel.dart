@@ -97,6 +97,11 @@ class DesktopViewModel extends ChangeNotifier {
     _showNotifications = !_showNotifications;
     showNotificationsNotifier.value = _showNotifications;
     notifyListeners();
+    
+    // Explicitly request permissions the first time the user opens the notification centre
+    if (_showNotifications) {
+      _webNotificationService.requestPermission();
+    }
   }
 
   void addNotification(DesktopNotification notification) {
