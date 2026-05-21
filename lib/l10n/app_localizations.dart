@@ -60,6 +60,16 @@ class AppLocalizations {
       "techQAA1p3Title": "Seamless Fallback System",
       "techQAA1p3Body":
           "If a browser lacks WasmGC or has strict privacy settings, Flutter Web silently falls back to CanvasKit (JS) or HTML (DOM) — 100% uptime on any device.",
+      "techQAQ2": "How are the wallpaper particles and mouse effect rendered?",
+      "techQAA2p1Title": "dart:ui FragmentShader — pure GPU",
+      "techQAA2p1Body":
+          "The wallpaper is a GLSL fragment shader loaded with ui.FragmentProgram.fromAsset. On Impeller (native) it compiles to Metal/Vulkan; on the web it runs via CanvasKit/WebGL. ~140M operations per frame execute in parallel on the GPU — near-zero CPU cost.",
+      "techQAA2p2Title": "Mouse repulsion as a shader uniform",
+      "techQAA2p2Body":
+          "The cursor position is sent to the shader every frame as uMouseX/uMouseY uniforms. The repulsion force uses a smoothstep curve (force² × (3 − 2 × force)) computed per-pixel on the GPU — no CPU physics loop at all.",
+      "techQAA2p3Title": "Native vsync Ticker + zero-allocation hot path",
+      "techQAA2p3Body":
+          "A Ticker tied to the engine's vsync runs at the screen's native refresh rate (120 fps on ProMotion, 60 fps otherwise). One Paint is reused every frame, RepaintBoundary isolates repaints, and a ValueNotifier avoids setState — zero garbage per frame. A Dart CustomPainter activates automatically as a CPU fallback.",
       "expertise": "Expertise",
       "core": "Core",
       "tools": "Tools",
@@ -203,6 +213,17 @@ class AppLocalizations {
       "techQAA1p3Title": "Sistema de respaldo automático",
       "techQAA1p3Body":
           "Si un navegador no admite WasmGC o tiene privacidad estricta, Flutter Web hace fallback automático a CanvasKit (JS) o HTML (DOM) — disponibilidad del 100%.",
+      "techQAQ2":
+          "¿Cómo se renderizan las partículas del fondo y el efecto del mouse?",
+      "techQAA2p1Title": "dart:ui FragmentShader — GPU pura",
+      "techQAA2p1Body":
+          "El fondo es un shader GLSL cargado con ui.FragmentProgram.fromAsset. En Impeller (nativo) compila a Metal/Vulkan; en web corre via CanvasKit/WebGL. ~140M operaciones por frame se ejecutan en paralelo en la GPU — costo de CPU casi nulo.",
+      "techQAA2p2Title": "Repulsión del mouse como uniform del shader",
+      "techQAA2p2Body":
+          "La posición del cursor se envía al shader cada frame como uniforms uMouseX/uMouseY. La fuerza de repulsión usa una curva smoothstep (fuerza² × (3 − 2 × fuerza)) calculada por píxel en la GPU — sin bucle de física en la CPU.",
+      "techQAA2p3Title": "Ticker de vsync nativo + hot path sin asignaciones",
+      "techQAA2p3Body":
+          "Un Ticker vinculado al vsync del motor corre a la tasa nativa de la pantalla (120 fps en ProMotion, 60 fps en el resto). Un Paint se reutiliza cada frame, RepaintBoundary aísla los repaints y un ValueNotifier evita setState — cero basura por frame. Un Dart CustomPainter se activa automáticamente como fallback de CPU.",
       "expertise": "Especialidad",
       "core": "Core",
       "tools": "Herramientas",
@@ -346,6 +367,17 @@ class AppLocalizations {
       "techQAA1p3Title": "Système de repli transparent",
       "techQAA1p3Body":
           "Si un navigateur ne supporte pas WasmGC ou a des paramètres de confidentialité stricts, Flutter Web bascule silencieusement vers CanvasKit (JS) ou HTML (DOM) — disponibilité 100%.",
+      "techQAQ2":
+          "Comment les particules du fond et l'effet souris sont-ils rendus ?",
+      "techQAA2p1Title": "dart:ui FragmentShader — GPU pur",
+      "techQAA2p1Body":
+          "Le fond est un shader GLSL chargé via ui.FragmentProgram.fromAsset. Sur Impeller (natif) il compile en Metal/Vulkan ; sur le web via CanvasKit/WebGL. ~140M opérations par frame s'exécutent en parallèle sur le GPU — coût CPU quasi nul.",
+      "techQAA2p2Title": "Répulsion de la souris comme uniform du shader",
+      "techQAA2p2Body":
+          "La position du curseur est envoyée au shader chaque frame via les uniforms uMouseX/uMouseY. La force de répulsion utilise une courbe smoothstep (force² × (3 − 2 × force)) calculée par pixel sur le GPU — aucune boucle physique sur le CPU.",
+      "techQAA2p3Title": "Ticker vsync natif + hot path sans allocation",
+      "techQAA2p3Body":
+          "Un Ticker lié au vsync du moteur s'exécute à la cadence native de l'écran (120 fps sur ProMotion, 60 fps sinon). Un Paint est réutilisé chaque frame, RepaintBoundary isole les repaints et un ValueNotifier évite setState — zéro déchets par frame. Un Dart CustomPainter s'active automatiquement en fallback CPU.",
       "expertise": "Expertise",
       "core": "Core",
       "tools": "Outils",
@@ -489,6 +521,17 @@ class AppLocalizations {
       "techQAA1p3Title": "Sistema di fallback trasparente",
       "techQAA1p3Body":
           "Se un browser non supporta WasmGC o ha impostazioni di privacy rigide, Flutter Web passa silenziosamente a CanvasKit (JS) o HTML (DOM) — disponibilità 100%.",
+      "techQAQ2":
+          "Come vengono renderizzate le particelle dello sfondo e l'effetto mouse?",
+      "techQAA2p1Title": "dart:ui FragmentShader — GPU pura",
+      "techQAA2p1Body":
+          "Lo sfondo è uno shader GLSL caricato con ui.FragmentProgram.fromAsset. Su Impeller (nativo) compila in Metal/Vulkan; sul web tramite CanvasKit/WebGL. ~140M operazioni per frame vengono eseguite in parallelo sulla GPU — costo CPU quasi nullo.",
+      "techQAA2p2Title": "Repulsione del mouse come uniform dello shader",
+      "techQAA2p2Body":
+          "La posizione del cursore viene inviata allo shader ogni frame come uniform uMouseX/uMouseY. La forza di repulsione usa una curva smoothstep (forza² × (3 − 2 × forza)) calcolata per pixel sulla GPU — nessun ciclo fisico sulla CPU.",
+      "techQAA2p3Title": "Ticker vsync nativo + hot path senza allocazioni",
+      "techQAA2p3Body":
+          "Un Ticker collegato al vsync del motore gira alla frequenza nativa dello schermo (120 fps su ProMotion, 60 fps altrimenti). Un Paint viene riutilizzato ogni frame, RepaintBoundary isola i repaint e un ValueNotifier evita setState — zero garbage per frame. Un Dart CustomPainter si attiva automaticamente come fallback CPU.",
       "expertise": "Esperienza",
       "core": "Core",
       "tools": "Strumenti",
@@ -632,6 +675,17 @@ class AppLocalizations {
       "techQAA1p3Title": "Sistema de fallback transparente",
       "techQAA1p3Body":
           "Se um navegador não suporta WasmGC ou tem configurações rígidas de privacidade, o Flutter Web faz fallback silencioso para CanvasKit (JS) ou HTML (DOM) — disponibilidade de 100%.",
+      "techQAQ2":
+          "Como as partículas do fundo e o efeito do mouse são renderizados?",
+      "techQAA2p1Title": "dart:ui FragmentShader — GPU pura",
+      "techQAA2p1Body":
+          "O fundo é um shader GLSL carregado com ui.FragmentProgram.fromAsset. No Impeller (nativo) compila para Metal/Vulkan; na web roda via CanvasKit/WebGL. ~140M operações por frame são executadas em paralelo na GPU — custo de CPU quase zero.",
+      "techQAA2p2Title": "Repulsão do mouse como uniform do shader",
+      "techQAA2p2Body":
+          "A posição do cursor é enviada ao shader a cada frame como uniforms uMouseX/uMouseY. A força de repulsão usa uma curva smoothstep (força² × (3 − 2 × força)) calculada por pixel na GPU — sem loop de física na CPU.",
+      "techQAA2p3Title": "Ticker de vsync nativo + hot path sem alocações",
+      "techQAA2p3Body":
+          "Um Ticker vinculado ao vsync do engine roda na taxa de atualização nativa da tela (120 fps no ProMotion, 60 fps nos demais). Um Paint é reutilizado por frame, RepaintBoundary isola os repaints e um ValueNotifier evita setState — zero garbage por frame. Um Dart CustomPainter é ativado automaticamente como fallback de CPU.",
       "expertise": "Especialidade",
       "core": "Core",
       "tools": "Ferramentas",
@@ -861,6 +915,27 @@ class AppLocalizations {
   String get techQAA1p3Body =>
       _localizedValues[locale.languageCode]?['techQAA1p3Body'] ??
       'If a browser lacks WasmGC or has strict privacy settings, Flutter Web silently falls back to CanvasKit (JS) or HTML (DOM) — 100% uptime on any device.';
+  String get techQAQ2 =>
+      _localizedValues[locale.languageCode]?['techQAQ2'] ??
+      'How are the wallpaper particles and mouse effect rendered?';
+  String get techQAA2p1Title =>
+      _localizedValues[locale.languageCode]?['techQAA2p1Title'] ??
+      'dart:ui FragmentShader — pure GPU';
+  String get techQAA2p1Body =>
+      _localizedValues[locale.languageCode]?['techQAA2p1Body'] ??
+      'The wallpaper is a GLSL fragment shader loaded with ui.FragmentProgram.fromAsset. On Impeller (native) it compiles to Metal/Vulkan; on the web it runs via CanvasKit/WebGL. ~140M operations per frame execute in parallel on the GPU — near-zero CPU cost.';
+  String get techQAA2p2Title =>
+      _localizedValues[locale.languageCode]?['techQAA2p2Title'] ??
+      'Mouse repulsion as a shader uniform';
+  String get techQAA2p2Body =>
+      _localizedValues[locale.languageCode]?['techQAA2p2Body'] ??
+      'The cursor position is sent to the shader every frame as uMouseX/uMouseY uniforms. The repulsion force uses a smoothstep curve (force² × (3 − 2 × force)) computed per-pixel on the GPU — no CPU physics loop at all.';
+  String get techQAA2p3Title =>
+      _localizedValues[locale.languageCode]?['techQAA2p3Title'] ??
+      'Native vsync Ticker + zero-allocation hot path';
+  String get techQAA2p3Body =>
+      _localizedValues[locale.languageCode]?['techQAA2p3Body'] ??
+      'A Ticker tied to the engine\'s vsync runs at the screen\'s native refresh rate (120 fps on ProMotion, 60 fps otherwise). One Paint is reused every frame, RepaintBoundary isolates repaints, and a ValueNotifier avoids setState — zero garbage per frame. A Dart CustomPainter activates automatically as a CPU fallback.';
   String get expertise =>
       _localizedValues[locale.languageCode]?['expertise'] ?? 'Expertise';
   String get core => _localizedValues[locale.languageCode]?['core'] ?? 'Core';

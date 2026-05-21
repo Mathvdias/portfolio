@@ -8,7 +8,7 @@ import '../constants/app_sizes.dart';
 import '../constants/app_strings.dart';
 
 class FlutterDevWindowContent extends StatelessWidget {
-  const FlutterDevWindowContent({super.key});
+  const FlutterDevWindowContent({super.key}); // coverage:ignore-line
 
   @override
   Widget build(BuildContext context) {

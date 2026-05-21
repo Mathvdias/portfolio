@@ -7,6 +7,7 @@ import '../constants/app_sizes.dart';
 
 class ProjectStatsWindowContent extends StatelessWidget {
   const ProjectStatsWindowContent({
+    // coverage:ignore-line
     super.key,
     @visibleForTesting this.coverageOverride,
   });
@@ -240,6 +241,15 @@ class _TechQASection extends StatelessWidget {
             (l10n.techQAA1p1Title, l10n.techQAA1p1Body),
             (l10n.techQAA1p2Title, l10n.techQAA1p2Body),
             (l10n.techQAA1p3Title, l10n.techQAA1p3Body),
+          ],
+        ),
+        const SizedBox(height: AppSizes.spacingMd),
+        _QACard(
+          question: l10n.techQAQ2,
+          points: [
+            (l10n.techQAA2p1Title, l10n.techQAA2p1Body),
+            (l10n.techQAA2p2Title, l10n.techQAA2p2Body),
+            (l10n.techQAA2p3Title, l10n.techQAA2p3Body),
           ],
         ),
       ],

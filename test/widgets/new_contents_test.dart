@@ -119,6 +119,31 @@ void main() {
     );
 
     testWidgets(
+      'ProjectStatsWindowContent expands GPU shader Q&A card and shows answer points',
+      (tester) async {
+        await tester.pumpWidget(
+          const MaterialApp(
+            localizationsDelegates: [AppLocalizationsDelegate()],
+            home: Scaffold(body: ProjectStatsWindowContent()),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find.textContaining(
+            'How are the wallpaper particles',
+            skipOffstage: false,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.textContaining('FragmentShader'), findsWidgets);
+        expect(find.textContaining('smoothstep'), findsWidgets);
+        expect(find.textContaining('vsync'), findsWidgets);
+      },
+    );
+
+    testWidgets(
       'ProjectStatsWindowContent renders yellow for 60-79% coverage',
       (tester) async {
         await tester.pumpWidget(

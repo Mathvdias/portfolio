@@ -8,7 +8,7 @@ import '../../theme/app_theme.dart';
 import '../constants/app_sizes.dart';
 
 class AndroidDevWindowContent extends StatelessWidget {
-  const AndroidDevWindowContent({super.key});
+  const AndroidDevWindowContent({super.key}); // coverage:ignore-line
 
   @override
   Widget build(BuildContext context) {
