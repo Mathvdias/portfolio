@@ -24,7 +24,11 @@ Object? _invokeAction<I extends Intent>(
   Map<Type, Action<Intent>> actions,
   I intent,
 ) {
-  return const ActionDispatcher().invokeAction(_actionFor<I>(actions), intent);
+  final action = _actionFor<I>(actions);
+  if (action.isActionEnabled) {
+    return const ActionDispatcher().invokeAction(action, intent);
+  }
+  return null;
 }
 
 void main() {
