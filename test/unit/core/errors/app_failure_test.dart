@@ -17,5 +17,11 @@ void main() {
       const failure = CacheFailure('cache error');
       expect(failure.message, 'cache error');
     });
+
+    test('ValidationFailure stores message correctly', () {
+      const failure = ValidationFailure('nameMessageEmpty');
+      expect(failure.message, 'nameMessageEmpty');
+      expect(failure, isA<AppFailure>());
+    });
   });
 }

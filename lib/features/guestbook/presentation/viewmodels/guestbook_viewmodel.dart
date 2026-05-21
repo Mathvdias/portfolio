@@ -3,15 +3,21 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../core/result/result.dart';
 import '../../../../core/services/analytics_service.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../desktop/domain/models/desktop_notification.dart';
 import '../../data/repositories/guestbook_repository.dart';
 import '../../domain/models/guestbook_message.dart';
+import '../../domain/usecases/check_post_cooldown_usecase.dart';
+import '../../domain/usecases/validate_guestbook_entry_usecase.dart';
 
 class GuestbookViewModel extends ChangeNotifier {
   final GuestbookRepository _repository;
   final SharedPreferences _prefs;
+  final ValidateGuestbookEntryUseCase _validateEntry;
+  final CheckPostCooldownUseCase _checkCooldown;
+
   void Function(DesktopNotification)? onNotification;
   AnalyticsService? analytics;
 
@@ -37,7 +43,13 @@ class GuestbookViewModel extends ChangeNotifier {
   Timer? _loadingTimer;
   final DateTime _initTime = DateTime.now();
 
-  GuestbookViewModel(this._repository, this._prefs) {
+  GuestbookViewModel(
+    this._repository,
+    this._prefs, {
+    ValidateGuestbookEntryUseCase? validateEntry,
+    CheckPostCooldownUseCase? checkCooldown,
+  }) : _validateEntry = validateEntry ?? const ValidateGuestbookEntryUseCase(),
+       _checkCooldown = checkCooldown ?? CheckPostCooldownUseCase(_prefs) {
     _isAdmin = _prefs.getBool('isAdmin') ?? false;
     _subscribe();
   }
@@ -99,37 +111,20 @@ class GuestbookViewModel extends ChangeNotifier {
     _success = false;
     notifyListeners();
 
-    if (name.isEmpty || message.isEmpty) {
-      _lastError = 'nameMessageEmpty';
+    final validation = _validateEntry(name, message);
+    if (validation case Failure(:final failure)) {
+      _lastError = failure.message;
       _isSubmitting = false;
       notifyListeners();
       return;
     }
 
-    if (name.length > 30) {
-      _lastError = 'Name is too long';
+    final cooldown = _checkCooldown(isAdmin: _isAdmin);
+    if (cooldown case Failure(:final failure)) {
+      _lastError = failure.message;
       _isSubmitting = false;
       notifyListeners();
       return;
-    }
-
-    if (message.length > 500) {
-      _lastError = 'Message is too long';
-      _isSubmitting = false;
-      notifyListeners();
-      return;
-    }
-
-    // Anti-spam
-    if (!_isAdmin) {
-      final lastPost = _prefs.getInt('last_guestbook_post') ?? 0;
-      final now = DateTime.now().millisecondsSinceEpoch;
-      if (now - lastPost < 60000) {
-        _lastError = 'waitToPost';
-        _isSubmitting = false;
-        notifyListeners();
-        return;
-      }
     }
 
     try {

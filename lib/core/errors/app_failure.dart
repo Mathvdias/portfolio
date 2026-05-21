@@ -14,3 +14,7 @@ final class ServerFailure extends AppFailure {
 final class CacheFailure extends AppFailure {
   const CacheFailure(super.message);
 }
+
+final class ValidationFailure extends AppFailure {
+  const ValidationFailure(super.message);
+}
