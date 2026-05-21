@@ -7,7 +7,10 @@ class WebNotificationServiceImpl implements WebNotificationService {
   }
 
   @override
-  Future<void> showNotification({required String title, required String body}) async {
+  Future<void> showNotification({
+    required String title,
+    required String body,
+  }) async {
     // No-op on unsupported platforms (like tests)
   }
 }

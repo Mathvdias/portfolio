@@ -9,7 +9,8 @@ import '../../domain/models/desktop_notification.dart';
 /// context menu, spotlight visibility, and rubber-band selection.
 class DesktopViewModel extends ChangeNotifier {
   DesktopViewModel({WebNotificationService? webNotificationService})
-      : _webNotificationService = webNotificationService ?? WebNotificationService();
+    : _webNotificationService =
+          webNotificationService ?? WebNotificationService();
 
   final WebNotificationService _webNotificationService;
 
@@ -97,7 +98,7 @@ class DesktopViewModel extends ChangeNotifier {
     _showNotifications = !_showNotifications;
     showNotificationsNotifier.value = _showNotifications;
     notifyListeners();
-    
+
     // Explicitly request permissions the first time the user opens the notification centre
     if (_showNotifications) {
       _webNotificationService.requestPermission();

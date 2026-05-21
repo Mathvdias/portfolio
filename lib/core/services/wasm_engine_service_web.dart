@@ -23,19 +23,18 @@ extension type WebAssemblyInstance._(JSObject _) implements JSObject {
 extension type WebAssemblyExports._(JSObject _) implements JSObject {
   external WebAssemblyMemory get memory;
   @JS('get_buffer_pointer')
-  external JSFunction get getBufferPointer;
+  external JSNumber getBufferPointer();
   @JS('get_buffer_size')
-  external JSFunction get getBufferSize;
+  external JSNumber getBufferSize();
   @JS('generate_mandelbrot')
-  external void Function(
+  external void generateMandelbrot(
     JSNumber renderWidth,
     JSNumber renderHeight,
     JSNumber zoom,
     JSNumber offsetX,
     JSNumber offsetY,
     JSNumber maxIterations,
-  )
-  get generateMandelbrotTyped;
+  );
 }
 
 @JS()
@@ -77,8 +76,7 @@ class WasmEngineServiceImpl implements WasmEngineService {
     if (!_isReady) return;
     final exports = _instance!.exports;
 
-    // Call the typed interop function
-    exports.generateMandelbrotTyped(
+    exports.generateMandelbrot(
       width.toJS,
       height.toJS,
       zoom.toJS,
@@ -93,11 +91,11 @@ class WasmEngineServiceImpl implements WasmEngineService {
     if (!_isReady) return Uint8List(0);
     final exports = _instance!.exports;
 
-    final ptrVal = exports.getBufferPointer.callAsFunction(null);
-    final ptr = (ptrVal as JSNumber).toDartInt;
+    final ptrVal = exports.getBufferPointer();
+    final ptr = ptrVal.toDartInt;
 
-    final sizeVal = exports.getBufferSize.callAsFunction(null);
-    final size = (sizeVal as JSNumber).toDartInt;
+    final sizeVal = exports.getBufferSize();
+    final size = sizeVal.toDartInt;
 
     final memory = exports.memory;
     final buffer = memory.buffer.toDart;
