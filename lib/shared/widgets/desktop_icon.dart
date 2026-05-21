@@ -53,12 +53,11 @@ class _DesktopIconState extends State<DesktopIcon> {
               SizedBox(
                 width: AppSizes.iconArtSize,
                 height: AppSizes.iconArtSize,
-                child: IconTheme(
-                  data: IconThemeData(
-                    color: widget.color,
-                    size: AppSizes.iconArtSize * 0.8,
-                  ),
-                  child: SvgPicture.asset(widget.iconWidgetPath),
+                child: SvgPicture.asset(
+                  widget.iconWidgetPath,
+                  width: AppSizes.iconArtSize,
+                  height: AppSizes.iconArtSize,
+                  colorFilter: ColorFilter.mode(widget.color, BlendMode.srcIn),
                 ),
               ),
               const SizedBox(height: AppSizes.spacingXs),
