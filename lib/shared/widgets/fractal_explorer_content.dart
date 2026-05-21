@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'dart:math' as math;
@@ -19,12 +20,18 @@ class FractalScenario {
   final double targetX;
   final double targetY;
   final double zoomSpeed;
+  final bool isJulia;
+  final double cxJulia;
+  final double cyJulia;
 
   const FractalScenario({
     required this.name,
     required this.targetX,
     required this.targetY,
     this.zoomSpeed = 0.12,
+    this.isJulia = false,
+    this.cxJulia = 0.0,
+    this.cyJulia = 0.0,
   });
 }
 
@@ -33,6 +40,7 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
   late final WasmEngineService _engineService;
   ui.Image? _fractalImage;
   bool _isLoading = true;
+  bool _isRendering = false;
 
   double _zoom = 1.0;
   double _offsetX = -0.5;
@@ -42,27 +50,40 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
   // Auto-animation state
   late final Ticker _ticker;
   bool _autoAnimating = true;
+  double _currentTime = 0.0;
 
   static const List<FractalScenario> _scenarios = [
     FractalScenario(
-      name: 'Seahorse Valley',
+      name: 'Mandelbrot: Seahorse',
       targetX: -0.7435,
       targetY: 0.1314,
     ),
     FractalScenario(
-      name: 'Triple Spiral',
+      name: 'Mandelbrot: Triple Spiral',
       targetX: -0.088,
       targetY: 0.654,
       zoomSpeed: 0.15,
     ),
     FractalScenario(
-      name: 'Mini Mandelbrot',
-      targetX: -1.768,
+      name: 'Julia: Cosmic Bloom',
+      targetX: 0.0,
       targetY: 0.0,
+      isJulia: true,
+      cxJulia: -0.7,
+      cyJulia: 0.27015,
+      zoomSpeed: 0.08,
+    ),
+    FractalScenario(
+      name: 'Julia: Dragon Curve',
+      targetX: 0.0,
+      targetY: 0.0,
+      isJulia: true,
+      cxJulia: -0.8,
+      cyJulia: 0.156,
       zoomSpeed: 0.1,
     ),
     FractalScenario(
-      name: 'Elephant Valley',
+      name: 'Mandelbrot: Elephant Valley',
       targetX: 0.28,
       targetY: 0.008,
       zoomSpeed: 0.08,
@@ -85,12 +106,19 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
   }
 
   Future<void> _initEngine() async {
-    await _engineService.init();
+    try {
+      await _engineService.init();
+    } catch (e) {
+      debugPrint('Fractal engine failed to load: $e');
+    }
+
     if (mounted) {
       setState(() => _isLoading = false);
-      _renderFractal();
-      // Start auto-animation
-      _startAutoAnimation();
+      if (_engineService.isReady) {
+        _renderFractal();
+        // Start auto-animation
+        _startAutoAnimation();
+      }
     }
   }
 
@@ -113,52 +141,70 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
   }
 
   void _onTick(Duration elapsed) {
-    if (!_autoAnimating || !_engineService.isReady || !mounted) return;
+    if (!_engineService.isReady || !mounted || _isRendering) return;
 
-    // Smooth exponential zoom — increases by zoomSpeed per second
-    final seconds = elapsed.inMicroseconds / 1e6;
-    final newZoom = math.pow(1.0 + _currentScenario.zoomSpeed, seconds).toDouble();
+    _currentTime = elapsed.inMicroseconds / 1e6;
 
-    // Cap zoom to avoid precision loss
-    if (newZoom > 1e12) {
-      _stopAutoAnimation();
-      return;
+    if (_autoAnimating) {
+      // Smooth exponential zoom — increases by zoomSpeed per second
+      final newZoom =
+          math.pow(1.0 + _currentScenario.zoomSpeed, _currentTime).toDouble();
+
+      // Cap zoom to avoid precision loss
+      if (newZoom > 1e12) {
+        _stopAutoAnimation();
+      } else {
+        _zoom = newZoom;
+      }
     }
 
-    _zoom = newZoom;
     _renderFractal();
   }
 
   Future<void> _renderFractal() async {
-    if (!_engineService.isReady) return;
+    if (!_engineService.isReady || _isRendering) return;
 
-    _engineService.generateMandelbrot(
-      width: renderWidth,
-      height: renderHeight,
-      zoom: _zoom,
-      offsetX: _offsetX,
-      offsetY: _offsetY,
-      maxIterations: _maxIterations,
-    );
+    _isRendering = true;
 
-    final pixels = _engineService.getPixelBuffer();
+    try {
+      _engineService.generateFractal(
+        width: renderWidth,
+        height: renderHeight,
+        zoom: _zoom,
+        offsetX: _offsetX,
+        offsetY: _offsetY,
+        maxIterations: _maxIterations,
+        isJulia: _currentScenario.isJulia,
+        cxJulia: _currentScenario.cxJulia,
+        cyJulia: _currentScenario.cyJulia,
+        time: _currentTime,
+      );
 
-    // Decode pixels into a Flutter ui.Image
-    final completer = Completer<ui.Image>();
-    ui.decodeImageFromPixels(
-      // Ensure we get a copy of the Uint8List since the underlying buffer might be overwritten
-      pixels,
-      renderWidth,
-      renderHeight,
-      ui.PixelFormat.rgba8888,
-      (img) => completer.complete(img),
-    );
+      final pixels = _engineService.getPixelBuffer();
+      // MUST copy the buffer because decodeImageFromPixels is async and the
+      // underlying WASM memory might be modified before it completes.
+      final pixelsCopy = Uint8List.fromList(pixels);
 
-    final image = await completer.future;
-    if (mounted) {
-      setState(() {
-        _fractalImage = image;
-      });
+      // Decode pixels into a Flutter ui.Image
+      final completer = Completer<ui.Image>();
+      ui.decodeImageFromPixels(
+        pixelsCopy,
+        renderWidth,
+        renderHeight,
+        ui.PixelFormat.rgba8888,
+        (img) => completer.complete(img),
+      );
+
+      final image = await completer.future;
+      if (mounted) {
+        setState(() {
+          _fractalImage = image;
+        });
+      }
+    } catch (e) {
+      debugPrint('Fractal render failed: $e');
+    } finally {
+      _isRendering = false;
     }
   }
 
@@ -188,7 +234,7 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
     _stopAutoAnimation();
     setState(() {
       _zoom = 1.0;
-      _offsetX = -0.5;
+      _offsetX = _currentScenario.isJulia ? 0.0 : -0.5;
       _offsetY = 0.0;
     });
     _renderFractal();

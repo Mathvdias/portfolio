@@ -1,4 +1,6 @@
 import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
+
 import 'package:flutter/foundation.dart';
 
 import 'wasm_engine_service.dart';
@@ -16,25 +18,7 @@ extension type WebAssemblyInstanceResult._(JSObject _) implements JSObject {
 
 @JS()
 extension type WebAssemblyInstance._(JSObject _) implements JSObject {
-  external WebAssemblyExports get exports;
-}
-
-@JS()
-extension type WebAssemblyExports._(JSObject _) implements JSObject {
-  external WebAssemblyMemory get memory;
-  @JS('get_buffer_pointer')
-  external JSNumber getBufferPointer();
-  @JS('get_buffer_size')
-  external JSNumber getBufferSize();
-  @JS('generate_mandelbrot')
-  external void generateMandelbrot(
-    JSNumber renderWidth,
-    JSNumber renderHeight,
-    JSNumber zoom,
-    JSNumber offsetX,
-    JSNumber offsetY,
-    JSNumber maxIterations,
-  );
+  external JSObject get exports;
 }
 
 @JS()
@@ -53,37 +37,54 @@ class WasmEngineServiceImpl implements WasmEngineService {
   Future<void> init() async {
     if (_isReady) return;
     try {
-      final fetchPromise = _fetch('assets/wasm/mathos_engine.wasm'.toJS);
-      final instantiatePromise = _instantiateStreaming(fetchPromise);
-      final jsResult =
-          await instantiatePromise.toDart as WebAssemblyInstanceResult;
-      _instance = jsResult.instance;
-      _isReady = true;
+      final paths = [
+        'assets/wasm/mathos_engine.wasm',
+        'assets/assets/wasm/mathos_engine.wasm',
+      ];
+
+      Object? lastError;
+      for (final path in paths) {
+        try {
+          debugPrint('Attempting to load Wasm from: \$path');
+          final fetchPromise = _fetch(path.toJS);
+          final instantiatePromise = _instantiateStreaming(fetchPromise);
+          final jsResult =
+              await instantiatePromise.toDart as WebAssemblyInstanceResult;
+          _instance = jsResult.instance;
+          _isReady = true;
+          debugPrint('Wasm loaded successfully from: \$path');
+          break;
+        } catch (e) {
+          lastError = e;
+          debugPrint('Failed to load Wasm from \$path: \$e');
+        }
+      }
+
+      if (!_isReady) {
+        throw lastError ?? 'Unknown error';
+      }
     } catch (e) {
-      debugPrint('Wasm initialization failed: $e');
+      debugPrint('Wasm initialization failed entirely: \$e');
     }
   }
 
   @override
-  void generateMandelbrot({
+  void generateFractal({
     required int width,
     required int height,
     required double zoom,
     required double offsetX,
     required double offsetY,
     required int maxIterations,
+    required bool isJulia,
+    required double cxJulia,
+    required double cyJulia,
+    required double time,
   }) {
     if (!_isReady) return;
     final exports = _instance!.exports;
 
-    exports.generateMandelbrot(
-      width.toJS,
-      height.toJS,
-      zoom.toJS,
-      offsetX.toJS,
-      offsetY.toJS,
-      maxIterations.toJS,
-    );
+    exports.callMethod('generate_fractal'.toJS, width.toJS, height.toJS);
   }
 
   @override
@@ -91,13 +92,13 @@ class WasmEngineServiceImpl implements WasmEngineService {
     if (!_isReady) return Uint8List(0);
     final exports = _instance!.exports;
 
-    final ptrVal = exports.getBufferPointer();
+    final ptrVal = exports.callMethod('get_buffer_pointer'.toJS) as JSNumber;
     final ptr = ptrVal.toDartInt;
 
-    final sizeVal = exports.getBufferSize();
+    final sizeVal = exports.callMethod('get_buffer_size'.toJS) as JSNumber;
     final size = sizeVal.toDartInt;
 
-    final memory = exports.memory;
+    final memory = exports.getProperty<WebAssemblyMemory>('memory'.toJS);
     final buffer = memory.buffer.toDart;
 
     return Uint8List.view(buffer, ptr, size);
