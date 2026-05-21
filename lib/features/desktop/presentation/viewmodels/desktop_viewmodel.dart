@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:app_window/app_window.dart';
 
@@ -13,6 +15,8 @@ class DesktopViewModel extends ChangeNotifier {
           webNotificationService ?? WebNotificationService();
 
   final WebNotificationService _webNotificationService;
+
+  bool _welcomeSent = false;
 
   // ─── Window ID Handler ──────────────────────────────────────────
   void Function(String id, BuildContext context)? onOpenWindowById;
@@ -98,11 +102,41 @@ class DesktopViewModel extends ChangeNotifier {
     _showNotifications = !_showNotifications;
     showNotificationsNotifier.value = _showNotifications;
     notifyListeners();
+  }
 
-    // Explicitly request permissions the first time the user opens the notification centre
-    if (_showNotifications) {
-      _webNotificationService.requestPermission();
-    }
+  /// Requests browser notification permission immediately, then sends
+  /// the welcome notification after a short delay if granted.
+  Future<void> requestPermissionAndSendWelcome({
+    required String title,
+    required String message,
+  }) async {
+    if (_welcomeSent) return;
+
+    final granted = await _webNotificationService.requestPermission();
+    if (!granted || _welcomeSent) return;
+
+    _welcomeSent = true;
+
+    // Small delay so the notification feels natural after permission grant.
+    await Future<void>.delayed(const Duration(seconds: 2));
+
+    final notification = DesktopNotification(
+      title: title,
+      message: message,
+      icon: Icons.waving_hand,
+      color: const Color(0xFF89B4FA), // AppTheme.blue
+      time: DateTime.now(),
+    );
+
+    _notifications.insert(0, notification);
+    notificationsNotifier.value = List.unmodifiable(_notifications);
+    notifyListeners();
+
+    // Also fire the native OS notification.
+    _webNotificationService.showNotification(
+      title: notification.title,
+      body: notification.message,
+    );
   }
 
   void addNotification(DesktopNotification notification) {

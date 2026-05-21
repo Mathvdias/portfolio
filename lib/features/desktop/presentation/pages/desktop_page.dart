@@ -6,7 +6,6 @@ import 'package:flutter_lazy_load_web/flutter_lazy_load_web.dart';
 
 import '../../../../core/di/app_dependencies.dart';
 import '../../../../core/services/analytics_service.dart';
-import '../../../../features/desktop/domain/models/desktop_notification.dart';
 import '../../../../features/desktop/presentation/viewmodels/desktop_viewmodel.dart';
 import '../../../../features/guestbook/presentation/widgets/guestbook_content.dart'
     deferred as guestbook_content;
@@ -99,13 +98,10 @@ class _DesktopPageState extends State<DesktopPage> {
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final l10n = AppLocalizations.of(context);
-        _desktopVM.addNotification(
-          DesktopNotification(
+        unawaited(
+          _desktopVM.requestPermissionAndSendWelcome(
             title: l10n.welcomeTitle,
             message: l10n.welcomeBody,
-            icon: Icons.waving_hand,
-            color: AppTheme.blue,
-            time: DateTime.now(),
           ),
         );
       });
