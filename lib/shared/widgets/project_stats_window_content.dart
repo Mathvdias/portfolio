@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/project_stats.dart';
-import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
+import '../../theme/app_theme.dart';
 import '../constants/app_sizes.dart';
 
 class ProjectStatsWindowContent extends StatelessWidget {
@@ -81,6 +81,8 @@ class ProjectStatsWindowContent extends StatelessWidget {
           _StatRow(label: l10n.buildStatus, value: l10n.passing),
           const SizedBox(height: AppSizes.spacingLg),
           const _TechStackSection(),
+          const SizedBox(height: AppSizes.spacingXxl),
+          const _TechQASection(),
           const SizedBox(height: AppSizes.spacingXxl),
           Text(
             l10n.keepBuilding,
@@ -210,6 +212,144 @@ class _StackChip extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _TechQASection extends StatelessWidget {
+  const _TechQASection();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.techQAHeader,
+          style: GoogleFonts.pressStart2p(
+            fontSize: AppSizes.fontXs,
+            color: AppTheme.teal,
+            letterSpacing: 1,
+          ),
+        ),
+        const SizedBox(height: AppSizes.spacingMd),
+        _QACard(
+          question: l10n.techQAQ1,
+          points: [
+            (l10n.techQAA1p1Title, l10n.techQAA1p1Body),
+            (l10n.techQAA1p2Title, l10n.techQAA1p2Body),
+            (l10n.techQAA1p3Title, l10n.techQAA1p3Body),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _QACard extends StatelessWidget {
+  const _QACard({required this.question, required this.points});
+
+  final String question;
+  final List<(String, String)> points;
+
+  @override
+  Widget build(BuildContext context) {
+    return Theme(
+      data: Theme.of(context).copyWith(
+        dividerColor: Colors.transparent,
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+      ),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border.all(color: AppTheme.teal.withValues(alpha: 0.25)),
+        ),
+        child: Material(
+          color: AppTheme.surface,
+          child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(
+            horizontal: AppSizes.spacingLg,
+            vertical: AppSizes.spacingXs,
+          ),
+          childrenPadding: const EdgeInsets.fromLTRB(
+            AppSizes.spacingLg,
+            0,
+            AppSizes.spacingLg,
+            AppSizes.spacingLg,
+          ),
+          iconColor: AppTheme.teal,
+          collapsedIconColor: AppTheme.subtext,
+          title: Text(
+            question,
+            style: GoogleFonts.spaceMono(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.text,
+              height: 1.5,
+            ),
+          ),
+          children: [
+            const Divider(color: AppTheme.surface0, height: 1),
+            const SizedBox(height: AppSizes.spacingMd),
+            ...points.map((p) => _QAPoint(title: p.$1, body: p.$2)),
+          ],
+        ),
+      ),
+    ),
+    );
+  }
+}
+
+class _QAPoint extends StatelessWidget {
+  const _QAPoint({required this.title, required this.body});
+
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSizes.spacingMd),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '▸ ',
+            style: GoogleFonts.spaceMono(
+              fontSize: 11,
+              color: AppTheme.teal,
+              height: 1.6,
+            ),
+          ),
+          Expanded(
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: '$title\n',
+                    style: GoogleFonts.spaceMono(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.text,
+                      height: 1.6,
+                    ),
+                  ),
+                  TextSpan(
+                    text: body,
+                    style: GoogleFonts.spaceMono(
+                      fontSize: 10,
+                      color: AppTheme.subtext,
+                      height: 1.6,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

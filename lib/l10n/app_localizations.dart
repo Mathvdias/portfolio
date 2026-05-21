@@ -49,6 +49,17 @@ class AppLocalizations {
       "buildStatus": "Build Status",
       "passing": "Passing",
       "keepBuilding": "Keep building, keep testing.",
+      "techQAHeader": "TECH Q&A",
+      "techQAQ1": "Is Flutter Web compatible across all browsers?",
+      "techQAA1p1Title": "Modern WasmGC Support",
+      "techQAA1p1Body":
+          "All major browsers natively support WasmGC — Chrome/Chromium (v119+), Firefox (v120+), Safari (v17.4+). Skwasm runs beautifully across all of them.",
+      "techQAA1p2Title": "COOP/COEP — credentialless policy",
+      "techQAA1p2Body":
+          "The credentialless COEP policy lets Firefox and Safari load public third-party resources (avatars, CDNs) without breaking layout, while still enabling GPU multithreading via SharedArrayBuffer.",
+      "techQAA1p3Title": "Seamless Fallback System",
+      "techQAA1p3Body":
+          "If a browser lacks WasmGC or has strict privacy settings, Flutter Web silently falls back to CanvasKit (JS) or HTML (DOM) — 100% uptime on any device.",
       "expertise": "Expertise",
       "core": "Core",
       "tools": "Tools",
@@ -181,6 +192,17 @@ class AppLocalizations {
       "buildStatus": "Estado del Build",
       "passing": "Pasando",
       "keepBuilding": "Sigue construyendo, sigue probando.",
+      "techQAHeader": "PREGUNTAS TÉCNICAS",
+      "techQAQ1": "¿Flutter Web es compatible con todos los navegadores?",
+      "techQAA1p1Title": "Soporte moderno de WasmGC",
+      "techQAA1p1Body":
+          "Todos los navegadores principales soportan WasmGC nativamente — Chrome/Chromium (v119+), Firefox (v120+), Safari (v17.4+). Skwasm funciona perfectamente en todos ellos.",
+      "techQAA1p2Title": "COOP/COEP — política credentialless",
+      "techQAA1p2Body":
+          "La política credentialless permite que Firefox y Safari carguen recursos públicos de terceros sin romper el diseño, manteniendo el multihilo GPU mediante SharedArrayBuffer.",
+      "techQAA1p3Title": "Sistema de respaldo automático",
+      "techQAA1p3Body":
+          "Si un navegador no admite WasmGC o tiene privacidad estricta, Flutter Web hace fallback automático a CanvasKit (JS) o HTML (DOM) — disponibilidad del 100%.",
       "expertise": "Especialidad",
       "core": "Core",
       "tools": "Herramientas",
@@ -313,6 +335,17 @@ class AppLocalizations {
       "buildStatus": "État du Build",
       "passing": "Réussi",
       "keepBuilding": "Continuez à construire, continuez à tester.",
+      "techQAHeader": "Q&A TECHNIQUE",
+      "techQAQ1": "Flutter Web est-il compatible avec tous les navigateurs ?",
+      "techQAA1p1Title": "Support WasmGC moderne",
+      "techQAA1p1Body":
+          "Tous les navigateurs majeurs supportent nativement WasmGC — Chrome/Chromium (v119+), Firefox (v120+), Safari (v17.4+). Skwasm fonctionne parfaitement sur chacun.",
+      "techQAA1p2Title": "COOP/COEP — politique credentialless",
+      "techQAA1p2Body":
+          "La politique credentialless permet à Firefox et Safari de charger des ressources publiques tierces sans casser la mise en page, tout en maintenant le multithreading GPU via SharedArrayBuffer.",
+      "techQAA1p3Title": "Système de repli transparent",
+      "techQAA1p3Body":
+          "Si un navigateur ne supporte pas WasmGC ou a des paramètres de confidentialité stricts, Flutter Web bascule silencieusement vers CanvasKit (JS) ou HTML (DOM) — disponibilité 100%.",
       "expertise": "Expertise",
       "core": "Core",
       "tools": "Outils",
@@ -445,6 +478,17 @@ class AppLocalizations {
       "buildStatus": "Stato del Build",
       "passing": "Superato",
       "keepBuilding": "Continua a costruire, continua a testare.",
+      "techQAHeader": "Q&A TECNICO",
+      "techQAQ1": "Flutter Web è compatibile con tutti i browser?",
+      "techQAA1p1Title": "Supporto moderno WasmGC",
+      "techQAA1p1Body":
+          "Tutti i principali browser supportano nativamente WasmGC — Chrome/Chromium (v119+), Firefox (v120+), Safari (v17.4+). Skwasm funziona perfettamente su tutti.",
+      "techQAA1p2Title": "COOP/COEP — criterio credentialless",
+      "techQAA1p2Body":
+          "Il criterio credentialless consente a Firefox e Safari di caricare risorse pubbliche di terze parti senza compromettere il layout, mantenendo il multithreading GPU tramite SharedArrayBuffer.",
+      "techQAA1p3Title": "Sistema di fallback trasparente",
+      "techQAA1p3Body":
+          "Se un browser non supporta WasmGC o ha impostazioni di privacy rigide, Flutter Web passa silenziosamente a CanvasKit (JS) o HTML (DOM) — disponibilità 100%.",
       "expertise": "Esperienza",
       "core": "Core",
       "tools": "Strumenti",
@@ -577,6 +621,17 @@ class AppLocalizations {
       "buildStatus": "Status do Build",
       "passing": "Passando",
       "keepBuilding": "Continue construindo, continue testando.",
+      "techQAHeader": "PERGUNTAS TÉCNICAS",
+      "techQAQ1": "Flutter Web é compatível com todos os navegadores?",
+      "techQAA1p1Title": "Suporte moderno ao WasmGC",
+      "techQAA1p1Body":
+          "Todos os principais navegadores suportam nativamente WasmGC — Chrome/Chromium (v119+), Firefox (v120+), Safari (v17.4+). O Skwasm roda perfeitamente em todos eles.",
+      "techQAA1p2Title": "COOP/COEP — política credentialless",
+      "techQAA1p2Body":
+          "A política credentialless permite que Firefox e Safari carreguem recursos públicos de terceiros sem quebrar o layout, mantendo o multithreading GPU via SharedArrayBuffer.",
+      "techQAA1p3Title": "Sistema de fallback transparente",
+      "techQAA1p3Body":
+          "Se um navegador não suporta WasmGC ou tem configurações rígidas de privacidade, o Flutter Web faz fallback silencioso para CanvasKit (JS) ou HTML (DOM) — disponibilidade de 100%.",
       "expertise": "Especialidade",
       "core": "Core",
       "tools": "Ferramentas",
@@ -783,6 +838,29 @@ class AppLocalizations {
   String get keepBuilding =>
       _localizedValues[locale.languageCode]?['keepBuilding'] ??
       'Keep building, keep testing.';
+  String get techQAHeader =>
+      _localizedValues[locale.languageCode]?['techQAHeader'] ?? 'TECH Q&A';
+  String get techQAQ1 =>
+      _localizedValues[locale.languageCode]?['techQAQ1'] ??
+      'Is Flutter Web compatible across all browsers?';
+  String get techQAA1p1Title =>
+      _localizedValues[locale.languageCode]?['techQAA1p1Title'] ??
+      'Modern WasmGC Support';
+  String get techQAA1p1Body =>
+      _localizedValues[locale.languageCode]?['techQAA1p1Body'] ??
+      'All major browsers natively support WasmGC — Chrome/Chromium (v119+), Firefox (v120+), Safari (v17.4+). Skwasm runs beautifully across all of them.';
+  String get techQAA1p2Title =>
+      _localizedValues[locale.languageCode]?['techQAA1p2Title'] ??
+      'COOP/COEP — credentialless policy';
+  String get techQAA1p2Body =>
+      _localizedValues[locale.languageCode]?['techQAA1p2Body'] ??
+      'The credentialless COEP policy lets Firefox and Safari load public third-party resources without breaking layout, while still enabling GPU multithreading via SharedArrayBuffer.';
+  String get techQAA1p3Title =>
+      _localizedValues[locale.languageCode]?['techQAA1p3Title'] ??
+      'Seamless Fallback System';
+  String get techQAA1p3Body =>
+      _localizedValues[locale.languageCode]?['techQAA1p3Body'] ??
+      'If a browser lacks WasmGC or has strict privacy settings, Flutter Web silently falls back to CanvasKit (JS) or HTML (DOM) — 100% uptime on any device.';
   String get expertise =>
       _localizedValues[locale.languageCode]?['expertise'] ?? 'Expertise';
   String get core => _localizedValues[locale.languageCode]?['core'] ?? 'Core';

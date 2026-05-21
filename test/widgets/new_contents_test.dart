@@ -85,7 +85,38 @@ void main() {
         find.textContaining('Integration / E2E', skipOffstage: false),
         findsOneWidget,
       );
+      expect(
+        find.textContaining('TECH Q&A', skipOffstage: false),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('Is Flutter Web compatible', skipOffstage: false),
+        findsOneWidget,
+      );
     });
+
+    testWidgets(
+      'ProjectStatsWindowContent expands Q&A card and shows answer points',
+      (tester) async {
+        await tester.pumpWidget(
+          const MaterialApp(
+            localizationsDelegates: [AppLocalizationsDelegate()],
+            home: Scaffold(body: ProjectStatsWindowContent()),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Tap the expansion tile to expand it
+        await tester.tap(
+          find.textContaining('Is Flutter Web compatible', skipOffstage: false),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.textContaining('WasmGC'), findsWidgets);
+        expect(find.textContaining('credentialless'), findsWidgets);
+        expect(find.textContaining('CanvasKit'), findsWidgets);
+      },
+    );
 
     testWidgets(
       'ProjectStatsWindowContent renders yellow for 60-79% coverage',
