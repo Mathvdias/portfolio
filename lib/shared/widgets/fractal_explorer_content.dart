@@ -347,7 +347,10 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
                         const SizedBox(width: 4),
                         Text(
                           'Auto-exploring: ${_currentScenario.name}',
-                          style: const TextStyle(color: Colors.white70, fontSize: 11),
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 11,
+                          ),
                         ),
                       ],
                     ),
