@@ -29,75 +29,75 @@ class ProjectStatsWindowContent extends StatelessWidget {
         padding: const EdgeInsets.all(AppSizes.spacingLg),
         child: Column(
           children: [
-          Text(
-            l10n.projectMetrics,
-            style: GoogleFonts.outfit(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.text,
+            Text(
+              l10n.projectMetrics,
+              style: GoogleFonts.outfit(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.text,
+              ),
             ),
-          ),
-          const SizedBox(height: AppSizes.spacingLg),
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              SizedBox(
-                width: 120,
-                height: 120,
-                child: CircularProgressIndicator(
-                  value: coverage / 100,
-                  strokeWidth: 12,
-                  backgroundColor: AppTheme.surface,
-                  valueColor: AlwaysStoppedAnimation<Color>(color),
+            const SizedBox(height: AppSizes.spacingLg),
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                SizedBox(
+                  width: 120,
+                  height: 120,
+                  child: CircularProgressIndicator(
+                    value: coverage / 100,
+                    strokeWidth: 12,
+                    backgroundColor: AppTheme.surface,
+                    valueColor: AlwaysStoppedAnimation<Color>(color),
+                  ),
                 ),
-              ),
-              Column(
-                children: [
-                  Text(
-                    '${coverage.toStringAsFixed(1)}%',
-                    style: GoogleFonts.spaceMono(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: color,
+                Column(
+                  children: [
+                    Text(
+                      '${coverage.toStringAsFixed(1)}%',
+                      style: GoogleFonts.spaceMono(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
                     ),
-                  ),
-                  Text(
-                    l10n.coverageLabel,
-                    style: GoogleFonts.spaceMono(
-                      fontSize: 10,
-                      color: AppTheme.subtext,
+                    Text(
+                      l10n.coverageLabel,
+                      style: GoogleFonts.spaceMono(
+                        fontSize: 10,
+                        color: AppTheme.subtext,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSizes.spacingLg),
-          _StatRow(
-            label: l10n.unitTests,
-            value: ProjectStats.totalTests.toString(),
-          ),
-          _StatRow(label: l10n.codeQuality, value: 'A+'),
-          _StatRow(label: l10n.buildStatus, value: l10n.passing),
-          const SizedBox(height: AppSizes.spacingLg),
-          const _TechStackSection(),
-          const SizedBox(height: AppSizes.spacingXxl),
-          const _TechQASection(),
-          const SizedBox(height: AppSizes.spacingXxl),
-          Text(
-            l10n.keepBuilding,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.spaceMono(
-              fontSize: 12,
-              fontStyle: FontStyle.italic,
-              color: AppTheme.subtext,
+                  ],
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: AppSizes.spacingMd),
-        ],
+            const SizedBox(height: AppSizes.spacingLg),
+            _StatRow(
+              label: l10n.unitTests,
+              value: ProjectStats.totalTests.toString(),
+            ),
+            _StatRow(label: l10n.codeQuality, value: 'A+'),
+            _StatRow(label: l10n.buildStatus, value: l10n.passing),
+            const SizedBox(height: AppSizes.spacingLg),
+            const _TechStackSection(),
+            const SizedBox(height: AppSizes.spacingXxl),
+            const _TechQASection(),
+            const SizedBox(height: AppSizes.spacingXxl),
+            Text(
+              l10n.keepBuilding,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.spaceMono(
+                fontSize: 12,
+                fontStyle: FontStyle.italic,
+                color: AppTheme.subtext,
+              ),
+            ),
+            const SizedBox(height: AppSizes.spacingMd),
+          ],
+        ),
       ),
-    ),
-  );
+    );
   }
 }
 
@@ -168,9 +168,7 @@ class _TechGroup extends StatelessWidget {
           spacing: 6,
           runSpacing: 6,
           children:
-              chips
-                  .map((c) => _StackChip(label: c.$1, value: c.$2))
-                  .toList(),
+              chips.map((c) => _StackChip(label: c.$1, value: c.$2)).toList(),
         ),
       ],
     );
@@ -270,35 +268,35 @@ class _QACard extends StatelessWidget {
         child: Material(
           color: AppTheme.surface,
           child: ExpansionTile(
-          tilePadding: const EdgeInsets.symmetric(
-            horizontal: AppSizes.spacingLg,
-            vertical: AppSizes.spacingXs,
-          ),
-          childrenPadding: const EdgeInsets.fromLTRB(
-            AppSizes.spacingLg,
-            0,
-            AppSizes.spacingLg,
-            AppSizes.spacingLg,
-          ),
-          iconColor: AppTheme.teal,
-          collapsedIconColor: AppTheme.subtext,
-          title: Text(
-            question,
-            style: GoogleFonts.spaceMono(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.text,
-              height: 1.5,
+            tilePadding: const EdgeInsets.symmetric(
+              horizontal: AppSizes.spacingLg,
+              vertical: AppSizes.spacingXs,
             ),
+            childrenPadding: const EdgeInsets.fromLTRB(
+              AppSizes.spacingLg,
+              0,
+              AppSizes.spacingLg,
+              AppSizes.spacingLg,
+            ),
+            iconColor: AppTheme.teal,
+            collapsedIconColor: AppTheme.subtext,
+            title: Text(
+              question,
+              style: GoogleFonts.spaceMono(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.text,
+                height: 1.5,
+              ),
+            ),
+            children: [
+              const Divider(color: AppTheme.surface0, height: 1),
+              const SizedBox(height: AppSizes.spacingMd),
+              ...points.map((p) => _QAPoint(title: p.$1, body: p.$2)),
+            ],
           ),
-          children: [
-            const Divider(color: AppTheme.surface0, height: 1),
-            const SizedBox(height: AppSizes.spacingMd),
-            ...points.map((p) => _QAPoint(title: p.$1, body: p.$2)),
-          ],
         ),
       ),
-    ),
     );
   }
 }

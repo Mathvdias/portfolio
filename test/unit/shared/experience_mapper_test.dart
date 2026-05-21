@@ -104,10 +104,7 @@ void main() {
     });
 
     test('returns pan asset for Banco Pan', () {
-      expect(
-        ExperienceMapper.iconAssetFor('Banco Pan'),
-        contains('pan.svg'),
-      );
+      expect(ExperienceMapper.iconAssetFor('Banco Pan'), contains('pan.svg'));
     });
 
     test('returns conecthus asset for Conecthus', () {
@@ -118,10 +115,7 @@ void main() {
     });
 
     test('returns oi asset for unknown company', () {
-      expect(
-        ExperienceMapper.iconAssetFor('Oi'),
-        contains('oi.svg'),
-      );
+      expect(ExperienceMapper.iconAssetFor('Oi'), contains('oi.svg'));
     });
   });
 
