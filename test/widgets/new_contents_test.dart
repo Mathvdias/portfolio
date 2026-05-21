@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portifolio/l10n/app_localizations.dart';
 import 'package:portifolio/shared/widgets/android_dev_window_content.dart';
+import 'package:portifolio/shared/widgets/flutter_dev_window_content.dart';
 import 'package:portifolio/shared/widgets/project_stats_window_content.dart';
 
 void main() {
@@ -23,6 +24,24 @@ void main() {
       expect(find.text('Jetpack Compose'), findsOneWidget);
     });
 
+    testWidgets('FlutterDevWindowContent renders expertise sections', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          localizationsDelegates: [AppLocalizationsDelegate()],
+          home: Scaffold(body: FlutterDevWindowContent()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Flutter Dev'), findsOneWidget);
+      expect(find.text('Core'), findsOneWidget);
+      expect(find.text('BLoC'), findsOneWidget);
+      expect(find.text('Golden Tests'), findsOneWidget);
+      expect(find.text('MVVM'), findsOneWidget);
+    });
+
     testWidgets('ProjectStatsWindowContent renders coverage indicator', (
       tester,
     ) async {
@@ -35,9 +54,37 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('PROJECT METRICS'), findsOneWidget);
-      expect(find.textContaining('%'), findsOneWidget);
+      expect(find.textContaining('%'), findsAtLeastNWidgets(1));
       expect(find.text('COVERAGE'), findsOneWidget);
       expect(find.text('Unit Tests'), findsOneWidget);
+      expect(
+        find.textContaining('TECH STACK', skipOffstage: false),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('MVVM 2.0', skipOffstage: false),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('CanvasKit / WebGL', skipOffstage: false),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('GLSL GPU Shader', skipOffstage: false),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('InheritedWidget · Pure Dart', skipOffstage: false),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('Golden Tests', skipOffstage: false),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('Integration / E2E', skipOffstage: false),
+        findsOneWidget,
+      );
     });
 
     testWidgets(

@@ -4,6 +4,7 @@ abstract final class AppStrings {
   static const String winFinder = 'finder';
   static const String winSkills = 'skills';
   static const String winAndroid = 'android';
+  static const String winFlutter = 'flutter';
   static const String winTerminal = 'terminal';
   static const String winCalculator = 'calculator';
   static const String winSnake = 'snake';
@@ -17,6 +18,7 @@ abstract final class AppStrings {
   static const String titleFinder = 'Finder';
   static const String titleSkills = 'Skills';
   static const String titleAndroid = 'Android Dev';
+  static const String titleFlutter = 'Flutter Dev';
   static const String titleTerminal = 'Terminal';
   static const String titleCalculator = 'Calculator';
   static const String titleSnake = 'Snake';
@@ -43,6 +45,7 @@ abstract final class AppStrings {
   static const String iconFinder = 'Finder';
   static const String iconSkills = 'Skills';
   static const String iconAndroid = 'Android';
+  static const String iconFlutter = 'Flutter';
   static const String iconTerminal = 'Terminal';
   static const String iconCalculator = 'Calculator';
   static const String iconSnake = 'Snake';
@@ -103,6 +106,14 @@ abstract final class AppStrings {
   // Skills
   static const String skillsMobile = 'Mobile';
   static const String skillsBackend = 'Backend & Tools';
+
+  // Flutter Dev window
+  static const String flutterDevSubtitle =
+      'Cross-platform expertise with Dart & Flutter SDK.';
+  static const String flutterExpertise = 'Expertise';
+  static const String flutterSectionCore = 'Core';
+  static const String flutterSectionTesting = 'Testing';
+  static const String flutterSectionArchitecture = 'Architecture';
 
   // Snake
   static const String snakeTitle = 'SNAKE';

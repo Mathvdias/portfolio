@@ -4,7 +4,7 @@ import 'package:app_window/app_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_lazy_load_web/flutter_lazy_load_web.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 
 import '../../../../core/di/app_dependencies.dart';
 import '../../../../core/services/analytics_service.dart';
@@ -46,6 +46,8 @@ import '../../../../shared/widgets/terminal_content.dart'
     deferred as terminal_content;
 import '../../../../shared/widgets/android_dev_window_content.dart'
     deferred as android_content;
+import '../../../../shared/widgets/flutter_dev_window_content.dart'
+    deferred as flutter_content;
 import '../../../../shared/widgets/project_stats_window_content.dart'
     deferred as stats_content;
 import '../../../../shared/widgets/snake_game_content.dart'
@@ -155,8 +157,14 @@ class _DesktopPageState extends State<DesktopPage> {
       SpotlightItem(
         id: AppStrings.winAndroid,
         label: l10n.androidDev,
-        iconWidget: const FaIcon(FontAwesomeIcons.android),
+        iconWidget: const Icon(Icons.android),
         color: AppTheme.green,
+      ),
+      const SpotlightItem(
+        id: AppStrings.winFlutter,
+        label: AppStrings.titleFlutter,
+        iconWidget: Icon(Icons.flutter_dash),
+        color: AppTheme.blue,
       ),
       const SpotlightItem(
         id: AppStrings.winTerminal,
@@ -173,7 +181,7 @@ class _DesktopPageState extends State<DesktopPage> {
       const SpotlightItem(
         id: AppStrings.winSnake,
         label: AppStrings.titleSnake,
-        iconWidget: FaIcon(FontAwesomeIcons.gamepad),
+        iconWidget: Icon(Icons.videogame_asset),
         color: AppTheme.peach,
       ),
       const SpotlightItem(
@@ -270,6 +278,18 @@ class _DesktopPageState extends State<DesktopPage> {
             () => android_content.AndroidDevWindowContent(),
           ),
           AppTheme.green,
+          width: 500,
+          height: 700,
+        );
+      case AppStrings.winFlutter:
+        _desktopVM.openWindow(
+          id,
+          AppStrings.titleFlutter,
+          DeferredWidget(
+            _trackedLoad(id, flutter_content.loadLibrary),
+            () => flutter_content.FlutterDevWindowContent(),
+          ),
+          AppTheme.blue,
           width: 500,
           height: 700,
         );

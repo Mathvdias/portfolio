@@ -23,11 +23,12 @@ class ProjectStatsWindowContent extends StatelessWidget {
             ? AppTheme.green
             : (coverage >= 60 ? AppTheme.yellow : AppTheme.red);
 
-    return Container(
+    return ColoredBox(
       color: AppTheme.background,
-      padding: const EdgeInsets.all(AppSizes.spacingLg),
-      child: Column(
-        children: [
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(AppSizes.spacingLg),
+        child: Column(
+          children: [
           Text(
             l10n.projectMetrics,
             style: GoogleFonts.outfit(
@@ -78,7 +79,9 @@ class ProjectStatsWindowContent extends StatelessWidget {
           ),
           _StatRow(label: l10n.codeQuality, value: 'A+'),
           _StatRow(label: l10n.buildStatus, value: l10n.passing),
-          const Spacer(),
+          const SizedBox(height: AppSizes.spacingLg),
+          const _TechStackSection(),
+          const SizedBox(height: AppSizes.spacingXxl),
           Text(
             l10n.keepBuilding,
             textAlign: TextAlign.center,
@@ -88,7 +91,125 @@ class ProjectStatsWindowContent extends StatelessWidget {
               color: AppTheme.subtext,
             ),
           ),
+          const SizedBox(height: AppSizes.spacingMd),
         ],
+      ),
+    ),
+  );
+  }
+}
+
+class _TechStackSection extends StatelessWidget {
+  const _TechStackSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'TECH STACK',
+          style: GoogleFonts.pressStart2p(
+            fontSize: AppSizes.fontXs,
+            color: AppTheme.yellow,
+            letterSpacing: 1,
+          ),
+        ),
+        const SizedBox(height: AppSizes.spacingMd),
+        const _TechGroup(
+          label: 'Runtime & Architecture',
+          chips: [
+            ('Architecture', 'MVVM 2.0'),
+            ('State', 'InheritedWidget'),
+            ('DI', 'InheritedWidget · Pure Dart'),
+            ('Wallpaper', 'GLSL GPU Shader'),
+            ('Web Render', 'CanvasKit / WebGL'),
+            ('CI', 'GitHub Actions'),
+          ],
+        ),
+        const SizedBox(height: AppSizes.spacingMd),
+        const _TechGroup(
+          label: 'Testing — 100% coverage',
+          chips: [
+            ('Unit Tests', '✓'),
+            ('Widget Tests', '✓'),
+            ('Golden Tests', '✓'),
+            ('Integration / E2E', '✓'),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _TechGroup extends StatelessWidget {
+  const _TechGroup({required this.label, required this.chips});
+
+  final String label;
+  final List<(String, String)> chips;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.spaceMono(
+            fontSize: 10,
+            color: AppTheme.subtext,
+            letterSpacing: 0.5,
+          ),
+        ),
+        const SizedBox(height: AppSizes.spacingSm),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children:
+              chips
+                  .map((c) => _StackChip(label: c.$1, value: c.$2))
+                  .toList(),
+        ),
+      ],
+    );
+  }
+}
+
+class _StackChip extends StatelessWidget {
+  const _StackChip({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppTheme.yellow.withValues(alpha: 0.3)),
+      ),
+      child: Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(
+              text: '$label: ',
+              style: GoogleFonts.spaceMono(
+                fontSize: 10,
+                color: AppTheme.subtext,
+              ),
+            ),
+            TextSpan(
+              text: value,
+              style: GoogleFonts.spaceMono(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.yellow,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

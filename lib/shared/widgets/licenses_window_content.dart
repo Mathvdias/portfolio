@@ -29,17 +29,8 @@ class LicensesWindowContent extends StatelessWidget {
           _SectionHeader(AppStrings.licensesOpenSource),
           SizedBox(height: AppSizes.spacingLg),
           _LicenseCard(
-            name: 'font_awesome_flutter',
-            version: '^11.0.0',
-            license: 'MIT',
-            description:
-                'The Font Awesome Icon pack available as set of Flutter Icons. '
-                'Provides high quality vector graphics for the UI.',
-            url: 'https://pub.dev/packages/font_awesome_flutter',
-          ),
-          _LicenseCard(
             name: 'Flutter',
-            version: '3.x',
+            version: '^3.29',
             license: 'BSD-3-Clause',
             description:
                 'Google\'s UI toolkit for building natively compiled applications '
@@ -48,10 +39,11 @@ class LicensesWindowContent extends StatelessWidget {
           ),
           _LicenseCard(
             name: 'Dart',
-            version: '3.x',
+            version: '^3.7',
             license: 'BSD-3-Clause',
             description:
-                'A client-optimized language for fast apps on any platform.',
+                'A client-optimized language for fast apps on any platform. '
+                'Used throughout the project with null-safety and records.',
             url: 'https://dart.dev',
           ),
           _LicenseCard(
@@ -60,8 +52,26 @@ class LicensesWindowContent extends StatelessWidget {
             license: 'MIT',
             description:
                 'Flutter package to use fonts from fonts.google.com. '
-                'Used for Space Mono, Press Start 2P, and Indie Flower.',
+                'Used for Space Mono, Press Start 2P, and Outfit.',
             url: 'https://pub.dev/packages/google_fonts',
+          ),
+          _LicenseCard(
+            name: 'flutter_svg',
+            version: '^2.3.0',
+            license: 'MIT',
+            description:
+                'SVG rendering library for Flutter. Used to display all icon '
+                'assets defined in AppSvgs.',
+            url: 'https://pub.dev/packages/flutter_svg',
+          ),
+          _LicenseCard(
+            name: 'flutter_lazy_load_web',
+            version: '^0.1.2',
+            license: 'MIT',
+            description:
+                'Deferred widget loader for Flutter Web. Enables each window '
+                'chunk to be downloaded only when first opened.',
+            url: 'https://pub.dev/packages/flutter_lazy_load_web',
           ),
           _LicenseCard(
             name: 'firebase_core',
@@ -72,11 +82,21 @@ class LicensesWindowContent extends StatelessWidget {
             url: 'https://pub.dev/packages/firebase_core',
           ),
           _LicenseCard(
+            name: 'firebase_analytics',
+            version: '^12.4.1',
+            license: 'BSD-3-Clause',
+            description:
+                'Firebase Analytics Flutter plugin. Used to track window opens, '
+                'locale switches, and dwell time.',
+            url: 'https://pub.dev/packages/firebase_analytics',
+          ),
+          _LicenseCard(
             name: 'cloud_firestore',
             version: '^6.3.0',
             license: 'BSD-3-Clause',
             description:
-                'Flutter plugin for Cloud Firestore. Used to store and stream visitor counts.',
+                'Flutter plugin for Cloud Firestore. Used to store and stream '
+                'visitor counts and guestbook entries.',
             url: 'https://pub.dev/packages/cloud_firestore',
           ),
           _LicenseCard(
@@ -90,11 +110,11 @@ class LicensesWindowContent extends StatelessWidget {
           ),
           _LicenseCard(
             name: 'url_launcher',
-            version: '^6.1.14',
+            version: '^6.3.2',
             license: 'BSD-3-Clause',
             description:
-                'Flutter plugin for launching URLs in the mobile platform. '
-                'Used to open GitHub, LinkedIn, and the résumé PDF.',
+                'Flutter plugin for launching URLs. Used to open GitHub, '
+                'LinkedIn, Medium, and the résumé PDF.',
             url: 'https://pub.dev/packages/url_launcher',
           ),
           SizedBox(height: AppSizes.spacing3xl),
