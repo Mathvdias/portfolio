@@ -34,7 +34,8 @@ extension type WebAssemblyExports._(JSObject _) implements JSObject {
     JSNumber offsetX,
     JSNumber offsetY,
     JSNumber maxIterations,
-  ) get generateMandelbrotTyped;
+  )
+  get generateMandelbrotTyped;
 }
 
 @JS()
@@ -55,7 +56,8 @@ class WasmEngineServiceImpl implements WasmEngineService {
     try {
       final fetchPromise = _fetch('assets/wasm/mathos_engine.wasm'.toJS);
       final instantiatePromise = _instantiateStreaming(fetchPromise);
-      final jsResult = await instantiatePromise.toDart as WebAssemblyInstanceResult;
+      final jsResult =
+          await instantiatePromise.toDart as WebAssemblyInstanceResult;
       _instance = jsResult.instance;
       _isReady = true;
     } catch (e) {
@@ -74,7 +76,7 @@ class WasmEngineServiceImpl implements WasmEngineService {
   }) {
     if (!_isReady) return;
     final exports = _instance!.exports;
-    
+
     // Call the typed interop function
     exports.generateMandelbrotTyped(
       width.toJS,
@@ -87,19 +89,19 @@ class WasmEngineServiceImpl implements WasmEngineService {
   }
 
   @override
-  List<int> getPixelBuffer() {
-    if (!_isReady) return [];
+  Uint8List getPixelBuffer() {
+    if (!_isReady) return Uint8List(0);
     final exports = _instance!.exports;
-    
+
     final ptrVal = exports.getBufferPointer.callAsFunction(null);
     final ptr = (ptrVal as JSNumber).toDartInt;
-    
+
     final sizeVal = exports.getBufferSize.callAsFunction(null);
     final size = (sizeVal as JSNumber).toDartInt;
 
     final memory = exports.memory;
     final buffer = memory.buffer.toDart;
-    
+
     return Uint8List.view(buffer, ptr, size);
   }
 }

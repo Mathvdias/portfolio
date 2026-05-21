@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'wasm_engine_service.dart';
 
 class WasmEngineServiceImpl implements WasmEngineService {
@@ -18,7 +19,7 @@ class WasmEngineServiceImpl implements WasmEngineService {
   }) {}
 
   @override
-  List<int> getPixelBuffer() => [];
+  Uint8List getPixelBuffer() => Uint8List(0);
 }
 
 WasmEngineService getService() => WasmEngineServiceImpl();

@@ -1,12 +1,13 @@
+import 'dart:typed_data';
 import 'wasm_engine_service_stub.dart'
     if (dart.library.js_interop) 'wasm_engine_service_web.dart';
 
 abstract class WasmEngineService {
   factory WasmEngineService() => getService();
-  
+
   Future<void> init();
   bool get isReady;
-  
+
   void generateMandelbrot({
     required int width,
     required int height,
@@ -17,5 +18,5 @@ abstract class WasmEngineService {
   });
 
   /// Returns the pointer memory RGBA pixel buffer
-  List<int> getPixelBuffer();
+  Uint8List getPixelBuffer();
 }

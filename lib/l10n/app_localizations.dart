@@ -11,6 +11,9 @@ class AppLocalizations {
 
   static final Map<String, Map<String, dynamic>> _localizedValues = {
     "en": {
+      "welcomeTitle": "Welcome to MathOS!",
+      "welcomeBody":
+          "Feel free to explore my projects, open apps, and leave a message in the Guestbook.",
       "guestbook": "Guestbook",
       "guestbookBannerTitle": "Leave your mark! ✍️",
       "guestbookBannerSubtitle":
@@ -164,6 +167,9 @@ class AppLocalizations {
       ],
     },
     "es": {
+      "welcomeTitle": "¡Bienvenido a MathOS!",
+      "welcomeBody":
+          "Siéntete libre de explorar mis proyectos, abrir aplicaciones y dejar un mensaje en el Libro de Visitas.",
       "hello": "Hola, soy Matheus Dias",
       "role": "Ingeniero de Software",
       "about": "Sobre Mí",
@@ -318,6 +324,9 @@ class AppLocalizations {
       ],
     },
     "fr": {
+      "welcomeTitle": "Bienvenue sur MathOS!",
+      "welcomeBody":
+          "N\'hésitez pas à explorer mes projets, ouvrir des applications et laisser un message dans le Livre d\'or.",
       "hello": "Bonjour, je suis Matheus Dias",
       "role": "Ingénieur Logiciel",
       "about": "À Propos",
@@ -472,6 +481,9 @@ class AppLocalizations {
       ],
     },
     "it": {
+      "welcomeTitle": "Benvenuto in MathOS!",
+      "welcomeBody":
+          "Sentiti libero di esplorare i miei progetti, aprire applicazioni e lasciare un messaggio nel Guestbook.",
       "hello": "Ciao, sono Matheus Dias",
       "role": "Ingegnere del Software",
       "about": "Chi Sono",
@@ -626,6 +638,9 @@ class AppLocalizations {
       ],
     },
     "pt": {
+      "welcomeTitle": "Bem-vindo ao MathOS!",
+      "welcomeBody":
+          "Sinta-se à vontade para explorar meus projetos, abrir os apps e deixar uma mensagem no Guestbook.",
       "guestbook": "Livro de Visitas",
       "guestbookBannerTitle": "Deixe sua marca! ✍️",
       "guestbookBannerSubtitle":
@@ -919,6 +934,14 @@ class AppLocalizations {
 
   String semStarsOutOf5(int n) =>
       _str('semStarsOutOf5', '%d out of 5 stars').replaceFirst('%d', '$n');
+
+  String get welcomeTitle =>
+      _localizedValues[locale.languageCode]?['welcomeTitle'] ??
+      _localizedValues['en']!['welcomeTitle'];
+
+  String get welcomeBody =>
+      _localizedValues[locale.languageCode]?['welcomeBody'] ??
+      _localizedValues['en']!['welcomeBody'];
 
   String getSection(String section) {
     switch (section) {

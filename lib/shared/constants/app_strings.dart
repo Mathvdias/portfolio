@@ -13,6 +13,7 @@ abstract final class AppStrings {
   static const String winInterceptedHttp = 'intercepted_http';
   static const String winGuestbook = 'guestbook';
   static const String winProjectStats = 'project_stats';
+  static const String winFractal = 'fractal';
 
   // Window titles
   static const String titleFinder = 'Finder';
@@ -27,6 +28,7 @@ abstract final class AppStrings {
   static const String titleInterceptedHttp = 'intercepted_http';
   static const String titleGuestbook = 'Guestbook';
   static const String titleProjectStats = 'Project Stats';
+  static const String titleFractal = 'Fractal (Wasm)';
 
   // URLs
   static const String urlGitHub = 'https://github.com/Mathvdias';
@@ -53,6 +55,7 @@ abstract final class AppStrings {
   static const String iconWhitepaper = 'Whitepaper';
   static const String iconResume = 'Resume';
   static const String iconInterceptedHttp = 'intercepted\n_http';
+  static const String iconFractal = 'Fractal';
 
   // Dock labels
   static const String dockGitHub = 'GitHub';
