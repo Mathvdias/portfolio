@@ -1,6 +1,6 @@
 import 'dart:js_interop';
 import 'dart:js_interop_unsafe';
-import 'dart:typed_data';
+
 import 'package:flutter/foundation.dart';
 
 import 'wasm_engine_service.dart';
@@ -84,18 +84,27 @@ class WasmEngineServiceImpl implements WasmEngineService {
     if (!_isReady) return;
     final exports = _instance!.exports;
 
-    exports.callMethod(
-      'generate_fractal'.toJS,
-      width.toJS,
-      height.toJS,
-      zoom.toJS,
-      offsetX.toJS,
-      offsetY.toJS,
-      maxIterations.toJS,
-      isJulia.toJS,
-      cxJulia.toJS,
-      cyJulia.toJS,
-      time.toJS,
+    // We must call the WASM function directly via the property name
+    // Since we have more than 4 arguments, we must use a helper or multiple callMethod calls if supported,
+    // but callMethod supports up to 4 arguments in the basic version.
+    // For WASM, the most compatible way in dart:js_interop is to use the Function object.
+    final func = exports['generate_fractal'] as JSFunction;
+    // Use callMethod on the function object itself, passing arguments
+    // Note: JS interop extensions allow up to a certain number of args.
+    // Since we have 10, we'll use a direct JS call to avoid argument limits.
+    _callWasm(
+      func,
+      exports,
+      width,
+      height,
+      zoom,
+      offsetX,
+      offsetY,
+      maxIterations,
+      isJulia,
+      cxJulia,
+      cyJulia,
+      time,
     );
   }
 
@@ -104,17 +113,57 @@ class WasmEngineServiceImpl implements WasmEngineService {
     if (!_isReady) return Uint8List(0);
     final exports = _instance!.exports;
 
-    final ptrVal = exports.callMethod('get_buffer_pointer'.toJS) as JSNumber;
-    final ptr = ptrVal.toDartInt;
+    final ptr =
+        (exports['get_buffer_pointer'] as JSFunction).callMethod(
+              'call'.toJS,
+              exports,
+            )
+            as JSNumber;
+    final size =
+        (exports['get_buffer_size'] as JSFunction).callMethod(
+              'call'.toJS,
+              exports,
+            )
+            as JSNumber;
 
-    final sizeVal = exports.callMethod('get_buffer_size'.toJS) as JSNumber;
-    final size = sizeVal.toDartInt;
-
-    final memory = exports.getProperty<WebAssemblyMemory>('memory'.toJS);
+    final memory = exports['memory'] as WebAssemblyMemory;
     final buffer = memory.buffer.toDart;
 
-    return Uint8List.view(buffer, ptr, size);
+    return Uint8List.view(buffer, ptr.toDartInt, size.toDartInt);
   }
+}
+
+@JS('Function.prototype.apply.call')
+external JSAny? _callWasmInternal(JSFunction f, JSObject thisArg, JSArray args);
+
+void _callWasm(
+  JSFunction f,
+  JSObject thisArg,
+  int width,
+  int height,
+  double zoom,
+  double offsetX,
+  double offsetY,
+  int maxIterations,
+  bool isJulia,
+  double cxJulia,
+  double cyJulia,
+  double time,
+) {
+  final args =
+      [
+        width.toJS,
+        height.toJS,
+        zoom.toJS,
+        offsetX.toJS,
+        offsetY.toJS,
+        maxIterations.toJS,
+        isJulia.toJS,
+        cxJulia.toJS,
+        cyJulia.toJS,
+        time.toJS,
+      ].toJS;
+  _callWasmInternal(f, thisArg, args);
 }
 
 WasmEngineService getService() => WasmEngineServiceImpl();
