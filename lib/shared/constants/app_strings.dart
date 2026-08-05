@@ -14,6 +14,7 @@ abstract final class AppStrings {
   static const String winGuestbook = 'guestbook';
   static const String winProjectStats = 'project_stats';
   static const String winFractal = 'fractal';
+  static const String winWasmDiagnostics = 'wasm_diagnostics';
 
   // Window titles
   static const String titleFinder = 'Finder';
@@ -29,6 +30,7 @@ abstract final class AppStrings {
   static const String titleGuestbook = 'Guestbook';
   static const String titleProjectStats = 'Project Stats';
   static const String titleFractal = 'Fractal (Wasm)';
+  static const String titleWasmDiagnostics = 'WASM Diagnostics';
 
   // URLs
   static const String urlGitHub = 'https://github.com/Mathvdias';
@@ -56,6 +58,7 @@ abstract final class AppStrings {
   static const String iconResume = 'Resume';
   static const String iconInterceptedHttp = 'intercepted\n_http';
   static const String iconFractal = 'Fractal';
+  static const String iconWasmDiagnostics = 'WASM Monitor';
 
   // Dock labels
   static const String dockGitHub = 'GitHub';
@@ -140,4 +143,38 @@ abstract final class AppStrings {
 
   // Experience
   static const String techLabel = 'TECH:';
+
+  // WASM Diagnostics
+  static const String wasmFps = 'FPS';
+  static const String wasmFrameLatency = 'Frame latency';
+  static const String wasmHeap = 'WASM Heap';
+  static const String wasmGcPause = 'GC Pause';
+  static const String wasmTimelineTitle = 'WASM Frame Timeline';
+  static const String wasmTargetBudgetPrefix = 'Target budget: ';
+  static const String wasmHotReload = 'Hot Reload';
+  static const String wasmCompiling = 'Compiling...';
+  static const String wasmTriggerGc = 'Trigger GC';
+  static const String wasmSimd = 'SIMD';
+  static const String wasmWasmGc = 'WASM GC';
+  static const String wasmConsoleTitle = 'Engine Diagnostic Console';
+  static const String wasmCompilerVersion = 'WASM compiler: v3.29.0';
+  static const String wasmEngineInit = 'Engine: Flutter WebAssembly (Wasm GC) v3.29.0 initialized.';
+  static const String wasmCpuDetect = 'CPU: %d execution threads detected. RAM: %s GB.';
+  static const String wasmRendererDetect = 'Renderer: %s (%s).';
+  static const String wasmSimdSupported = 'SIMD support: verified (128-bit hardware acceleration active)';
+  static const String wasmSimdUnsupported = 'SIMD support: unsupported (using software fallback emulation)';
+  static const String wasmGcSupported = 'Native Wasm GC: supported (V8 native Garbage Collection active)';
+  static const String wasmGcUnsupported = 'Native Wasm GC: unsupported (using legacy polyfill garbage collection)';
+  static const String wasmProfilingActive = 'Diagnostics: Frame latency timeline profiling active at hardware refresh rate.';
+  static const String wasmHotReloadTrigger = 'Compiler: Hot Reload triggered. Scanning file hierarchy...';
+  static const String wasmHotReloadCompile = 'Compiler: Compiling and translating main.dart modules to WASM GC format...';
+  static const String wasmHotReloadSuccess = 'Compiler: Reload success: main.dart.wasm re-built in 42ms. Pipelines synchronized.';
+  static const String wasmHotReloadToast = 'WASM Engine Hot Reload Complete (42ms)!';
+  static const String wasmGcAuto = 'Automatic';
+  static const String wasmGcManual = 'Manual';
+  static const String wasmGcLogTemplate = '%s sweep triggered. V8/Wasm GC heap: %s MB. Pause: %sms.';
+  static const String wasmSimdEnabledLog = 'SIMD: Optimizations enabled (level 3).';
+  static const String wasmSimdDisabledLog = 'SIMD: Optimizations disabled (software fallback mode).';
+  static const String wasmGcEnabledLog = 'GC: WebAssembly native Garbage Collection active.';
+  static const String wasmGcDisabledLog = 'GC: WebAssembly native Garbage Collection deactivated.';
 }

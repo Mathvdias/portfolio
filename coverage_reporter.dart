@@ -1,14 +1,10 @@
-import 'dart:developer' as dev;
+// ignore_for_file: avoid_print
 import 'dart:io';
 
 void main() {
   final lcovFile = File('coverage/lcov.info');
   if (!lcovFile.existsSync()) {
-    dev.log(
-      'Error: lcov.info not found. Run "flutter test --coverage" first.',
-      name: 'CoverageReporter',
-      level: 1000,
-    );
+    print('Error: lcov.info not found. Run "flutter test --coverage" first.');
     exit(1);
   }
 
@@ -52,14 +48,11 @@ void main() {
         ..sort((a, b) => fileStats[a]!.compareTo(fileStats[b]!));
   for (final file in sortedFiles) {
     final percentage = fileStats[file]!.toStringAsFixed(1);
-    dev.log('$percentage% | $file', name: 'CoverageReporter');
+    print('$percentage% | $file');
   }
 
   final overall = (totalLH / totalLF) * 100;
-  dev.log('----------------------------------------', name: 'CoverageReporter');
-  dev.log(
-    'OVERALL COVERAGE: ${overall.toStringAsFixed(2)}%',
-    name: 'CoverageReporter',
-  );
-  dev.log('----------------------------------------', name: 'CoverageReporter');
+  print('----------------------------------------');
+  print('OVERALL COVERAGE: ${overall.toStringAsFixed(2)}%');
+  print('----------------------------------------');
 }

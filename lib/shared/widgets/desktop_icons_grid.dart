@@ -24,6 +24,7 @@ import 'skills_window_content.dart';
 import 'snake_game_content.dart';
 import 'terminal_content.dart';
 import 'fractal_explorer_content.dart';
+import 'wasm_diagnostics_content.dart';
 
 /// The right-aligned, vertically-wrapping grid of desktop icons.
 class DesktopIconsGrid extends StatelessWidget {
@@ -168,6 +169,18 @@ class DesktopIconsGrid extends StatelessWidget {
               AppStrings.titleFractal,
               const FractalExplorerContent(),
               AppTheme.mauve,
+            ),
+      ),
+      DesktopIcon(
+        label: AppStrings.iconWasmDiagnostics,
+        iconWidgetPath: AppSvgs.projectStats,
+        color: AppTheme.pink,
+        onTap:
+            () => onOpenWindow(
+              AppStrings.winWasmDiagnostics,
+              AppStrings.titleWasmDiagnostics,
+              const WasmDiagnosticsContent(),
+              AppTheme.pink,
             ),
       ),
       DesktopIcon(

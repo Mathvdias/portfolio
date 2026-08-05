@@ -20,5 +20,25 @@ void main() {
       expect(subtitle, isNotEmpty);
       expect(subtitle, contains('Metal'));
     });
+
+    test('getJsHeapSize returns stub default', () {
+      expect(getJsHeapSize(), 18.2);
+    });
+
+    test('isHardwareSimdSupported returns stub default', () {
+      expect(isHardwareSimdSupported(), isTrue);
+    });
+
+    test('isHardwareWasmGcSupported returns stub default', () {
+      expect(isHardwareWasmGcSupported(), isTrue);
+    });
+
+    test('getHardwareCpuCores returns stub default', () {
+      expect(getHardwareCpuCores(), 8);
+    });
+
+    test('getHardwareDeviceMemory returns stub default', () {
+      expect(getHardwareDeviceMemory(), 8.0);
+    });
   });
 }

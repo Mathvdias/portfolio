@@ -50,6 +50,8 @@ import '../../../../shared/widgets/spotlight_overlay.dart';
 import '../../../../shared/widgets/sticky_note.dart';
 import '../../../../shared/widgets/terminal_content.dart'
     deferred as terminal_content;
+import '../../../../shared/widgets/wasm_diagnostics_content.dart'
+    deferred as wasm_diagnostics_content;
 import '../../../../theme/app_theme.dart';
 
 class DesktopPage extends StatefulWidget {
@@ -209,6 +211,12 @@ class _DesktopPageState extends State<DesktopPage> {
         iconWidget: const Icon(Icons.analytics),
         color: AppTheme.yellow,
       ),
+      const SpotlightItem(
+        id: AppStrings.winWasmDiagnostics,
+        label: 'WASM Diagnostics',
+        iconWidget: Icon(Icons.insights),
+        color: AppTheme.pink,
+      ),
     ];
   }
 
@@ -362,6 +370,18 @@ class _DesktopPageState extends State<DesktopPage> {
             () => stats_content.ProjectStatsWindowContent(),
           ),
           AppTheme.yellow,
+        );
+      case AppStrings.winWasmDiagnostics:
+        _desktopVM.openWindow(
+          id,
+          AppStrings.titleWasmDiagnostics,
+          DeferredWidget(
+            _trackedLoad(id, wasm_diagnostics_content.loadLibrary),
+            () => wasm_diagnostics_content.WasmDiagnosticsContent(),
+          ),
+          AppTheme.pink,
+          width: 540,
+          height: 480,
         );
     }
   }

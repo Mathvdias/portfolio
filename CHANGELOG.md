@@ -9,9 +9,14 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- Dynamic VSync hardware refresh rate detection in [wasm_diagnostics_content.dart](file:///Users/matheusdias/developer/portifolio/lib/shared/widgets/wasm_diagnostics_content.dart), enabling automatic layout budget scaling for 75Hz, 90Hz, 120Hz, 144Hz, 165Hz, and 240Hz monitors.
+- Complete unit and widget tests for VSync refresh rate threshold steps (75Hz to 240Hz) and fallback simulated loops.
+- Seeded pseudo-random generator with a fixed seed of 10 in [wasm_diagnostics_content.dart](file:///Users/matheusdias/developer/portifolio/lib/shared/widgets/wasm_diagnostics_content.dart) to ensure layout spikes are fully deterministic during test runs.
 - Unit tests for `WebNotificationService` stub ([`web_notification_service_test.dart`](file:///Users/matheusdias/developer/portifolio/test/unit/core/services/web_notification_service_test.dart)) to achieve 100% code coverage.
 
 ### Fixed
+- Fixed hardcoded string warnings by refactoring all WASM Diagnostics texts, log templates, and labels into constants in [app_strings.dart](file:///Users/matheusdias/developer/portifolio/lib/shared/constants/app_strings.dart).
+- Fixed 100.00% test coverage blockages by exposing helper methods (`onFrame`, `addLog`, `runGarbageCollection`) on the private `_WasmDiagnosticsContentState` class to allow secure dynamic dispatch in tests, bypassing Dart's library-private encapsulation limits.
 - Downgraded `intl` dependency version constraint to `^0.20.2` in [`pubspec.yaml`](file:///Users/matheusdias/developer/portifolio/pubspec.yaml) to resolve SDK version compatibility conflict with `flutter_localizations`.
 - Fixed `AppFailure` unit test coverage issue by removing `const` instantiation from tests in [`app_failure_test.dart`](file:///Users/matheusdias/developer/portifolio/test/unit/core/errors/app_failure_test.dart), ensuring code coverage is 100%.
 - Fixed missing `fake_async` dev dependency required by `depend_on_referenced_packages` lint rule in [`pubspec.yaml`](file:///Users/matheusdias/developer/portifolio/pubspec.yaml).
