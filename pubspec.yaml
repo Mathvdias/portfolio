@@ -37,7 +37,7 @@ dependencies:
   google_fonts: ^8.1.0
   firebase_core: ^4.7.0
   firebase_analytics: ^12.4.1
-  cloud_firestore: ^6.3.0
+  cloud_firestore: ^6.7.1
   shared_preferences: ^2.5.5
 
   # Internal packages
