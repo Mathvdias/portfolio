@@ -188,16 +188,17 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             localizationsDelegates: [AppLocalizationsDelegate()],
-            home: Scaffold(
-              body: WasmDiagnosticsContent(),
-            ),
+            home: Scaffold(body: WasmDiagnosticsContent()),
           ),
         );
         await tester.pumpAndSettle();
 
         // 1. Verify metrics and layouts
         expect(find.text(AppStrings.wasmFps), findsOneWidget);
-        expect(find.text(AppStrings.wasmFrameLatency.toUpperCase()), findsOneWidget);
+        expect(
+          find.text(AppStrings.wasmFrameLatency.toUpperCase()),
+          findsOneWidget,
+        );
         expect(find.text(AppStrings.wasmHeap.toUpperCase()), findsOneWidget);
         expect(find.text(AppStrings.wasmGcPause.toUpperCase()), findsOneWidget);
         expect(find.text(AppStrings.wasmConsoleTitle), findsOneWidget);
@@ -217,7 +218,7 @@ void main() {
         // 4. Tap custom toggles (SIMD and WASM GC)
         await tester.tap(find.text(AppStrings.wasmSimd));
         await tester.pump();
-        
+
         await tester.tap(find.text(AppStrings.wasmWasmGc));
         await tester.pump();
 
@@ -281,7 +282,9 @@ void main() {
         expect(state.detectedRefreshRate, 90.0);
 
         // 75Hz (<= 14.5ms)
-        state.onFrame(Duration(milliseconds: 510 * 16 + 4 + 6 + 7 + 8 + 11 + 14));
+        state.onFrame(
+          Duration(milliseconds: 510 * 16 + 4 + 6 + 7 + 8 + 11 + 14),
+        );
         expect(state.detectedRefreshRate, 75.0);
 
         // 3. Force stats timer to tick with zero heapMemory to trigger auto GC sweep

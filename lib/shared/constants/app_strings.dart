@@ -158,23 +158,39 @@ abstract final class AppStrings {
   static const String wasmWasmGc = 'WASM GC';
   static const String wasmConsoleTitle = 'Engine Diagnostic Console';
   static const String wasmCompilerVersion = 'WASM compiler: v3.29.0';
-  static const String wasmEngineInit = 'Engine: Flutter WebAssembly (Wasm GC) v3.29.0 initialized.';
-  static const String wasmCpuDetect = 'CPU: %d execution threads detected. RAM: %s GB.';
+  static const String wasmEngineInit =
+      'Engine: Flutter WebAssembly (Wasm GC) v3.29.0 initialized.';
+  static const String wasmCpuDetect =
+      'CPU: %d execution threads detected. RAM: %s GB.';
   static const String wasmRendererDetect = 'Renderer: %s (%s).';
-  static const String wasmSimdSupported = 'SIMD support: verified (128-bit hardware acceleration active)';
-  static const String wasmSimdUnsupported = 'SIMD support: unsupported (using software fallback emulation)';
-  static const String wasmGcSupported = 'Native Wasm GC: supported (V8 native Garbage Collection active)';
-  static const String wasmGcUnsupported = 'Native Wasm GC: unsupported (using legacy polyfill garbage collection)';
-  static const String wasmProfilingActive = 'Diagnostics: Frame latency timeline profiling active at hardware refresh rate.';
-  static const String wasmHotReloadTrigger = 'Compiler: Hot Reload triggered. Scanning file hierarchy...';
-  static const String wasmHotReloadCompile = 'Compiler: Compiling and translating main.dart modules to WASM GC format...';
-  static const String wasmHotReloadSuccess = 'Compiler: Reload success: main.dart.wasm re-built in 42ms. Pipelines synchronized.';
-  static const String wasmHotReloadToast = 'WASM Engine Hot Reload Complete (42ms)!';
+  static const String wasmSimdSupported =
+      'SIMD support: verified (128-bit hardware acceleration active)';
+  static const String wasmSimdUnsupported =
+      'SIMD support: unsupported (using software fallback emulation)';
+  static const String wasmGcSupported =
+      'Native Wasm GC: supported (V8 native Garbage Collection active)';
+  static const String wasmGcUnsupported =
+      'Native Wasm GC: unsupported (using legacy polyfill garbage collection)';
+  static const String wasmProfilingActive =
+      'Diagnostics: Frame latency timeline profiling active at hardware refresh rate.';
+  static const String wasmHotReloadTrigger =
+      'Compiler: Hot Reload triggered. Scanning file hierarchy...';
+  static const String wasmHotReloadCompile =
+      'Compiler: Compiling and translating main.dart modules to WASM GC format...';
+  static const String wasmHotReloadSuccess =
+      'Compiler: Reload success: main.dart.wasm re-built in 42ms. Pipelines synchronized.';
+  static const String wasmHotReloadToast =
+      'WASM Engine Hot Reload Complete (42ms)!';
   static const String wasmGcAuto = 'Automatic';
   static const String wasmGcManual = 'Manual';
-  static const String wasmGcLogTemplate = '%s sweep triggered. V8/Wasm GC heap: %s MB. Pause: %sms.';
-  static const String wasmSimdEnabledLog = 'SIMD: Optimizations enabled (level 3).';
-  static const String wasmSimdDisabledLog = 'SIMD: Optimizations disabled (software fallback mode).';
-  static const String wasmGcEnabledLog = 'GC: WebAssembly native Garbage Collection active.';
-  static const String wasmGcDisabledLog = 'GC: WebAssembly native Garbage Collection deactivated.';
+  static const String wasmGcLogTemplate =
+      '%s sweep triggered. V8/Wasm GC heap: %s MB. Pause: %sms.';
+  static const String wasmSimdEnabledLog =
+      'SIMD: Optimizations enabled (level 3).';
+  static const String wasmSimdDisabledLog =
+      'SIMD: Optimizations disabled (software fallback mode).';
+  static const String wasmGcEnabledLog =
+      'GC: WebAssembly native Garbage Collection active.';
+  static const String wasmGcDisabledLog =
+      'GC: WebAssembly native Garbage Collection deactivated.';
 }

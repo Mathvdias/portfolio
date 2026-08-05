@@ -10,10 +10,7 @@ import '../constants/app_strings.dart';
 import '../utils/renderer_detector.dart';
 
 class WasmDiagnosticsContent extends StatefulWidget {
-  const WasmDiagnosticsContent({
-    super.key,
-    this.heapSizeOverride,
-  });
+  const WasmDiagnosticsContent({super.key, this.heapSizeOverride});
 
   final double Function()? heapSizeOverride;
 
@@ -33,7 +30,8 @@ class _WasmDiagnosticsContentState extends State<WasmDiagnosticsContent> {
   bool _simdEnabled = true;
   bool _gcEnabled = true;
   bool _compiling = false;
-  double _detectedRefreshRate = 60.0; // Starts at 60Hz and dynamically scales upwards based on hardware VSync
+  double _detectedRefreshRate =
+      60.0; // Starts at 60Hz and dynamically scales upwards based on hardware VSync
   double get detectedRefreshRate => _detectedRefreshRate;
 
   // Real-time Frame Profiler
@@ -41,7 +39,10 @@ class _WasmDiagnosticsContentState extends State<WasmDiagnosticsContent> {
   final List<double> _recordedFrameTimes = [];
 
   // Chart History
-  final List<double> _frameHistory = List.generate(60, (_) => 8.0 + math.Random().nextDouble() * 4.0);
+  final List<double> _frameHistory = List.generate(
+    60,
+    (_) => 8.0 + math.Random().nextDouble() * 4.0,
+  );
 
   // System Logs
   final List<String> _logs = [];
@@ -73,7 +74,9 @@ class _WasmDiagnosticsContentState extends State<WasmDiagnosticsContent> {
     );
     addLog(
       'SIMD',
-      _simdEnabled ? AppStrings.wasmSimdSupported : AppStrings.wasmSimdUnsupported,
+      _simdEnabled
+          ? AppStrings.wasmSimdSupported
+          : AppStrings.wasmSimdUnsupported,
     );
     addLog(
       'GC',
@@ -82,7 +85,10 @@ class _WasmDiagnosticsContentState extends State<WasmDiagnosticsContent> {
     addLog('Diagnostics', AppStrings.wasmProfilingActive);
 
     // Fetch initial real memory
-    _heapMemory = widget.heapSizeOverride != null ? widget.heapSizeOverride!() : getJsHeapSize();
+    _heapMemory =
+        widget.heapSizeOverride != null
+            ? widget.heapSizeOverride!()
+            : getJsHeapSize();
 
     // Start listening to actual frames rendered by the device
     WidgetsBinding.instance.addPostFrameCallback(onFrame);
@@ -100,13 +106,16 @@ class _WasmDiagnosticsContentState extends State<WasmDiagnosticsContent> {
 
         // Add minor realistic render jitter and micro-spikes (e.g. mouse move, canvas updates)
         if (_random.nextDouble() > 0.85) {
-          avgFrameTime += 2.0 + _random.nextDouble() * 4.0; // Simulated layout spike
+          avgFrameTime +=
+              2.0 + _random.nextDouble() * 4.0; // Simulated layout spike
         } else {
           avgFrameTime += (_random.nextDouble() - 0.5) * 0.8; // Normal jitter
         }
 
         if (!_simdEnabled) {
-          avgFrameTime += 3.0 + _random.nextDouble() * 2.0; // Simulate software fallback overhead
+          avgFrameTime +=
+              3.0 +
+              _random.nextDouble() * 2.0; // Simulate software fallback overhead
         }
 
         // Clamp values to realistic ranges
@@ -116,7 +125,10 @@ class _WasmDiagnosticsContentState extends State<WasmDiagnosticsContent> {
         _fps = math.min(240.0, 1000.0 / _frameTime);
 
         // Fetch actual JS heap memory from native browser API
-        final realMemory = widget.heapSizeOverride != null ? widget.heapSizeOverride!() : getJsHeapSize();
+        final realMemory =
+            widget.heapSizeOverride != null
+                ? widget.heapSizeOverride!()
+                : getJsHeapSize();
         if (realMemory > 0.0) {
           _heapMemory = realMemory;
         } else {
@@ -169,7 +181,7 @@ class _WasmDiagnosticsContentState extends State<WasmDiagnosticsContent> {
       }
     }
     _lastFrameMicros = currentMicros;
-    
+
     // Listen for next frame rendering callback
     WidgetsBinding.instance.addPostFrameCallback(onFrame);
   }
@@ -199,7 +211,10 @@ class _WasmDiagnosticsContentState extends State<WasmDiagnosticsContent> {
 
   void runGarbageCollection({bool auto = false}) {
     _gcPause = 0.2 + _random.nextDouble() * 0.4;
-    final realMemory = widget.heapSizeOverride != null ? widget.heapSizeOverride!() : getJsHeapSize();
+    final realMemory =
+        widget.heapSizeOverride != null
+            ? widget.heapSizeOverride!()
+            : getJsHeapSize();
 
     // If real memory API works, it will naturally drop after a GC signal,
     // otherwise we simulate a memory drop.
@@ -289,7 +304,10 @@ class _WasmDiagnosticsContentState extends State<WasmDiagnosticsContent> {
     final double maxInHistory = _frameHistory.reduce(math.max);
     final bool isHighRefreshRate = _detectedRefreshRate > 90.0;
     final double baseMax = isHighRefreshRate ? 16.0 : 28.0;
-    final double maxMs = math.max(baseMax, (maxInHistory * 1.15).ceilToDouble());
+    final double maxMs = math.max(
+      baseMax,
+      (maxInHistory * 1.15).ceilToDouble(),
+    );
 
     return Container(
       color: AppTheme.background,
@@ -303,7 +321,9 @@ class _WasmDiagnosticsContentState extends State<WasmDiagnosticsContent> {
               _buildStatCard(
                 AppStrings.wasmFps,
                 _fps.toStringAsFixed(1),
-                _fps > (_detectedRefreshRate * 0.95) ? AppTheme.green : AppTheme.yellow,
+                _fps > (_detectedRefreshRate * 0.95)
+                    ? AppTheme.green
+                    : AppTheme.yellow,
                 icon: Icons.speed,
               ),
               const SizedBox(width: AppSizes.spacingSm),
@@ -390,7 +410,11 @@ class _WasmDiagnosticsContentState extends State<WasmDiagnosticsContent> {
               ElevatedButton.icon(
                 onPressed: _compiling ? null : _triggerHotReload,
                 icon: const Icon(Icons.flash_on, size: 13),
-                label: Text(_compiling ? AppStrings.wasmCompiling : AppStrings.wasmHotReload),
+                label: Text(
+                  _compiling
+                      ? AppStrings.wasmCompiling
+                      : AppStrings.wasmHotReload,
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.blue,
                   foregroundColor: AppTheme.background,
@@ -435,7 +459,9 @@ class _WasmDiagnosticsContentState extends State<WasmDiagnosticsContent> {
                 setState(() => _simdEnabled = val);
                 addLog(
                   AppStrings.wasmSimd,
-                  val ? AppStrings.wasmSimdEnabledLog : AppStrings.wasmSimdDisabledLog,
+                  val
+                      ? AppStrings.wasmSimdEnabledLog
+                      : AppStrings.wasmSimdDisabledLog,
                 );
               }),
               const SizedBox(width: AppSizes.spacingLg),
@@ -443,7 +469,9 @@ class _WasmDiagnosticsContentState extends State<WasmDiagnosticsContent> {
                 setState(() => _gcEnabled = val);
                 addLog(
                   AppStrings.wasmWasmGc,
-                  val ? AppStrings.wasmGcEnabledLog : AppStrings.wasmGcDisabledLog,
+                  val
+                      ? AppStrings.wasmGcEnabledLog
+                      : AppStrings.wasmGcDisabledLog,
                 );
               }),
             ],
@@ -465,7 +493,11 @@ class _WasmDiagnosticsContentState extends State<WasmDiagnosticsContent> {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.terminal, size: 12, color: AppTheme.green),
+                      const Icon(
+                        Icons.terminal,
+                        size: 12,
+                        color: AppTheme.green,
+                      ),
                       const SizedBox(width: AppSizes.spacingSm),
                       Text(
                         AppStrings.wasmConsoleTitle,
@@ -492,7 +524,9 @@ class _WasmDiagnosticsContentState extends State<WasmDiagnosticsContent> {
                       itemCount: _logs.length,
                       itemBuilder: (context, index) {
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: AppSizes.spacingXxs),
+                          padding: const EdgeInsets.only(
+                            bottom: AppSizes.spacingXxs,
+                          ),
                           child: Text(
                             _logs[index],
                             style: GoogleFonts.spaceMono(
@@ -637,9 +671,10 @@ class _DiagnosticsChartPainter extends CustomPainter {
     final h = size.height;
 
     // Grid lines (budget levels)
-    final gridPaint = Paint()
-      ..color = AppTheme.surface0.withValues(alpha: 0.3)
-      ..strokeWidth = 1.0;
+    final gridPaint =
+        Paint()
+          ..color = AppTheme.surface0.withValues(alpha: 0.3)
+          ..strokeWidth = 1.0;
 
     // Draw horizontal budget grid lines (4 lines partition)
     final step = maxMs / 4.0;
@@ -651,10 +686,11 @@ class _DiagnosticsChartPainter extends CustomPainter {
     }
 
     // Target VSync baseline (e.g. 16.67ms or 8.33ms)
-    final targetPaint = Paint()
-      ..color = AppTheme.blue.withValues(alpha: 0.4)
-      ..strokeWidth = 1.5
-      ..style = PaintingStyle.stroke;
+    final targetPaint =
+        Paint()
+          ..color = AppTheme.blue.withValues(alpha: 0.4)
+          ..strokeWidth = 1.5
+          ..style = PaintingStyle.stroke;
 
     final targetY = h - (targetMs / maxMs) * h;
     canvas.drawLine(Offset(0, targetY), Offset(w, targetY), targetPaint);
@@ -678,22 +714,24 @@ class _DiagnosticsChartPainter extends CustomPainter {
     );
 
     // Plot graph line
-    final linePaint = Paint()
-      ..color = AppTheme.teal
-      ..strokeWidth = 2.0
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
+    final linePaint =
+        Paint()
+          ..color = AppTheme.teal
+          ..strokeWidth = 2.0
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round;
 
-    final fillPaint = Paint()
-      ..style = PaintingStyle.fill
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          AppTheme.teal.withValues(alpha: 0.3),
-          AppTheme.teal.withValues(alpha: 0.0),
-        ],
-      ).createShader(Rect.fromLTWH(0, 0, w, h));
+    final fillPaint =
+        Paint()
+          ..style = PaintingStyle.fill
+          ..shader = LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              AppTheme.teal.withValues(alpha: 0.3),
+              AppTheme.teal.withValues(alpha: 0.0),
+            ],
+          ).createShader(Rect.fromLTWH(0, 0, w, h));
 
     final path = Path();
     final fillPath = Path();
