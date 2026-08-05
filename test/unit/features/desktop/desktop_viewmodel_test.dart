@@ -7,7 +7,9 @@ import 'package:portifolio/features/desktop/domain/models/desktop_notification.d
 import 'package:portifolio/features/desktop/presentation/viewmodels/desktop_viewmodel.dart';
 
 class MockBuildContext extends Fake implements BuildContext {}
-class MockWebNotificationService extends Mock implements WebNotificationService {}
+
+class MockWebNotificationService extends Mock
+    implements WebNotificationService {}
 
 void main() {
   late DesktopViewModel vm;
@@ -262,7 +264,9 @@ void main() {
 
     setUp(() {
       mockNotificationService = MockWebNotificationService();
-      customVm = DesktopViewModel(webNotificationService: mockNotificationService);
+      customVm = DesktopViewModel(
+        webNotificationService: mockNotificationService,
+      );
     });
 
     tearDown(() {
@@ -270,12 +274,15 @@ void main() {
     });
 
     test('does nothing if welcome is already sent', () async {
-      when(() => mockNotificationService.requestPermission())
-          .thenAnswer((_) async => true);
-      when(() => mockNotificationService.showNotification(
-            title: any(named: 'title'),
-            body: any(named: 'body'),
-          )).thenAnswer((_) async {});
+      when(
+        () => mockNotificationService.requestPermission(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockNotificationService.showNotification(
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+        ),
+      ).thenAnswer((_) async {});
 
       fakeAsync((async) {
         customVm.requestPermissionAndSendWelcome(title: 'T1', message: 'M1');
@@ -283,19 +290,20 @@ void main() {
       });
 
       expect(customVm.notifications, hasLength(1));
-      
+
       fakeAsync((async) {
         customVm.requestPermissionAndSendWelcome(title: 'T2', message: 'M2');
         async.elapse(const Duration(seconds: 2));
       });
-      
+
       expect(customVm.notifications, hasLength(1));
       verify(() => mockNotificationService.requestPermission()).called(1);
     });
 
     test('does not send notification if permission is denied', () {
-      when(() => mockNotificationService.requestPermission())
-          .thenAnswer((_) async => false);
+      when(
+        () => mockNotificationService.requestPermission(),
+      ).thenAnswer((_) async => false);
 
       fakeAsync((async) {
         customVm.requestPermissionAndSendWelcome(title: 'T', message: 'M');
@@ -304,36 +312,46 @@ void main() {
 
       expect(customVm.notifications, isEmpty);
       verify(() => mockNotificationService.requestPermission()).called(1);
-      verifyNever(() => mockNotificationService.showNotification(
-            title: any(named: 'title'),
-            body: any(named: 'body'),
-          ));
+      verifyNever(
+        () => mockNotificationService.showNotification(
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+        ),
+      );
     });
 
     test('sends notification after delay if permission is granted', () {
-      when(() => mockNotificationService.requestPermission())
-          .thenAnswer((_) async => true);
-      when(() => mockNotificationService.showNotification(
-            title: any(named: 'title'),
-            body: any(named: 'body'),
-          )).thenAnswer((_) async {});
+      when(
+        () => mockNotificationService.requestPermission(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockNotificationService.showNotification(
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+        ),
+      ).thenAnswer((_) async {});
 
       fakeAsync((async) {
-        customVm.requestPermissionAndSendWelcome(title: 'Welcome', message: 'Hello');
-        
+        customVm.requestPermissionAndSendWelcome(
+          title: 'Welcome',
+          message: 'Hello',
+        );
+
         async.elapse(const Duration(seconds: 1));
         expect(customVm.notifications, isEmpty);
-        
+
         async.elapse(const Duration(seconds: 1));
         expect(customVm.notifications, hasLength(1));
         expect(customVm.notifications.first.title, 'Welcome');
         expect(customVm.notifications.first.message, 'Hello');
       });
 
-      verify(() => mockNotificationService.showNotification(
-            title: 'Welcome',
-            body: 'Hello',
-          )).called(1);
+      verify(
+        () => mockNotificationService.showNotification(
+          title: 'Welcome',
+          body: 'Hello',
+        ),
+      ).called(1);
     });
   });
 }
