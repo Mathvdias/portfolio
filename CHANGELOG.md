@@ -8,6 +8,15 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- Unit tests for `WebNotificationService` stub ([`web_notification_service_test.dart`](file:///Users/matheusdias/developer/portifolio/test/unit/core/services/web_notification_service_test.dart)) to achieve 100% code coverage.
+
+### Fixed
+- Downgraded `intl` dependency version constraint to `^0.20.2` in [`pubspec.yaml`](file:///Users/matheusdias/developer/portifolio/pubspec.yaml) to resolve SDK version compatibility conflict with `flutter_localizations`.
+- Fixed `AppFailure` unit test coverage issue by removing `const` instantiation from tests in [`app_failure_test.dart`](file:///Users/matheusdias/developer/portifolio/test/unit/core/errors/app_failure_test.dart), ensuring code coverage is 100%.
+- Fixed missing `fake_async` dev dependency required by `depend_on_referenced_packages` lint rule in [`pubspec.yaml`](file:///Users/matheusdias/developer/portifolio/pubspec.yaml).
+- Fixed code coverage for `DesktopViewModel.requestPermissionAndSendWelcome` in [`desktop_viewmodel_test.dart`](file:///Users/matheusdias/developer/portifolio/test/unit/features/desktop/desktop_viewmodel_test.dart) and localization keys (`welcomeTitle`, `welcomeBody`) in [`app_localizations_test.dart`](file:///Users/matheusdias/developer/portifolio/test/unit/l10n/app_localizations_test.dart).
+
 ---
 
 ## [2.1.0] — 2026-05-11

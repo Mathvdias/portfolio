@@ -1,25 +1,26 @@
+// ignore_for_file: prefer_const_constructors
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portifolio/core/errors/app_failure.dart';
 
 void main() {
   group('AppFailure Subclasses', () {
     test('NetworkFailure stores message correctly', () {
-      const failure = NetworkFailure('no connection');
+      final failure = NetworkFailure('no connection');
       expect(failure.message, 'no connection');
     });
 
     test('ServerFailure stores message correctly', () {
-      const failure = ServerFailure('server error');
+      final failure = ServerFailure('server error');
       expect(failure.message, 'server error');
     });
 
     test('CacheFailure stores message correctly', () {
-      const failure = CacheFailure('cache error');
+      final failure = CacheFailure('cache error');
       expect(failure.message, 'cache error');
     });
 
     test('ValidationFailure stores message correctly', () {
-      const failure = ValidationFailure('nameMessageEmpty');
+      final failure = ValidationFailure('nameMessageEmpty');
       expect(failure.message, 'nameMessageEmpty');
       expect(failure, isA<AppFailure>());
     });

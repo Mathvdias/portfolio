@@ -122,6 +122,17 @@ void main() {
       expect(l10n.semDeleteMessage, 'Delete message');
     });
 
+    test('welcomeTitle and welcomeBody return non-empty English values', () {
+      expect(enL10n.welcomeTitle, isNotEmpty);
+      expect(enL10n.welcomeBody, isNotEmpty);
+    });
+
+    test('welcomeTitle and welcomeBody fall back for unknown locale', () {
+      final l10n = AppLocalizations(const Locale('zz'));
+      expect(l10n.welcomeTitle, 'Welcome to MathOS!');
+      expect(l10n.welcomeBody, isNotEmpty);
+    });
+
     test('semBattery formats percent correctly', () {
       final l10n = AppLocalizations(const Locale('zz'));
       expect(l10n.semBattery(82), 'Battery 82%');
