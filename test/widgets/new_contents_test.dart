@@ -3,10 +3,12 @@
 // constructors execute at runtime and are tracked by the coverage tool.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lava_flutter/lava_flutter.dart';
 import 'package:portifolio/l10n/app_localizations.dart';
 import 'package:portifolio/shared/constants/app_strings.dart';
 import 'package:portifolio/shared/widgets/android_dev_window_content.dart';
 import 'package:portifolio/shared/widgets/flutter_dev_window_content.dart';
+import 'package:portifolio/shared/widgets/lava_studio_content.dart';
 import 'package:portifolio/shared/widgets/project_stats_window_content.dart';
 import 'package:portifolio/shared/widgets/wasm_diagnostics_content.dart';
 
@@ -298,5 +300,37 @@ void main() {
         await tester.pumpAndSettle();
       },
     );
+
+    testWidgets('LavaStudioContent renders 3D studio, controls, and badges', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: [AppLocalizationsDelegate()],
+          home: Scaffold(body: LavaStudioContent()),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.text(AppStrings.lavaStudioTitle), findsOneWidget);
+      expect(find.text(AppStrings.lavaStudioBadgeTile), findsOneWidget);
+      expect(find.text(AppStrings.lavaStudioBadgeAlpha), findsOneWidget);
+      expect(find.text(AppStrings.lavaStudioArchitecture), findsOneWidget);
+      expect(find.byType(LavaIcon), findsOneWidget);
+
+      // Tap speed selector
+      await tester.tap(find.text('2.0x'));
+      await tester.pump();
+
+      // Tap Play/Pause button
+      await tester.tap(find.byIcon(Icons.pause));
+      await tester.pump();
+      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+
+      // Tap reset
+      await tester.tap(find.byIcon(Icons.replay));
+      await tester.pump();
+    });
   });
 }

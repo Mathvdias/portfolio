@@ -15,6 +15,7 @@ abstract final class AppStrings {
   static const String winProjectStats = 'project_stats';
   static const String winFractal = 'fractal';
   static const String winWasmDiagnostics = 'wasm_diagnostics';
+  static const String winLava = 'lava';
 
   // Window titles
   static const String titleFinder = 'Finder';
@@ -31,6 +32,7 @@ abstract final class AppStrings {
   static const String titleProjectStats = 'Project Stats';
   static const String titleFractal = 'Fractal (Wasm)';
   static const String titleWasmDiagnostics = 'WASM Diagnostics';
+  static const String titleLava = 'Lava 3D Studio';
 
   // URLs
   static const String urlGitHub = 'https://github.com/Mathvdias';
@@ -52,6 +54,8 @@ abstract final class AppStrings {
       'https://github.com/Mathvdias/flutter_lazy_load_web';
   static const String urlPubDevLazyLoad =
       'https://pub.dev/packages/flutter_lazy_load_web';
+  static const String urlGitHubLava =
+      'https://github.com/Mathvdias/portfolio/tree/main/packages/lava_flutter';
   static const String emailAddress = 'mailto:mattmvc56@gmail.com';
   static const String emailRaw = 'mattmvc56@gmail.com';
 
@@ -69,6 +73,7 @@ abstract final class AppStrings {
   static const String iconInterceptedHttp = 'intercepted\n_http';
   static const String iconFractal = 'Fractal';
   static const String iconWasmDiagnostics = 'WASM Monitor';
+  static const String iconLava = 'Lava 3D';
 
   // Dock labels
   static const String dockGitHub = 'GitHub';
@@ -128,6 +133,9 @@ abstract final class AppStrings {
   static const String mobileAppMetrics = 'METRICS';
   static const String mobileAppMetricsSubtitle = 'CI & 100% Tests';
   static const String mobileAppMetricsTitle = 'METRICS & CI';
+  static const String mobileAppLava = 'LAVA 3D';
+  static const String mobileAppLavaSubtitle = 'Micro-Engine';
+  static const String mobileAppLavaTitle = 'LAVA 3D STUDIO';
 
   // Mobile projects
   static const String projectInterceptedName = 'intercepted_http';
@@ -255,4 +263,24 @@ abstract final class AppStrings {
       'GC: WebAssembly native Garbage Collection active.';
   static const String wasmGcDisabledLog =
       'GC: WebAssembly native Garbage Collection deactivated.';
+
+  // Lava Studio
+  static const String lavaStudioTitle = 'Lava 3D Micro-Animation Engine';
+  static const String lavaStudioSubtitle =
+      'Native 32-bit Alpha • Tile Atlas Blitting • Interactive Tactile Physics';
+  static const String lavaStudioHint =
+      'Hover to tilt in 3D • Tap for spring compression bounce';
+  static const String lavaStudioArchitecture = 'Why Lava?';
+  static const String lavaStudioArchitectureDesc =
+      'Standard Lottie cannot render photorealistic 3D lighting, while video players lack native cross-platform alpha channel support. Lava solves this by packing 3D raster frames into a GPU tile atlas, blitting at 60/120 FPS with zero heap allocations.';
+  static const String lavaStudioBadgeTile = 'Tile Atlas';
+  static const String lavaStudioBadgeAlpha = '32-bit RGBA';
+  static const String lavaStudioBadgePerspective = '3D Perspective';
+  static const String lavaStudioBadgeZeroAlloc = 'Zero Allocations';
+  static const String lavaStudioBadgeWasm = 'WASM Ready';
+  static const String lavaStudioBtnGithub = 'View on GitHub';
+  static const String lavaStudioBtnPubDev = 'Pub.dev Publisher';
+  static const String lavaStudioFrame = 'FRAME';
+  static const String lavaStudioStatus = 'STATUS';
+  static const String lavaStudioFps = '30 FPS';
 }

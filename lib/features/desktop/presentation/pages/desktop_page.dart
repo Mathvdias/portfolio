@@ -47,6 +47,8 @@ import '../../../../shared/widgets/skills_window_content.dart'
     deferred as skills_content;
 import '../../../../shared/widgets/snake_game_content.dart'
     deferred as snake_content;
+import '../../../../shared/widgets/lava_studio_content.dart'
+    deferred as lava_content;
 import '../../../../shared/widgets/spotlight_overlay.dart';
 import '../../../../shared/widgets/sticky_note.dart';
 import '../../../../shared/widgets/terminal_content.dart'
@@ -220,6 +222,12 @@ class _DesktopPageState extends State<DesktopPage> {
         iconWidget: Icon(Icons.insights),
         color: AppTheme.pink,
       ),
+      const SpotlightItem(
+        id: AppStrings.winLava,
+        label: AppStrings.titleLava,
+        iconWidget: Icon(Icons.view_in_ar_rounded),
+        color: AppTheme.peach,
+      ),
     ];
   }
 
@@ -387,6 +395,18 @@ class _DesktopPageState extends State<DesktopPage> {
           AppTheme.pink,
           width: 540,
           height: 480,
+        );
+      case AppStrings.winLava:
+        _desktopVM.openWindow(
+          id,
+          AppStrings.titleLava,
+          DeferredWidget(
+            _trackedLoad(id, lava_content.loadLibrary),
+            () => lava_content.LavaStudioContent(),
+          ),
+          AppTheme.peach,
+          width: 760,
+          height: 680,
         );
     }
   }

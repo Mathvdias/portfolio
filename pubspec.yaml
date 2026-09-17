@@ -43,6 +43,8 @@ dependencies:
   # Internal packages
   app_window:
     path: packages/app_window
+  lava_flutter:
+    path: packages/lava_flutter
   flutter_lazy_load_web: ^0.1.2
   flutter_svg: ^2.3.0
 

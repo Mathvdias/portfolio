@@ -339,6 +339,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.1"
+  lava_flutter:
+    dependency: "direct main"
+    description:
+      path: "packages/lava_flutter"
+      relative: true
+    source: path
+    version: "0.1.0"
   leak_tracker:
     dependency: transitive
     description:

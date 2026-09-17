@@ -23,6 +23,7 @@ import 'pixel_wallpaper.dart';
 import 'project_stats_window_content.dart';
 import 'skills_window_content.dart';
 import 'snake_game_content.dart';
+import 'lava_studio_content.dart';
 import 'terminal_content.dart';
 
 const _kMobileLanguages = [
@@ -649,6 +650,21 @@ class _MobileAppGrid extends StatelessWidget {
               title: AppStrings.mobileAppMetricsTitle,
               accent: AppTheme.teal,
               child: const ProjectStatsWindowContent(),
+            );
+          },
+        ),
+        _MobileAppCard(
+          title: AppStrings.mobileAppLava,
+          subtitle: AppStrings.mobileAppLavaSubtitle,
+          accent: AppTheme.peach,
+          iconSvg: AppSvgs.flutter,
+          onPlaySound: onPlaySound,
+          onTap: () {
+            onOpenApp(
+              context,
+              title: AppStrings.mobileAppLavaTitle,
+              accent: AppTheme.peach,
+              child: const LavaStudioContent(),
             );
           },
         ),
