@@ -318,33 +318,33 @@ class _WasmDiagnosticsContentState extends State<WasmDiagnosticsContent> {
           // Row of stats cards
           Row(
             children: [
-              _buildStatCard(
-                AppStrings.wasmFps,
-                _fps.toStringAsFixed(1),
-                _fps > (_detectedRefreshRate * 0.95)
+              _WasmStatCard(
+                title: AppStrings.wasmFps,
+                val: _fps.toStringAsFixed(1),
+                color: _fps > (_detectedRefreshRate * 0.95)
                     ? AppTheme.green
                     : AppTheme.yellow,
                 icon: Icons.speed,
               ),
               const SizedBox(width: AppSizes.spacingSm),
-              _buildStatCard(
-                AppStrings.wasmFrameLatency,
-                '${_frameTime.toStringAsFixed(1)}ms',
-                _frameTime < targetMs ? AppTheme.blue : AppTheme.peach,
+              _WasmStatCard(
+                title: AppStrings.wasmFrameLatency,
+                val: '${_frameTime.toStringAsFixed(1)}ms',
+                color: _frameTime < targetMs ? AppTheme.blue : AppTheme.peach,
                 icon: Icons.timelapse,
               ),
               const SizedBox(width: AppSizes.spacingSm),
-              _buildStatCard(
-                AppStrings.wasmHeap,
-                '${_heapMemory.toStringAsFixed(1)} MB',
-                _heapMemory < 19 ? AppTheme.teal : AppTheme.pink,
+              _WasmStatCard(
+                title: AppStrings.wasmHeap,
+                val: '${_heapMemory.toStringAsFixed(1)} MB',
+                color: _heapMemory < 19 ? AppTheme.teal : AppTheme.pink,
                 icon: Icons.memory,
               ),
               const SizedBox(width: AppSizes.spacingSm),
-              _buildStatCard(
-                AppStrings.wasmGcPause,
-                _gcPause > 0 ? '${_gcPause.toStringAsFixed(1)}ms' : '0.0ms',
-                _gcPause > 0 ? AppTheme.red : AppTheme.subtext,
+              _WasmStatCard(
+                title: AppStrings.wasmGcPause,
+                val: _gcPause > 0 ? '${_gcPause.toStringAsFixed(1)}ms' : '0.0ms',
+                color: _gcPause > 0 ? AppTheme.red : AppTheme.subtext,
                 icon: Icons.delete_sweep,
                 pulse: _gcPause > 0,
               ),
@@ -455,25 +455,33 @@ class _WasmDiagnosticsContentState extends State<WasmDiagnosticsContent> {
               ),
               const Spacer(),
               // Custom switches
-              _buildCustomToggle(AppStrings.wasmSimd, _simdEnabled, (val) {
-                setState(() => _simdEnabled = val);
-                addLog(
-                  AppStrings.wasmSimd,
-                  val
-                      ? AppStrings.wasmSimdEnabledLog
-                      : AppStrings.wasmSimdDisabledLog,
-                );
-              }),
+              _WasmCustomToggle(
+                label: AppStrings.wasmSimd,
+                value: _simdEnabled,
+                onChanged: (val) {
+                  setState(() => _simdEnabled = val);
+                  addLog(
+                    AppStrings.wasmSimd,
+                    val
+                        ? AppStrings.wasmSimdEnabledLog
+                        : AppStrings.wasmSimdDisabledLog,
+                  );
+                },
+              ),
               const SizedBox(width: AppSizes.spacingLg),
-              _buildCustomToggle(AppStrings.wasmWasmGc, _gcEnabled, (val) {
-                setState(() => _gcEnabled = val);
-                addLog(
-                  AppStrings.wasmWasmGc,
-                  val
-                      ? AppStrings.wasmGcEnabledLog
-                      : AppStrings.wasmGcDisabledLog,
-                );
-              }),
+              _WasmCustomToggle(
+                label: AppStrings.wasmWasmGc,
+                value: _gcEnabled,
+                onChanged: (val) {
+                  setState(() => _gcEnabled = val);
+                  addLog(
+                    AppStrings.wasmWasmGc,
+                    val
+                        ? AppStrings.wasmGcEnabledLog
+                        : AppStrings.wasmGcDisabledLog,
+                  );
+                },
+              ),
             ],
           ),
           const SizedBox(height: AppSizes.spacingMd),
@@ -546,14 +554,25 @@ class _WasmDiagnosticsContentState extends State<WasmDiagnosticsContent> {
       ),
     );
   }
+}
 
-  Widget _buildStatCard(
-    String title,
-    String val,
-    Color color, {
-    required IconData icon,
-    bool pulse = false,
-  }) {
+class _WasmStatCard extends StatelessWidget {
+  const _WasmStatCard({
+    required this.title,
+    required this.val,
+    required this.color,
+    required this.icon,
+    this.pulse = false,
+  });
+
+  final String title;
+  final String val;
+  final Color color;
+  final IconData icon;
+  final bool pulse;
+
+  @override
+  Widget build(BuildContext context) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(
@@ -599,12 +618,21 @@ class _WasmDiagnosticsContentState extends State<WasmDiagnosticsContent> {
       ),
     );
   }
+}
 
-  Widget _buildCustomToggle(
-    String label,
-    bool value,
-    ValueChanged<bool> onChanged,
-  ) {
+class _WasmCustomToggle extends StatelessWidget {
+  const _WasmCustomToggle({
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final String label;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => onChanged(!value),
       child: MouseRegion(

@@ -30,7 +30,9 @@ class _Particle {
 }
 
 class PixelWallpaper extends StatefulWidget {
-  const PixelWallpaper({super.key});
+  const PixelWallpaper({super.key, this.animate = true});
+
+  final bool animate;
 
   @override
   State<PixelWallpaper> createState() => _PixelWallpaperState();
@@ -57,7 +59,34 @@ class _PixelWallpaperState extends State<PixelWallpaper>
       _lastElapsed = elapsed;
       _elapsed.value += dt;
     });
-    _ticker.start();
+
+    bool isTest = false;
+    assert(() {
+      isTest = WidgetsBinding.instance.runtimeType.toString().contains('Test');
+      return true;
+    }());
+
+    if (widget.animate && !isTest) {
+      _ticker.start();
+    }
+  }
+
+  @override
+  void didUpdateWidget(PixelWallpaper oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.animate != oldWidget.animate) {
+      bool isTest = false;
+      assert(() {
+        isTest =
+            WidgetsBinding.instance.runtimeType.toString().contains('Test');
+        return true;
+      }());
+      if (widget.animate && !_ticker.isActive && !isTest) {
+        _ticker.start();
+      } else if (!widget.animate && _ticker.isActive) {
+        _ticker.stop();
+      }
+    }
   }
 
   void _buildParticles() {

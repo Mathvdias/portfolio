@@ -42,6 +42,16 @@ abstract final class AppStrings {
   static const String urlWhitepaper = 'https://matheusdias.gitbook.io/tesouro';
   static const String urlGitHubIntercepted =
       'https://github.com/Mathvdias/intercepted_http';
+  static const String urlPubDevIntercepted =
+      'https://pub.dev/packages/intercepted_http';
+  static const String urlGitHubHomelab =
+      'https://github.com/Mathvdias/homelab-infrastructure';
+  static const String urlGitHubLiturgical =
+      'https://github.com/cm-manaus/liturgical-calendar-engine';
+  static const String urlGitHubLazyLoad =
+      'https://github.com/Mathvdias/flutter_lazy_load_web';
+  static const String urlPubDevLazyLoad =
+      'https://pub.dev/packages/flutter_lazy_load_web';
   static const String emailAddress = 'mailto:mattmvc56@gmail.com';
   static const String emailRaw = 'mattmvc56@gmail.com';
 
@@ -68,6 +78,7 @@ abstract final class AppStrings {
   static const String dockEmail = 'Email';
   static const String dockGuestbook = 'Guestbook';
   static const String dockProjectStats = 'Stats';
+  static const String dockResume = 'Resume';
 
   // Context menu
   static const String ctxNewNote = 'New Sticky Note';
@@ -82,6 +93,57 @@ abstract final class AppStrings {
   static const String mobileTitle = 'MATHEUS DIAS';
   static const String mobileSubtitle = 'Portfolio\ndesigned\nfor desktop';
   static const String mobileGitHubLink = 'github.com/Mathvdias';
+  static const String mobileRole = 'Mobile Software Engineer';
+  static const String mobileLocation = 'São Paulo, SP — Brazil';
+  static const String mobileBattery = '82%';
+  static const String mobilePocketApps = 'POCKET APPS';
+  static const String mobileEsc = 'ESC';
+  static const String mobileDefaultRole = 'Software Engineer';
+
+  // Mobile pocket apps
+  static const String mobileAppAbout = 'ABOUT';
+  static const String mobileAppAboutSubtitle = 'Bio & Education';
+  static const String mobileAppAboutTitle = 'ABOUT ME';
+  static const String mobileAppExperience = 'EXPERIENCE';
+  static const String mobileAppExperienceSubtitle = 'Career Timeline';
+  static const String mobileAppExperienceTitle = 'EXPERIENCE';
+  static const String mobileAppSkills = 'SKILLS';
+  static const String mobileAppSkillsSubtitle = 'Stack & Tools';
+  static const String mobileAppSkillsTitle = 'TECHNICAL SKILLS';
+  static const String mobileAppProjects = 'PROJECTS';
+  static const String mobileAppProjectsSubtitle = 'Open Source';
+  static const String mobileAppProjectsTitle = 'PROJECTS';
+  static const String mobileAppGuestbook = 'GUESTBOOK';
+  static const String mobileAppGuestbookSubtitle = 'Leave a Note';
+  static const String mobileAppGuestbookTitle = 'GUESTBOOK';
+  static const String mobileAppTerminal = 'TERMINAL';
+  static const String mobileAppTerminalSubtitle = 'Interactive Shell';
+  static const String mobileAppTerminalTitle = 'TERMINAL';
+  static const String mobileAppSnake = 'SNAKE';
+  static const String mobileAppSnakeSubtitle = 'Retro Arcade';
+  static const String mobileAppSnakeTitle = 'SNAKE GAME';
+  static const String mobileAppCalc = 'CALC';
+  static const String mobileAppCalcSubtitle = 'Calculator';
+  static const String mobileAppCalcTitle = 'CALCULATOR';
+  static const String mobileAppMetrics = 'METRICS';
+  static const String mobileAppMetricsSubtitle = 'CI & 100% Tests';
+  static const String mobileAppMetricsTitle = 'METRICS & CI';
+
+  // Mobile projects
+  static const String projectInterceptedName = 'intercepted_http';
+  static const String projectInterceptedDesc =
+      'Composable HTTP interceptor layer for Dart / Flutter — token refresh, auth, and retry without replacing client.';
+  static const String projectHomelabName = 'homelab-infrastructure';
+  static const String projectHomelabDesc =
+      'IaC & SRE automation for bare-metal homelab: Docker microservices, Linux BBR TCP kernel tuning, Cloudflare R2.';
+  static const String projectLiturgicalName = 'liturgical-calendar-engine';
+  static const String projectLiturgicalDesc =
+      'High-performance traditional Roman Rite liturgical calendar computation engine in Go.';
+  static const String projectLazyLoadName = 'flutter_lazy_load_web';
+  static const String projectLazyLoadDesc =
+      'A Flutter package for intelligent on-demand deferred chunk loading on Flutter Web.';
+  static const String projectBtnGitHub = 'GitHub';
+  static const String projectBtnPubDev = 'pub.dev';
 
   // About window
   static const String aboutName = 'MATHEUS DIAS';

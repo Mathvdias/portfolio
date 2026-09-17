@@ -311,7 +311,8 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
                             : const SizedBox.shrink(),
               ),
               // Touch D-pad for mobile gameplay (only shown when showDpad is true)
-              if (widget.showDpad) _buildDpad(),
+              if (widget.showDpad)
+                _SnakeDpad(onDirection: _handleDpadDirection),
             ],
           ),
         ),
@@ -319,57 +320,80 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
     );
   }
 
-  Widget _buildDpad() {
-    Widget dpadBtn({
-      required IconData icon,
-      required _Dir dir,
-    }) {
-      return Material(
-        color: AppTheme.surface,
+  void _handleDpadDirection(_Dir dir) {
+    final s = _state.value;
+    if (!s.running || s.gameOver) _start();
+    final opposite = switch (dir) {
+      _Dir.up => _Dir.down,
+      _Dir.down => _Dir.up,
+      _Dir.left => _Dir.right,
+      _Dir.right => _Dir.left,
+    };
+    if (_dir != opposite) {
+      _nextDir = dir;
+    }
+  }
+}
+
+class _SnakeDpadButton extends StatelessWidget {
+  const _SnakeDpadButton({
+    required this.icon,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppTheme.surface,
+      borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(8),
-        child: InkWell(
-          onTap: () {
-            final s = _state.value;
-            if (!s.running || s.gameOver) _start();
-            final opposite = switch (dir) {
-              _Dir.up => _Dir.down,
-              _Dir.down => _Dir.up,
-              _Dir.left => _Dir.right,
-              _Dir.right => _Dir.left,
-            };
-            if (_dir != opposite) {
-              _nextDir = dir;
-            }
-          },
-          borderRadius: BorderRadius.circular(8),
-          splashColor: AppTheme.blue.withValues(alpha: 0.3),
-          highlightColor: AppTheme.blue.withValues(alpha: 0.2),
-          child: Container(
-            width: 46,
-            height: 46,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppTheme.surface0, width: 1.5),
-            ),
-            child: Center(
-              child: Icon(icon, color: AppTheme.blue, size: 28),
-            ),
+        splashColor: AppTheme.blue.withValues(alpha: 0.3),
+        highlightColor: AppTheme.blue.withValues(alpha: 0.2),
+        child: Container(
+          width: 46,
+          height: 46,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppTheme.surface0, width: 1.5),
+          ),
+          child: Center(
+            child: Icon(icon, color: AppTheme.blue, size: 28),
           ),
         ),
-      );
-    }
+      ),
+    );
+  }
+}
 
+class _SnakeDpad extends StatelessWidget {
+  const _SnakeDpad({required this.onDirection});
+
+  final void Function(_Dir) onDirection;
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSizes.spacingSm),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          dpadBtn(icon: Icons.arrow_drop_up, dir: _Dir.up),
+          _SnakeDpadButton(
+            icon: Icons.arrow_drop_up,
+            onTap: () => onDirection(_Dir.up),
+          ),
           const SizedBox(height: 4),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              dpadBtn(icon: Icons.arrow_left, dir: _Dir.left),
+              _SnakeDpadButton(
+                icon: Icons.arrow_left,
+                onTap: () => onDirection(_Dir.left),
+              ),
               Container(
                 width: 36,
                 height: 36,
@@ -390,11 +414,17 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
                   ),
                 ),
               ),
-              dpadBtn(icon: Icons.arrow_right, dir: _Dir.right),
+              _SnakeDpadButton(
+                icon: Icons.arrow_right,
+                onTap: () => onDirection(_Dir.right),
+              ),
             ],
           ),
           const SizedBox(height: 4),
-          dpadBtn(icon: Icons.arrow_drop_down, dir: _Dir.down),
+          _SnakeDpadButton(
+            icon: Icons.arrow_drop_down,
+            onTap: () => onDirection(_Dir.down),
+          ),
         ],
       ),
     );

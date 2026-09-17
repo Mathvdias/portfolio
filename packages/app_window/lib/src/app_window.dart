@@ -115,44 +115,65 @@ class _AppWindowState extends State<AppWindow>
               Positioned(left: pos.dx, top: pos.dy, child: child!),
       child: GestureDetector(
         onTap: widget.onFocus,
-        child: RepaintBoundary(child: buildAnimatedWindow(_buildWindow())),
-      ),
-    );
-  }
-
-  Widget _buildWindow() {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 250),
-      curve: Curves.easeInOut,
-      width: _width,
-      height: _height,
-      decoration: BoxDecoration(
-        color: widget.titleBarColor,
-        border: Border.all(
-          color: widget.borderColor,
-          width: _isMaximized ? 0 : 2,
-        ),
-        boxShadow:
-            _isMaximized
-                ? []
-                : const [
-                  BoxShadow(
-                    color: Colors.black54,
-                    blurRadius: 24,
-                    offset: Offset(6, 6),
+        child: RepaintBoundary(
+          child: buildAnimatedWindow(
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              width: _width,
+              height: _height,
+              decoration: BoxDecoration(
+                color: widget.titleBarColor,
+                border: Border.all(
+                  color: widget.borderColor,
+                  width: _isMaximized ? 0 : 2,
+                ),
+                boxShadow:
+                    _isMaximized
+                        ? []
+                        : const [
+                          BoxShadow(
+                            color: Colors.black54,
+                            blurRadius: 24,
+                            offset: Offset(6, 6),
+                          ),
+                        ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _AppWindowTitleBar(
+                    title: widget.title,
+                    titleStyle: _titleStyle,
+                    titleBarHeight: widget.titleBarHeight,
+                    titleBarColor: widget.titleBarColor,
+                    closeColor: widget.closeColor,
+                    minimizeColor: widget.minimizeColor,
+                    maximizeColor: widget.maximizeColor,
+                    trafficLightSize: widget.trafficLightSize,
+                    trafficLightSpacing: widget.trafficLightSpacing,
+                    onClose: _closeWindow,
+                    onToggleMaximize: _toggleMaximize,
+                    onPanStart: (_) => widget.onFocus(),
+                    onPanUpdate: (details) {
+                      if (!_isMaximized) {
+                        _positionNotifier.value += details.delta;
+                      }
+                    },
+                  ),
+                  Expanded(
+                    child: RepaintBoundary(
+                      child: Container(
+                        color: widget.contentColor,
+                        child: widget.child,
+                      ),
+                    ),
                   ),
                 ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _buildTitleBar(),
-          Expanded(
-            child: RepaintBoundary(
-              child: Container(color: widget.contentColor, child: widget.child),
+              ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -160,51 +181,80 @@ class _AppWindowState extends State<AppWindow>
   void _closeWindow() {
     closeWithAnimation(widget.onClose);
   }
+}
 
-  Widget _buildTitleBar() {
+class _AppWindowTitleBar extends StatelessWidget {
+  const _AppWindowTitleBar({
+    required this.title,
+    required this.titleStyle,
+    required this.titleBarHeight,
+    required this.titleBarColor,
+    required this.closeColor,
+    required this.minimizeColor,
+    required this.maximizeColor,
+    required this.trafficLightSize,
+    required this.trafficLightSpacing,
+    required this.onClose,
+    required this.onToggleMaximize,
+    required this.onPanStart,
+    required this.onPanUpdate,
+  });
+
+  final String title;
+  final TextStyle titleStyle;
+  final double titleBarHeight;
+  final Color titleBarColor;
+  final Color closeColor;
+  final Color minimizeColor;
+  final Color maximizeColor;
+  final double trafficLightSize;
+  final double trafficLightSpacing;
+  final VoidCallback onClose;
+  final VoidCallback onToggleMaximize;
+  final GestureDragStartCallback onPanStart;
+  final GestureDragUpdateCallback onPanUpdate;
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
-      onDoubleTap: _toggleMaximize,
-      onPanStart: (_) => widget.onFocus(),
-      onPanUpdate: (details) {
-        if (!_isMaximized) {
-          _positionNotifier.value += details.delta;
-        }
-      },
+      onDoubleTap: onToggleMaximize,
+      onPanStart: onPanStart,
+      onPanUpdate: onPanUpdate,
       child: Container(
-        height: widget.titleBarHeight,
-        color: widget.titleBarColor,
+        height: titleBarHeight,
+        color: titleBarColor,
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Row(
           children: [
             GestureDetector(
               key: const Key('close_button'),
-              onTap: _closeWindow,
+              onTap: onClose,
               child: Container(
-                width: widget.trafficLightSize,
-                height: widget.trafficLightSize,
+                width: trafficLightSize,
+                height: trafficLightSize,
                 decoration: BoxDecoration(
-                  color: widget.closeColor,
+                  color: closeColor,
                   shape: BoxShape.circle,
                 ),
               ),
             ),
-            SizedBox(width: widget.trafficLightSpacing),
+            SizedBox(width: trafficLightSpacing),
             Container(
-              width: widget.trafficLightSize,
-              height: widget.trafficLightSize,
+              width: trafficLightSize,
+              height: trafficLightSize,
               decoration: BoxDecoration(
-                color: widget.minimizeColor,
+                color: minimizeColor,
                 shape: BoxShape.circle,
               ),
             ),
-            SizedBox(width: widget.trafficLightSpacing),
+            SizedBox(width: trafficLightSpacing),
             GestureDetector(
-              onTap: _toggleMaximize,
+              onTap: onToggleMaximize,
               child: Container(
-                width: widget.trafficLightSize,
-                height: widget.trafficLightSize,
+                width: trafficLightSize,
+                height: trafficLightSize,
                 decoration: BoxDecoration(
-                  color: widget.maximizeColor,
+                  color: maximizeColor,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -212,8 +262,8 @@ class _AppWindowState extends State<AppWindow>
             Expanded(
               child: Center(
                 child: Text(
-                  widget.title,
-                  style: _titleStyle,
+                  title,
+                  style: titleStyle,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

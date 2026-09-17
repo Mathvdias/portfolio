@@ -28,6 +28,11 @@ void main() {
         AppStrings.urlResume,
         AppStrings.urlWhitepaper,
         AppStrings.urlGitHubIntercepted,
+        AppStrings.urlPubDevIntercepted,
+        AppStrings.urlGitHubHomelab,
+        AppStrings.urlGitHubLiturgical,
+        AppStrings.urlGitHubLazyLoad,
+        AppStrings.urlPubDevLazyLoad,
         AppStrings.emailAddress,
       ];
       for (final url in urls) {
@@ -39,6 +44,26 @@ void main() {
           reason: 'URL "$url" should start with https://, mailto:, or /',
         );
       }
+    });
+
+    test('mobile fallback constants are non-empty', () {
+      expect(AppStrings.mobileTitle, isNotEmpty);
+      expect(AppStrings.mobileSubtitle, isNotEmpty);
+      expect(AppStrings.mobileGitHubLink, isNotEmpty);
+      expect(AppStrings.mobileRole, isNotEmpty);
+      expect(AppStrings.mobileLocation, isNotEmpty);
+      expect(AppStrings.mobileBattery, isNotEmpty);
+      expect(AppStrings.mobilePocketApps, isNotEmpty);
+      expect(AppStrings.mobileEsc, isNotEmpty);
+      expect(AppStrings.mobileAppAbout, isNotEmpty);
+      expect(AppStrings.mobileAppExperience, isNotEmpty);
+      expect(AppStrings.mobileAppSkills, isNotEmpty);
+      expect(AppStrings.mobileAppProjects, isNotEmpty);
+      expect(AppStrings.mobileAppGuestbook, isNotEmpty);
+      expect(AppStrings.mobileAppTerminal, isNotEmpty);
+      expect(AppStrings.mobileAppSnake, isNotEmpty);
+      expect(AppStrings.mobileAppCalc, isNotEmpty);
+      expect(AppStrings.mobileAppMetrics, isNotEmpty);
     });
 
     test('all window titles are non-empty', () {

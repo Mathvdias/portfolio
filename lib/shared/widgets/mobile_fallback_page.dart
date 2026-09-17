@@ -19,6 +19,7 @@ import '../models/experience.dart';
 import 'about_window_content.dart';
 import 'calculator_content.dart';
 import 'experience_window_content.dart';
+import 'pixel_wallpaper.dart';
 import 'project_stats_window_content.dart';
 import 'skills_window_content.dart';
 import 'snake_game_content.dart';
@@ -35,8 +36,9 @@ const _kMobileLanguages = [
 /// A rich, responsive "MathOS Pocket Edition" shown on mobile devices.
 ///
 /// Features a retro cyberdeck status bar, interactive app launcher grid,
-/// macOS-styled modal sheets with live contents (Guestbook, Terminal, Snake,
-/// Experiences, Skills), and quick links to professional profiles.
+/// animated cosmic wallpaper with parallax scroll, macOS-styled modal sheets
+/// with live contents (Guestbook, Terminal, Snake, Experiences, Skills),
+/// and quick links to professional profiles.
 class MobileFallbackPage extends StatefulWidget {
   const MobileFallbackPage({super.key});
 
@@ -46,6 +48,7 @@ class MobileFallbackPage extends StatefulWidget {
 
 class _MobileFallbackPageState extends State<MobileFallbackPage> {
   late Timer _clockTimer;
+  late final ScrollController _scrollController;
   DateTime _now = DateTime.now();
   SoundService? _sound;
   bool _muted = false;
@@ -53,6 +56,7 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
     _clockTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() => _now = DateTime.now());
     });
@@ -72,6 +76,7 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
   @override
   void dispose() {
     _clockTimer.cancel();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -128,13 +133,6 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
     });
   }
 
-  void _openSheet(
-    BuildContext context, {
-    required String title,
-    required Color accent,
-    required Widget child,
-  }) => _openApp(context, title: title, accent: accent, child: child);
-
   @override
   Widget build(BuildContext context) {
     AppLocalizations? l10n;
@@ -146,108 +144,159 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
         ? ExperienceMapper.fromL10n(l10n.experiences)
         : <Experience>[];
 
-    final hourStr = _now.hour.toString().padLeft(2, '0');
-    final minStr = _now.minute.toString().padLeft(2, '0');
-
     return Scaffold(
       backgroundColor: AppTheme.background,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // ── Top Status Bar ─────────────────────────────────────────
-            Container(
-              height: 38,
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              decoration: const BoxDecoration(
-                color: AppTheme.surface,
-                border: Border(bottom: BorderSide(color: AppTheme.surface0, width: 1)),
-              ),
-              child: Row(
-                children: [
-                  Text(
-                    '$hourStr:$minStr',
-                    style: GoogleFonts.pressStart2p(
-                      fontSize: 9,
-                      color: AppTheme.text,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  // Sound Toggle
-                  GestureDetector(
-                    onTap: () {
-                      final s = _sound ?? SoundService();
-                      s.toggleMute();
-                      setState(() => _muted = s.isMuted);
-                      if (!_muted) s.playClick();
-                    },
-                    child: Icon(
-                      _muted ? Icons.volume_off : Icons.volume_up,
-                      size: 15,
-                      color: _muted ? AppTheme.subtext : AppTheme.green,
-                    ),
-                  ),
-                  const Spacer(),
-                  // Language Picker
-                  _buildLanguagePicker(),
-                  const SizedBox(width: 10),
-                  const Icon(Icons.wifi, size: 14, color: AppTheme.teal),
-                  const SizedBox(width: 6),
-                  Text(
-                    '82%',
-                    style: GoogleFonts.spaceMono(fontSize: 10, color: AppTheme.subtext),
-                  ),
-                  const SizedBox(width: 2),
-                  const Icon(Icons.battery_5_bar, size: 16, color: AppTheme.green),
-                ],
+      body: Stack(
+        children: [
+          // ── Parallax Cosmic Wallpaper ─────────────────────────────
+          Positioned(
+            top: -120,
+            bottom: -400,
+            left: 0,
+            right: 0,
+            child: AnimatedBuilder(
+              animation: _scrollController,
+              builder: (context, child) {
+                final offset =
+                    _scrollController.hasClients ? _scrollController.offset : 0.0;
+                return Transform.translate(
+                  offset: Offset(0, -offset * 0.3),
+                  child: child,
+                );
+              },
+              child: const RepaintBoundary(
+                child: PixelWallpaper(),
               ),
             ),
+          ),
 
-            // ── Main Scrollable Body ──────────────────────────────────
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Profile Header Card
-                    _buildProfileCard(l10n),
-                    const SizedBox(height: 20),
-
-                    // Section Title
-                    Row(
+          // ── Foreground Cyberdeck UI ───────────────────────────────
+          SafeArea(
+            child: Column(
+              children: [
+                _MobileStatusBar(
+                  now: _now,
+                  sound: _sound,
+                  muted: _muted,
+                  onToggleMute: () {
+                    final s = _sound ?? SoundService();
+                    s.toggleMute();
+                    setState(() => _muted = s.isMuted);
+                    if (!_muted) s.playClick();
+                  },
+                  onPlaySound: _playSound,
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 18,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const Icon(Icons.grid_view_rounded, size: 14, color: AppTheme.mauve),
-                        const SizedBox(width: 8),
-                        Text(
-                          'POCKET APPS',
-                          style: GoogleFonts.pressStart2p(
-                            fontSize: 10,
-                            color: AppTheme.mauve,
-                            letterSpacing: 1.5,
-                          ),
+                        _MobileProfileCard(onLaunch: _launch),
+                        const SizedBox(height: 20),
+                        const _PocketAppsHeader(),
+                        const SizedBox(height: 12),
+                        _MobileAppGrid(
+                          l10n: l10n,
+                          experiences: experiences,
+                          onOpenApp: _openApp,
+                          onPlaySound: _playSound,
+                          onLaunch: _launch,
                         ),
+                        const SizedBox(height: 24),
+                        _MobileQuickDock(
+                          onPlaySound: _playSound,
+                          onLaunch: _launch,
+                        ),
+                        const SizedBox(height: 20),
                       ],
                     ),
-                    const SizedBox(height: 12),
-
-                    // Pocket Apps Grid
-                    _buildAppGrid(context, l10n, experiences),
-                    const SizedBox(height: 24),
-
-                    // Quick Links Dock Bar
-                    _buildQuickDock(),
-                    const SizedBox(height: 20),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
+}
 
-  Widget _buildLanguagePicker() {
+class _MobileStatusBar extends StatelessWidget {
+  const _MobileStatusBar({
+    required this.now,
+    required this.sound,
+    required this.muted,
+    required this.onToggleMute,
+    required this.onPlaySound,
+  });
+
+  final DateTime now;
+  final SoundService? sound;
+  final bool muted;
+  final VoidCallback onToggleMute;
+  final void Function(void Function(SoundService)) onPlaySound;
+
+  @override
+  Widget build(BuildContext context) {
+    final hourStr = now.hour.toString().padLeft(2, '0');
+    final minStr = now.minute.toString().padLeft(2, '0');
+
+    return Container(
+      height: 38,
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      decoration: BoxDecoration(
+        color: AppTheme.surface.withValues(alpha: 0.95),
+        border: const Border(
+          bottom: BorderSide(color: AppTheme.surface0, width: 1),
+        ),
+      ),
+      child: Row(
+        children: [
+          Text(
+            '$hourStr:$minStr',
+            style: GoogleFonts.pressStart2p(
+              fontSize: 9,
+              color: AppTheme.text,
+            ),
+          ),
+          const SizedBox(width: 12),
+          GestureDetector(
+            onTap: onToggleMute,
+            child: Icon(
+              muted ? Icons.volume_off : Icons.volume_up,
+              size: 15,
+              color: muted ? AppTheme.subtext : AppTheme.green,
+            ),
+          ),
+          const Spacer(),
+          _MobileLanguagePicker(onPlaySound: onPlaySound),
+          const SizedBox(width: 10),
+          const Icon(Icons.wifi, size: 14, color: AppTheme.teal),
+          const SizedBox(width: 6),
+          Text(
+            AppStrings.mobileBattery,
+            style: GoogleFonts.spaceMono(fontSize: 10, color: AppTheme.subtext),
+          ),
+          const SizedBox(width: 2),
+          const Icon(Icons.battery_5_bar, size: 16, color: AppTheme.green),
+        ],
+      ),
+    );
+  }
+}
+
+class _MobileLanguagePicker extends StatelessWidget {
+  const _MobileLanguagePicker({required this.onPlaySound});
+
+  final void Function(void Function(SoundService)) onPlaySound;
+
+  @override
+  Widget build(BuildContext context) {
     String currentCode = 'en';
     try {
       currentCode = AppDependencies.of(context).localeViewModel.currentCode;
@@ -258,7 +307,7 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
       offset: const Offset(0, 24),
       padding: EdgeInsets.zero,
       onSelected: (code) {
-        _playSound((s) => s.playClick());
+        onPlaySound((s) => s.playClick());
         try {
           AppDependencies.of(context).localeViewModel.setLocaleByCode(code);
         } catch (_) {}
@@ -298,12 +347,19 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
       }).toList(),
     );
   }
+}
 
-  Widget _buildProfileCard(AppLocalizations? l10n) {
+class _MobileProfileCard extends StatelessWidget {
+  const _MobileProfileCard({required this.onLaunch});
+
+  final Future<void> Function(String) onLaunch;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: AppTheme.surface.withValues(alpha: 0.92),
         borderRadius: BorderRadius.circular(AppSizes.radiusLg),
         border: Border.all(color: AppTheme.surface0, width: 1.5),
       ),
@@ -339,7 +395,7 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Mobile Software Engineer',
+                      AppStrings.mobileRole,
                       style: GoogleFonts.spaceMono(
                         fontSize: 12,
                         color: AppTheme.text,
@@ -366,14 +422,17 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
               const Icon(Icons.location_on, size: 12, color: AppTheme.red),
               const SizedBox(width: 4),
               Text(
-                'São Paulo, SP — Brazil',
-                style: GoogleFonts.spaceMono(fontSize: 11, color: AppTheme.subtext),
+                AppStrings.mobileLocation,
+                style: GoogleFonts.spaceMono(
+                  fontSize: 11,
+                  color: AppTheme.subtext,
+                ),
               ),
             ],
           ),
           const SizedBox(height: 8),
           TextButton(
-            onPressed: () => _launch(AppStrings.urlGitHub),
+            onPressed: () => onLaunch(AppStrings.urlGitHub),
             style: TextButton.styleFrom(
               padding: EdgeInsets.zero,
               minimumSize: const Size(50, 30),
@@ -392,12 +451,52 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
       ),
     );
   }
+}
 
-  Widget _buildAppGrid(
-    BuildContext context,
-    AppLocalizations? l10n,
-    List<Experience> experiences,
-  ) {
+class _PocketAppsHeader extends StatelessWidget {
+  const _PocketAppsHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Icon(Icons.grid_view_rounded, size: 14, color: AppTheme.mauve),
+        const SizedBox(width: 8),
+        Text(
+          AppStrings.mobilePocketApps,
+          style: GoogleFonts.pressStart2p(
+            fontSize: 10,
+            color: AppTheme.mauve,
+            letterSpacing: 1.5,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MobileAppGrid extends StatelessWidget {
+  const _MobileAppGrid({
+    required this.l10n,
+    required this.experiences,
+    required this.onOpenApp,
+    required this.onPlaySound,
+    required this.onLaunch,
+  });
+
+  final AppLocalizations? l10n;
+  final List<Experience> experiences;
+  final void Function(
+    BuildContext context, {
+    required String title,
+    required Color accent,
+    required Widget child,
+  }) onOpenApp;
+  final void Function(void Function(SoundService)) onPlaySound;
+  final Future<void> Function(String) onLaunch;
+
+  @override
+  Widget build(BuildContext context) {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -406,136 +505,145 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
       crossAxisSpacing: 10,
       childAspectRatio: 1.45,
       children: [
-        _buildAppCard(
-          title: 'ABOUT',
-          subtitle: 'Bio & Education',
+        _MobileAppCard(
+          title: AppStrings.mobileAppAbout,
+          subtitle: AppStrings.mobileAppAboutSubtitle,
           accent: AppTheme.blue,
           iconSvg: AppSvgs.person,
+          onPlaySound: onPlaySound,
           onTap: () {
-            _openSheet(
+            onOpenApp(
               context,
-              title: 'ABOUT ME',
+              title: AppStrings.mobileAppAboutTitle,
               accent: AppTheme.blue,
               child: AboutWindowContent(
                 bio: l10n?.bio ?? '',
-                role: l10n?.role ?? 'Software Engineer',
+                role: l10n?.role ?? AppStrings.mobileDefaultRole,
               ),
             );
           },
         ),
-        _buildAppCard(
-          title: 'EXPERIENCE',
-          subtitle: 'Career Timeline',
+        _MobileAppCard(
+          title: AppStrings.mobileAppExperience,
+          subtitle: AppStrings.mobileAppExperienceSubtitle,
           accent: AppTheme.peach,
           iconSvg: AppSvgs.kotlin,
+          onPlaySound: onPlaySound,
           onTap: () {
-            _openSheet(
+            onOpenApp(
               context,
-              title: 'EXPERIENCE',
+              title: AppStrings.mobileAppExperienceTitle,
               accent: AppTheme.peach,
-              child: _buildExperienceList(experiences),
+              child: _MobileExperienceList(experiences: experiences),
             );
           },
         ),
-        _buildAppCard(
-          title: 'SKILLS',
-          subtitle: 'Stack & Tools',
+        _MobileAppCard(
+          title: AppStrings.mobileAppSkills,
+          subtitle: AppStrings.mobileAppSkillsSubtitle,
           accent: AppTheme.mauve,
           iconSvg: AppSvgs.skills,
+          onPlaySound: onPlaySound,
           onTap: () {
-            _openSheet(
+            onOpenApp(
               context,
-              title: 'TECHNICAL SKILLS',
+              title: AppStrings.mobileAppSkillsTitle,
               accent: AppTheme.mauve,
               child: const SkillsWindowContent(),
             );
           },
         ),
-        _buildAppCard(
-          title: 'PROJECTS',
-          subtitle: 'Open Source',
+        _MobileAppCard(
+          title: AppStrings.mobileAppProjects,
+          subtitle: AppStrings.mobileAppProjectsSubtitle,
           accent: AppTheme.teal,
           iconSvg: AppSvgs.file,
+          onPlaySound: onPlaySound,
           onTap: () {
-            _openSheet(
+            onOpenApp(
               context,
-              title: 'PROJECTS',
+              title: AppStrings.mobileAppProjectsTitle,
               accent: AppTheme.teal,
-              child: _buildProjectsList(),
+              child: _MobileProjectsList(onLaunch: onLaunch),
             );
           },
         ),
-        _buildAppCard(
-          title: 'GUESTBOOK',
-          subtitle: 'Leave a Note',
+        _MobileAppCard(
+          title: AppStrings.mobileAppGuestbook,
+          subtitle: AppStrings.mobileAppGuestbookSubtitle,
           accent: AppTheme.mauve,
           iconSvg: AppSvgs.guestbook,
+          onPlaySound: onPlaySound,
           onTap: () {
             GuestbookViewModel? vm;
             try {
               vm = AppDependencies.of(context).guestbookViewModel;
             } catch (_) {}
             if (vm != null) {
-              _openSheet(
+              onOpenApp(
                 context,
-                title: 'GUESTBOOK',
+                title: AppStrings.mobileAppGuestbookTitle,
                 accent: AppTheme.mauve,
                 child: GuestbookContent(viewModel: vm),
               );
             }
           },
         ),
-        _buildAppCard(
-          title: 'TERMINAL',
-          subtitle: 'Interactive Shell',
+        _MobileAppCard(
+          title: AppStrings.mobileAppTerminal,
+          subtitle: AppStrings.mobileAppTerminalSubtitle,
           accent: AppTheme.green,
           iconSvg: AppSvgs.terminal,
+          onPlaySound: onPlaySound,
           onTap: () {
-            _openSheet(
+            onOpenApp(
               context,
-              title: 'TERMINAL',
+              title: AppStrings.mobileAppTerminalTitle,
               accent: AppTheme.green,
               child: const TerminalContent(),
             );
           },
         ),
-        _buildAppCard(
-          title: 'SNAKE',
-          subtitle: 'Retro Arcade',
+        _MobileAppCard(
+          title: AppStrings.mobileAppSnake,
+          subtitle: AppStrings.mobileAppSnakeSubtitle,
           accent: AppTheme.yellow,
           iconSvg: AppSvgs.game,
+          onPlaySound: onPlaySound,
           onTap: () {
-            _openSheet(
+            onOpenApp(
               context,
-              title: 'SNAKE GAME',
+              title: AppStrings.mobileAppSnakeTitle,
               accent: AppTheme.yellow,
               child: const SnakeGameContent(showDpad: true),
             );
           },
         ),
-        _buildAppCard(
-          title: 'CALC',
-          subtitle: 'Calculator',
+        _MobileAppCard(
+          title: AppStrings.mobileAppCalc,
+          subtitle: AppStrings.mobileAppCalcSubtitle,
           accent: AppTheme.peach,
           iconSvg: AppSvgs.calculator,
+          onPlaySound: onPlaySound,
           onTap: () {
-            _openSheet(
+            onOpenApp(
               context,
-              title: 'CALCULATOR',
+              title: AppStrings.mobileAppCalcTitle,
               accent: AppTheme.peach,
               child: const CalculatorContent(),
             );
           },
         ),
-        _buildAppCard(
-          title: 'METRICS',
-          subtitle: 'CI & 100% Tests',
+        _MobileAppCard(
+          title: AppStrings.mobileAppMetrics,
+          subtitle: AppStrings.mobileAppMetricsSubtitle,
           accent: AppTheme.teal,
           iconSvg: AppSvgs.projectStats,
+          onPlaySound: onPlaySound,
           onTap: () {
-            _openSheet(
+            onOpenApp(
               context,
-              title: 'METRICS & CI',
+              title: AppStrings.mobileAppMetricsTitle,
               accent: AppTheme.teal,
               child: const ProjectStatsWindowContent(),
             );
@@ -544,24 +652,37 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
       ],
     );
   }
+}
 
-  Widget _buildAppCard({
-    required String title,
-    required String subtitle,
-    required Color accent,
-    required String iconSvg,
-    required VoidCallback onTap,
-  }) {
+class _MobileAppCard extends StatelessWidget {
+  const _MobileAppCard({
+    required this.title,
+    required this.subtitle,
+    required this.accent,
+    required this.iconSvg,
+    required this.onTap,
+    required this.onPlaySound,
+  });
+
+  final String title;
+  final String subtitle;
+  final Color accent;
+  final String iconSvg;
+  final VoidCallback onTap;
+  final void Function(void Function(SoundService)) onPlaySound;
+
+  @override
+  Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        _playSound((s) => s.playClick());
+        onPlaySound((s) => s.playClick());
         onTap();
       },
       borderRadius: BorderRadius.circular(AppSizes.radiusMd),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
+          color: AppTheme.surface.withValues(alpha: 0.92),
           borderRadius: BorderRadius.circular(AppSizes.radiusMd),
           border: Border.all(color: AppTheme.surface0, width: 1.2),
         ),
@@ -615,8 +736,15 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
       ),
     );
   }
+}
 
-  Widget _buildExperienceList(List<Experience> experiences) {
+class _MobileExperienceList extends StatelessWidget {
+  const _MobileExperienceList({required this.experiences});
+
+  final List<Experience> experiences;
+
+  @override
+  Widget build(BuildContext context) {
     if (experiences.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -642,35 +770,42 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
       },
     );
   }
+}
 
-  Widget _buildProjectsList() {
+class _MobileProjectsList extends StatelessWidget {
+  const _MobileProjectsList({required this.onLaunch});
+
+  final Future<void> Function(String) onLaunch;
+
+  @override
+  Widget build(BuildContext context) {
     final projects = [
       (
-        'intercepted_http',
-        'Composable HTTP interceptor layer for Dart / Flutter — token refresh, auth, and retry without replacing client.',
-        'https://github.com/Mathvdias/intercepted_http',
-        'https://pub.dev/packages/intercepted_http',
+        AppStrings.projectInterceptedName,
+        AppStrings.projectInterceptedDesc,
+        AppStrings.urlGitHubIntercepted,
+        AppStrings.urlPubDevIntercepted,
         AppTheme.teal,
       ),
       (
-        'homelab-infrastructure',
-        'IaC & SRE automation for bare-metal homelab: Docker microservices, Linux BBR TCP kernel tuning, Cloudflare R2.',
-        'https://github.com/Mathvdias/homelab-infrastructure',
+        AppStrings.projectHomelabName,
+        AppStrings.projectHomelabDesc,
+        AppStrings.urlGitHubHomelab,
         null,
         AppTheme.blue,
       ),
       (
-        'liturgical-calendar-engine',
-        'High-performance traditional Roman Rite liturgical calendar computation engine in Go.',
-        'https://github.com/cm-manaus/liturgical-calendar-engine',
+        AppStrings.projectLiturgicalName,
+        AppStrings.projectLiturgicalDesc,
+        AppStrings.urlGitHubLiturgical,
         null,
         AppTheme.peach,
       ),
       (
-        'flutter_lazy_load_web',
-        'A Flutter package for intelligent on-demand deferred chunk loading on Flutter Web.',
-        'https://github.com/Mathvdias/flutter_lazy_load_web',
-        'https://pub.dev/packages/flutter_lazy_load_web',
+        AppStrings.projectLazyLoadName,
+        AppStrings.projectLazyLoadDesc,
+        AppStrings.urlGitHubLazyLoad,
+        AppStrings.urlPubDevLazyLoad,
         AppTheme.mauve,
       ),
     ];
@@ -710,10 +845,10 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
               Row(
                 children: [
                   ElevatedButton.icon(
-                    onPressed: () => _launch(p.$3),
+                    onPressed: () => onLaunch(p.$3),
                     icon: const Icon(Icons.code, size: 14),
                     label: Text(
-                      'GitHub',
+                      AppStrings.projectBtnGitHub,
                       style: GoogleFonts.spaceMono(fontSize: 10),
                     ),
                     style: ElevatedButton.styleFrom(
@@ -724,10 +859,10 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
                   if (p.$4 != null) ...[
                     const SizedBox(width: 8),
                     ElevatedButton.icon(
-                      onPressed: () => _launch(p.$4!),
+                      onPressed: () => onLaunch(p.$4!),
                       icon: const Icon(Icons.open_in_new, size: 14),
                       label: Text(
-                        'pub.dev',
+                        AppStrings.projectBtnPubDev,
                         style: GoogleFonts.spaceMono(fontSize: 10),
                       ),
                       style: ElevatedButton.styleFrom(
@@ -744,21 +879,62 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
       },
     );
   }
+}
 
-  Widget _buildQuickDock() {
+class _MobileQuickDock extends StatelessWidget {
+  const _MobileQuickDock({
+    required this.onPlaySound,
+    required this.onLaunch,
+  });
+
+  final void Function(void Function(SoundService)) onPlaySound;
+  final Future<void> Function(String) onLaunch;
+
+  @override
+  Widget build(BuildContext context) {
     final links = [
-      ('GitHub', AppSvgs.github, AppStrings.urlGitHub, AppTheme.blue),
-      ('LinkedIn', AppSvgs.linkedin, AppStrings.urlLinkedIn, AppTheme.teal),
-      ('Medium', AppSvgs.medium, AppStrings.urlMedium, AppTheme.peach),
-      ('pub.dev', AppSvgs.pubDev, AppStrings.urlPubDev, AppTheme.blue),
-      ('Resume', AppSvgs.pdf, AppStrings.urlResume, AppTheme.yellow),
-      ('Email', AppSvgs.email, AppStrings.emailAddress, AppTheme.mauve),
+      (
+        AppStrings.dockGitHub,
+        AppSvgs.github,
+        AppStrings.urlGitHub,
+        AppTheme.blue,
+      ),
+      (
+        AppStrings.dockLinkedIn,
+        AppSvgs.linkedin,
+        AppStrings.urlLinkedIn,
+        AppTheme.teal,
+      ),
+      (
+        AppStrings.dockMedium,
+        AppSvgs.medium,
+        AppStrings.urlMedium,
+        AppTheme.peach,
+      ),
+      (
+        AppStrings.dockPubDev,
+        AppSvgs.pubDev,
+        AppStrings.urlPubDev,
+        AppTheme.blue,
+      ),
+      (
+        AppStrings.dockResume,
+        AppSvgs.pdf,
+        AppStrings.urlResume,
+        AppTheme.yellow,
+      ),
+      (
+        AppStrings.dockEmail,
+        AppSvgs.email,
+        AppStrings.emailAddress,
+        AppTheme.mauve,
+      ),
     ];
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: AppTheme.surface.withValues(alpha: 0.92),
         borderRadius: BorderRadius.circular(AppSizes.radiusLg),
         border: Border.all(color: AppTheme.surface0, width: 1.2),
       ),
@@ -767,8 +943,8 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
         children: links.map((link) {
           return GestureDetector(
             onTap: () {
-              _playSound((s) => s.playClick());
-              _launch(link.$3);
+              onPlaySound((s) => s.playClick());
+              onLaunch(link.$3);
             },
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -841,7 +1017,11 @@ class _MobileAppWindow extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                       child: const Center(
-                        child: Icon(Icons.close, size: 13, color: AppTheme.background),
+                        child: Icon(
+                          Icons.close,
+                          size: 13,
+                          color: AppTheme.background,
+                        ),
                       ),
                     ),
                   ),
@@ -880,7 +1060,10 @@ class _MobileAppWindow extends StatelessWidget {
                     behavior: HitTestBehavior.opaque,
                     onTap: onClose,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: AppTheme.surface,
                         borderRadius: BorderRadius.circular(4),
@@ -892,7 +1075,7 @@ class _MobileAppWindow extends StatelessWidget {
                           Icon(Icons.arrow_back, size: 11, color: accent),
                           const SizedBox(width: 4),
                           Text(
-                            'ESC',
+                            AppStrings.mobileEsc,
                             style: GoogleFonts.pressStart2p(
                               fontSize: 7.5,
                               color: accent,

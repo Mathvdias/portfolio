@@ -140,18 +140,25 @@ class _FakeAnalytics extends AnalyticsService {
 
 // Builds an AppDependencies subtree with fake implementations.
 // Used for TerminalContent, Dock, and GuestbookContent previews.
-Widget _withDeps({required Widget child, GuestbookViewModel? guestbookVM}) {
-  final desktopVM = DesktopViewModel();
-  final localeVM = LocaleViewModel()..init();
-  return AppDependencies(
-    localeViewModel: localeVM,
-    visitorRepository: _FakeVisitorRepo(),
-    guestbookViewModel:
-        guestbookVM ?? GuestbookViewModel(_FakeGuestbookRepo(), _emptyPrefs()),
-    desktopViewModel: desktopVM,
-    analyticsService: _FakeAnalytics(),
-    child: child,
-  );
+class _PreviewDepsScope extends StatelessWidget {
+  const _PreviewDepsScope({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final desktopVM = DesktopViewModel();
+    final localeVM = LocaleViewModel()..init();
+    return AppDependencies(
+      localeViewModel: localeVM,
+      visitorRepository: _FakeVisitorRepo(),
+      guestbookViewModel:
+          GuestbookViewModel(_FakeGuestbookRepo(), _emptyPrefs()),
+      desktopViewModel: desktopVM,
+      analyticsService: _FakeAnalytics(),
+      child: child,
+    );
+  }
 }
 
 // Returns a synchronous SharedPreferences backed by an empty in-memory store.
@@ -341,7 +348,7 @@ Widget previewRubberBand() => Stack(
 // Needs AppDependencies for admin_login / admin_logout commands only.
 
 @Preview(name: 'Terminal', wrapper: previewWrapper, size: Size(640, 480))
-Widget previewTerminal() => _withDeps(child: const TerminalContent());
+Widget previewTerminal() => const _PreviewDepsScope(child: TerminalContent());
 
 // ── NotificationCenter ────────────────────────────────────────────────────────
 
@@ -385,7 +392,7 @@ Widget previewNotificationCenterFilled() {
 // ── Dock ──────────────────────────────────────────────────────────────────────
 
 @Preview(name: 'Dock', wrapper: previewWrapper, size: Size(600, 100))
-Widget previewDock() => _withDeps(child: const Dock());
+Widget previewDock() => const _PreviewDepsScope(child: Dock());
 
 // ── GuestbookContent ──────────────────────────────────────────────────────────
 
