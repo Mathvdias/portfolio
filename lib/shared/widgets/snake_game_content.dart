@@ -44,9 +44,14 @@ class _GameState {
 }
 
 class SnakeGameContent extends StatefulWidget {
-  const SnakeGameContent({super.key, this.randomSeed});
+  const SnakeGameContent({
+    super.key,
+    this.randomSeed,
+    this.showDpad = false,
+  });
 
   final int? randomSeed;
+  final bool showDpad;
 
   @override
   State<SnakeGameContent> createState() => _SnakeGameContentState();
@@ -199,6 +204,8 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
           if (!s.running || s.gameOver) _start();
         },
         onVerticalDragEnd: (details) {
+          final s = _state.value;
+          if (!s.running || s.gameOver) _start();
           final v = details.primaryVelocity;
           if (v != null) {
             if (v < -100 && _dir != _Dir.down) _nextDir = _Dir.up;
@@ -206,6 +213,8 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
           }
         },
         onHorizontalDragEnd: (details) {
+          final s = _state.value;
+          if (!s.running || s.gameOver) _start();
           final v = details.primaryVelocity;
           if (v != null) {
             if (v < -100 && _dir != _Dir.right) _nextDir = _Dir.left;
@@ -236,7 +245,9 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
                             ),
                           ),
                           Text(
-                            s.running ? 'WASD / ↑↓←→' : 'PRESS ENTER',
+                            s.running
+                                ? (widget.showDpad ? 'SWIPE / DPAD' : 'WASD / ↑↓←→')
+                                : (widget.showDpad ? 'TAP TO START' : 'PRESS ENTER'),
                             style: GoogleFonts.pressStart2p(
                               fontSize: AppSizes.fontXs,
                               color: AppTheme.subtext,
@@ -299,47 +310,92 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
                             )
                             : const SizedBox.shrink(),
               ),
-              // Touch D-pad for mobile gameplay
-              Padding(
-                padding: const EdgeInsets.only(top: AppSizes.spacingMd),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_left, color: AppTheme.blue, size: 28),
-                      onPressed: () {
-                        if (_dir != _Dir.right) _nextDir = _Dir.left;
-                      },
-                    ),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.arrow_drop_up, color: AppTheme.blue, size: 28),
-                          onPressed: () {
-                            if (_dir != _Dir.down) _nextDir = _Dir.up;
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.arrow_drop_down, color: AppTheme.blue, size: 28),
-                          onPressed: () {
-                            if (_dir != _Dir.up) _nextDir = _Dir.down;
-                          },
-                        ),
-                      ],
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.arrow_right, color: AppTheme.blue, size: 28),
-                      onPressed: () {
-                        if (_dir != _Dir.left) _nextDir = _Dir.right;
-                      },
-                    ),
-                  ],
-                ),
-              ),
+              // Touch D-pad for mobile gameplay (only shown when showDpad is true)
+              if (widget.showDpad) _buildDpad(),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildDpad() {
+    Widget dpadBtn({
+      required IconData icon,
+      required _Dir dir,
+    }) {
+      return Material(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(8),
+        child: InkWell(
+          onTap: () {
+            final s = _state.value;
+            if (!s.running || s.gameOver) _start();
+            final opposite = switch (dir) {
+              _Dir.up => _Dir.down,
+              _Dir.down => _Dir.up,
+              _Dir.left => _Dir.right,
+              _Dir.right => _Dir.left,
+            };
+            if (_dir != opposite) {
+              _nextDir = dir;
+            }
+          },
+          borderRadius: BorderRadius.circular(8),
+          splashColor: AppTheme.blue.withValues(alpha: 0.3),
+          highlightColor: AppTheme.blue.withValues(alpha: 0.2),
+          child: Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppTheme.surface0, width: 1.5),
+            ),
+            child: Center(
+              child: Icon(icon, color: AppTheme.blue, size: 28),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSizes.spacingSm),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          dpadBtn(icon: Icons.arrow_drop_up, dir: _Dir.up),
+          const SizedBox(height: 4),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              dpadBtn(icon: Icons.arrow_left, dir: _Dir.left),
+              Container(
+                width: 36,
+                height: 36,
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                decoration: BoxDecoration(
+                  color: AppTheme.surface0,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppTheme.surface, width: 1),
+                ),
+                child: Center(
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: AppTheme.subtext,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              ),
+              dpadBtn(icon: Icons.arrow_right, dir: _Dir.right),
+            ],
+          ),
+          const SizedBox(height: 4),
+          dpadBtn(icon: Icons.arrow_drop_down, dir: _Dir.down),
+        ],
       ),
     );
   }

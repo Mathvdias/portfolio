@@ -49,5 +49,44 @@ void main() {
       expect(find.text('Resume'), findsOneWidget);
       expect(find.text('Email'), findsOneWidget);
     });
+
+    testWidgets('tapping app card opens full-screen window and closes via red button', (tester) async {
+      await tester.pumpWidget(const MaterialApp(home: MobileFallbackPage()));
+
+      // Tap ABOUT pocket app
+      await tester.tap(find.text('ABOUT'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('ABOUT ME'), findsOneWidget);
+      expect(find.text('ESC'), findsOneWidget);
+
+      // Tap close button (the red traffic light with close icon)
+      await tester.tap(find.byIcon(Icons.close));
+      await tester.pumpAndSettle();
+
+      expect(find.text('ABOUT ME'), findsNothing);
+    });
+
+    testWidgets('tapping app card opens full-screen window and closes via ESC button', (tester) async {
+      tester.view.physicalSize = const Size(600, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(const MaterialApp(home: MobileFallbackPage()));
+
+      // Tap SNAKE pocket app
+      await tester.tap(find.text('SNAKE'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('SNAKE GAME'), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_drop_up), findsOneWidget); // D-pad is visible on mobile
+
+      // Tap ESC button
+      await tester.tap(find.text('ESC'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('SNAKE GAME'), findsNothing);
+    });
   });
 }

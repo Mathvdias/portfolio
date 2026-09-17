@@ -85,113 +85,55 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
     if (await canLaunchUrl(uri)) await launchUrl(uri);
   }
 
-  void _openSheet(
+  void _openApp(
     BuildContext context, {
     required String title,
     required Color accent,
     required Widget child,
   }) {
     _playSound((s) => s.playWindowOpen());
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) {
-        return Container(
-          height: MediaQuery.of(ctx).size.height * 0.88,
-          decoration: BoxDecoration(
-            color: AppTheme.background,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            border: Border.all(color: accent.withValues(alpha: 0.6), width: 1.5),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.5),
-                blurRadius: 20,
-                spreadRadius: 2,
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              // Retro macOS Window Header
-              Container(
-                height: 44,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: const BoxDecoration(
-                  color: AppTheme.surface0,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
-                  border: Border(
-                    bottom: BorderSide(color: AppTheme.surface, width: 1),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    // Red close traffic light
-                    GestureDetector(
-                      onTap: () {
-                        _playSound((s) => s.playWindowClose());
-                        Navigator.of(ctx).pop();
-                      },
-                      child: Container(
-                        width: 14,
-                        height: 14,
-                        decoration: const BoxDecoration(
-                          color: AppTheme.red,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Center(
-                          child: Icon(Icons.close, size: 9, color: AppTheme.background),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      width: 14,
-                      height: 14,
-                      decoration: const BoxDecoration(
-                        color: AppTheme.yellow,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      width: 14,
-                      height: 14,
-                      decoration: const BoxDecoration(
-                        color: AppTheme.green,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      title,
-                      style: GoogleFonts.pressStart2p(
-                        fontSize: 9,
-                        color: accent,
-                      ),
-                    ),
-                    const Spacer(),
-                    const SizedBox(width: 58), // Balance traffic lights
-                  ],
-                ),
-              ),
-              // Window Content
-              Expanded(
-                child: Theme(
-                  data: Theme.of(ctx).copyWith(
-                    scaffoldBackgroundColor: AppTheme.background,
-                  ),
-                  child: child,
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+    Navigator.of(context).push<void>(
+      PageRouteBuilder<void>(
+        opaque: true,
+        pageBuilder: (ctx, animation, secondaryAnimation) {
+          return _MobileAppWindow(
+            title: title,
+            accent: accent,
+            onClose: () => Navigator.of(ctx).pop(),
+            child: child,
+          );
+        },
+        transitionsBuilder: (ctx, animation, secondaryAnimation, child) {
+          final curved = CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+            reverseCurve: Curves.easeInCubic,
+          );
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 0.05),
+              end: Offset.zero,
+            ).animate(curved),
+            child: FadeTransition(
+              opacity: curved,
+              child: child,
+            ),
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 220),
+        reverseTransitionDuration: const Duration(milliseconds: 180),
+      ),
     ).then((_) {
       _playSound((s) => s.playWindowClose());
     });
   }
+
+  void _openSheet(
+    BuildContext context, {
+    required String title,
+    required Color accent,
+    required Widget child,
+  }) => _openApp(context, title: title, accent: accent, child: child);
 
   @override
   Widget build(BuildContext context) {
@@ -567,7 +509,7 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
               context,
               title: 'SNAKE GAME',
               accent: AppTheme.yellow,
-              child: const SnakeGameContent(),
+              child: const SnakeGameContent(showDpad: true),
             );
           },
         ),
@@ -849,6 +791,131 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
             ),
           );
         }).toList(),
+      ),
+    );
+  }
+}
+
+class _MobileAppWindow extends StatelessWidget {
+  const _MobileAppWindow({
+    required this.title,
+    required this.accent,
+    required this.onClose,
+    required this.child,
+  });
+
+  final String title;
+  final Color accent;
+  final VoidCallback onClose;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Retro macOS full-width window header
+            Container(
+              height: 48,
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              decoration: const BoxDecoration(
+                color: AppTheme.surface0,
+                border: Border(
+                  bottom: BorderSide(color: AppTheme.surface, width: 1.5),
+                ),
+              ),
+              child: Row(
+                children: [
+                  // Red close traffic light (prominent & touch-friendly)
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: onClose,
+                    child: Container(
+                      width: 24,
+                      height: 24,
+                      decoration: const BoxDecoration(
+                        color: AppTheme.red,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Center(
+                        child: Icon(Icons.close, size: 13, color: AppTheme.background),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    width: 13,
+                    height: 13,
+                    decoration: const BoxDecoration(
+                      color: AppTheme.yellow,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    width: 13,
+                    height: 13,
+                    decoration: const BoxDecoration(
+                      color: AppTheme.green,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const Spacer(),
+                  Flexible(
+                    child: Text(
+                      title,
+                      style: GoogleFonts.pressStart2p(
+                        fontSize: 9.5,
+                        color: accent,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const Spacer(),
+                  // Retro ESC / Back button
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: onClose,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppTheme.surface,
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: AppTheme.surface0, width: 1),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.arrow_back, size: 11, color: accent),
+                          const SizedBox(width: 4),
+                          Text(
+                            'ESC',
+                            style: GoogleFonts.pressStart2p(
+                              fontSize: 7.5,
+                              color: accent,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Full screen window content
+            Expanded(
+              child: Theme(
+                data: Theme.of(context).copyWith(
+                  scaffoldBackgroundColor: AppTheme.background,
+                ),
+                child: child,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

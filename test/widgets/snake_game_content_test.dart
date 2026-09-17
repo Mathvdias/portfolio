@@ -156,4 +156,72 @@ void main() {
     expect(find.textContaining('GAME OVER  •  SCORE: 2'), findsOneWidget);
     await tester.pumpAndSettle();
   });
+
+  testWidgets('SnakeGameContent hides D-pad by default for desktop', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_buildApp());
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.arrow_drop_up), findsNothing);
+    expect(find.byIcon(Icons.arrow_drop_down), findsNothing);
+    expect(find.byIcon(Icons.arrow_left), findsNothing);
+    expect(find.byIcon(Icons.arrow_right), findsNothing);
+  });
+
+  testWidgets('SnakeGameContent displays D-pad and controls snake when showDpad is true', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(body: SnakeGameContent(showDpad: true)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.arrow_drop_up), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_drop_down), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_left), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_right), findsOneWidget);
+    expect(find.textContaining('TAP TO START'), findsOneWidget);
+
+    // Tapping D-pad starts game
+    await tester.tap(find.byIcon(Icons.arrow_drop_up));
+    await tester.pump();
+
+    expect(find.textContaining('SWIPE / DPAD'), findsOneWidget);
+
+    // Test other directions
+    await tester.tap(find.byIcon(Icons.arrow_left));
+    await tester.pump();
+    await tester.tap(find.byIcon(Icons.arrow_drop_down));
+    await tester.pump();
+    await tester.tap(find.byIcon(Icons.arrow_right));
+    await tester.pump();
+  });
+
+  testWidgets('SnakeGameContent starts and controls with swipe gestures', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(body: SnakeGameContent(showDpad: true)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Swipe up starts game
+    await tester.drag(find.byType(SnakeGameContent), const Offset(0, -200));
+    await tester.pump();
+
+    expect(find.textContaining('SWIPE / DPAD'), findsOneWidget);
+
+    // Swipe left, down, right
+    await tester.drag(find.byType(SnakeGameContent), const Offset(-200, 0));
+    await tester.pump();
+    await tester.drag(find.byType(SnakeGameContent), const Offset(0, 200));
+    await tester.pump();
+    await tester.drag(find.byType(SnakeGameContent), const Offset(200, 0));
+    await tester.pump();
+  });
 }
