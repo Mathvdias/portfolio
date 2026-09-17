@@ -77,8 +77,9 @@ class _PixelWallpaperState extends State<PixelWallpaper>
     if (widget.animate != oldWidget.animate) {
       bool isTest = false;
       assert(() {
-        isTest =
-            WidgetsBinding.instance.runtimeType.toString().contains('Test');
+        isTest = WidgetsBinding.instance.runtimeType.toString().contains(
+          'Test',
+        );
         return true;
       }());
       if (widget.animate && !_ticker.isActive && !isTest) {

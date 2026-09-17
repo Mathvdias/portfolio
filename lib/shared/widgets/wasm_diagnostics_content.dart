@@ -321,9 +321,10 @@ class _WasmDiagnosticsContentState extends State<WasmDiagnosticsContent> {
               _WasmStatCard(
                 title: AppStrings.wasmFps,
                 val: _fps.toStringAsFixed(1),
-                color: _fps > (_detectedRefreshRate * 0.95)
-                    ? AppTheme.green
-                    : AppTheme.yellow,
+                color:
+                    _fps > (_detectedRefreshRate * 0.95)
+                        ? AppTheme.green
+                        : AppTheme.yellow,
                 icon: Icons.speed,
               ),
               const SizedBox(width: AppSizes.spacingSm),
@@ -343,7 +344,8 @@ class _WasmDiagnosticsContentState extends State<WasmDiagnosticsContent> {
               const SizedBox(width: AppSizes.spacingSm),
               _WasmStatCard(
                 title: AppStrings.wasmGcPause,
-                val: _gcPause > 0 ? '${_gcPause.toStringAsFixed(1)}ms' : '0.0ms',
+                val:
+                    _gcPause > 0 ? '${_gcPause.toStringAsFixed(1)}ms' : '0.0ms',
                 color: _gcPause > 0 ? AppTheme.red : AppTheme.subtext,
                 icon: Icons.delete_sweep,
                 pulse: _gcPause > 0,

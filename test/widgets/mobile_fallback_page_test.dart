@@ -50,43 +50,52 @@ void main() {
       expect(find.text(AppStrings.dockEmail), findsOneWidget);
     });
 
-    testWidgets('tapping app card opens full-screen window and closes via red button', (tester) async {
-      await tester.pumpWidget(const MaterialApp(home: MobileFallbackPage()));
+    testWidgets(
+      'tapping app card opens full-screen window and closes via red button',
+      (tester) async {
+        await tester.pumpWidget(const MaterialApp(home: MobileFallbackPage()));
 
-      // Tap ABOUT pocket app
-      await tester.tap(find.text(AppStrings.mobileAppAbout));
-      await tester.pumpAndSettle();
+        // Tap ABOUT pocket app
+        await tester.tap(find.text(AppStrings.mobileAppAbout));
+        await tester.pumpAndSettle();
 
-      expect(find.text(AppStrings.mobileAppAboutTitle), findsOneWidget);
-      expect(find.text(AppStrings.mobileEsc), findsOneWidget);
+        expect(find.text(AppStrings.mobileAppAboutTitle), findsOneWidget);
+        expect(find.text(AppStrings.mobileEsc), findsOneWidget);
 
-      // Tap close button (the red traffic light with close icon)
-      await tester.tap(find.byIcon(Icons.close));
-      await tester.pumpAndSettle();
+        // Tap close button (the red traffic light with close icon)
+        await tester.tap(find.byIcon(Icons.close));
+        await tester.pumpAndSettle();
 
-      expect(find.text(AppStrings.mobileAppAboutTitle), findsNothing);
-    });
+        expect(find.text(AppStrings.mobileAppAboutTitle), findsNothing);
+      },
+    );
 
-    testWidgets('tapping app card opens full-screen window and closes via ESC button', (tester) async {
-      tester.view.physicalSize = const Size(600, 1200);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+    testWidgets(
+      'tapping app card opens full-screen window and closes via ESC button',
+      (tester) async {
+        tester.view.physicalSize = const Size(600, 1200);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(const MaterialApp(home: MobileFallbackPage()));
+        await tester.pumpWidget(const MaterialApp(home: MobileFallbackPage()));
 
-      // Tap SNAKE pocket app
-      await tester.tap(find.text(AppStrings.mobileAppSnake));
-      await tester.pumpAndSettle();
+        // Tap SNAKE pocket app
+        await tester.tap(find.text(AppStrings.mobileAppSnake));
+        await tester.pumpAndSettle();
 
-      expect(find.text(AppStrings.mobileAppSnakeTitle), findsOneWidget);
-      expect(find.byIcon(Icons.arrow_drop_up), findsOneWidget); // D-pad is visible on mobile
+        expect(find.text(AppStrings.mobileAppSnakeTitle), findsOneWidget);
+        expect(
+          find.byIcon(Icons.arrow_drop_up),
+          findsOneWidget,
+        ); // D-pad is visible on mobile
 
-      // Tap ESC button
-      await tester.tap(find.text(AppStrings.mobileEsc));
-      await tester.pumpAndSettle();
+        // Tap ESC button
+        await tester.tap(find.text(AppStrings.mobileEsc));
+        await tester.pumpAndSettle();
 
-      expect(find.text(AppStrings.mobileAppSnakeTitle), findsNothing);
-    });
+        expect(find.text(AppStrings.mobileAppSnakeTitle), findsNothing);
+      },
+    );
   });
 }

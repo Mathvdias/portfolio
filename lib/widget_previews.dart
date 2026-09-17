@@ -152,8 +152,10 @@ class _PreviewDepsScope extends StatelessWidget {
     return AppDependencies(
       localeViewModel: localeVM,
       visitorRepository: _FakeVisitorRepo(),
-      guestbookViewModel:
-          GuestbookViewModel(_FakeGuestbookRepo(), _emptyPrefs()),
+      guestbookViewModel: GuestbookViewModel(
+        _FakeGuestbookRepo(),
+        _emptyPrefs(),
+      ),
       desktopViewModel: desktopVM,
       analyticsService: _FakeAnalytics(),
       child: child,

@@ -44,11 +44,7 @@ class _GameState {
 }
 
 class SnakeGameContent extends StatefulWidget {
-  const SnakeGameContent({
-    super.key,
-    this.randomSeed,
-    this.showDpad = false,
-  });
+  const SnakeGameContent({super.key, this.randomSeed, this.showDpad = false});
 
   final int? randomSeed;
   final bool showDpad;
@@ -246,8 +242,12 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
                           ),
                           Text(
                             s.running
-                                ? (widget.showDpad ? 'SWIPE / DPAD' : 'WASD / ↑↓←→')
-                                : (widget.showDpad ? 'TAP TO START' : 'PRESS ENTER'),
+                                ? (widget.showDpad
+                                    ? 'SWIPE / DPAD'
+                                    : 'WASD / ↑↓←→')
+                                : (widget.showDpad
+                                    ? 'TAP TO START'
+                                    : 'PRESS ENTER'),
                             style: GoogleFonts.pressStart2p(
                               fontSize: AppSizes.fontXs,
                               color: AppTheme.subtext,
@@ -349,10 +349,7 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
 }
 
 class _SnakeDpadButton extends StatelessWidget {
-  const _SnakeDpadButton({
-    required this.icon,
-    required this.onTap,
-  });
+  const _SnakeDpadButton({required this.icon, required this.onTap});
 
   final IconData icon;
   final VoidCallback onTap;
@@ -374,9 +371,7 @@ class _SnakeDpadButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: AppTheme.surface0, width: 1.5),
           ),
-          child: Center(
-            child: Icon(icon, color: AppTheme.blue, size: 28),
-          ),
+          child: Center(child: Icon(icon, color: AppTheme.blue, size: 28)),
         ),
       ),
     );

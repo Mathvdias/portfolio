@@ -97,40 +97,39 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
     required Widget child,
   }) {
     _playSound((s) => s.playWindowOpen());
-    Navigator.of(context).push<void>(
-      PageRouteBuilder<void>(
-        opaque: true,
-        pageBuilder: (ctx, animation, secondaryAnimation) {
-          return _MobileAppWindow(
-            title: title,
-            accent: accent,
-            onClose: () => Navigator.of(ctx).pop(),
-            child: child,
-          );
-        },
-        transitionsBuilder: (ctx, animation, secondaryAnimation, child) {
-          final curved = CurvedAnimation(
-            parent: animation,
-            curve: Curves.easeOutCubic,
-            reverseCurve: Curves.easeInCubic,
-          );
-          return SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(0, 0.05),
-              end: Offset.zero,
-            ).animate(curved),
-            child: FadeTransition(
-              opacity: curved,
-              child: child,
-            ),
-          );
-        },
-        transitionDuration: const Duration(milliseconds: 220),
-        reverseTransitionDuration: const Duration(milliseconds: 180),
-      ),
-    ).then((_) {
-      _playSound((s) => s.playWindowClose());
-    });
+    Navigator.of(context)
+        .push<void>(
+          PageRouteBuilder<void>(
+            opaque: true,
+            pageBuilder: (ctx, animation, secondaryAnimation) {
+              return _MobileAppWindow(
+                title: title,
+                accent: accent,
+                onClose: () => Navigator.of(ctx).pop(),
+                child: child,
+              );
+            },
+            transitionsBuilder: (ctx, animation, secondaryAnimation, child) {
+              final curved = CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOutCubic,
+                reverseCurve: Curves.easeInCubic,
+              );
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 0.05),
+                  end: Offset.zero,
+                ).animate(curved),
+                child: FadeTransition(opacity: curved, child: child),
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 220),
+            reverseTransitionDuration: const Duration(milliseconds: 180),
+          ),
+        )
+        .then((_) {
+          _playSound((s) => s.playWindowClose());
+        });
   }
 
   @override
@@ -140,9 +139,10 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
       l10n = AppLocalizations.of(context);
     } catch (_) {}
 
-    final experiences = l10n != null
-        ? ExperienceMapper.fromL10n(l10n.experiences)
-        : <Experience>[];
+    final experiences =
+        l10n != null
+            ? ExperienceMapper.fromL10n(l10n.experiences)
+            : <Experience>[];
 
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -158,15 +158,15 @@ class _MobileFallbackPageState extends State<MobileFallbackPage> {
               animation: _scrollController,
               builder: (context, child) {
                 final offset =
-                    _scrollController.hasClients ? _scrollController.offset : 0.0;
+                    _scrollController.hasClients
+                        ? _scrollController.offset
+                        : 0.0;
                 return Transform.translate(
                   offset: Offset(0, -offset * 0.3),
                   child: child,
                 );
               },
-              child: const RepaintBoundary(
-                child: PixelWallpaper(),
-              ),
+              child: const RepaintBoundary(child: PixelWallpaper()),
             ),
           ),
 
@@ -259,10 +259,7 @@ class _MobileStatusBar extends StatelessWidget {
         children: [
           Text(
             '$hourStr:$minStr',
-            style: GoogleFonts.pressStart2p(
-              fontSize: 9,
-              color: AppTheme.text,
-            ),
+            style: GoogleFonts.pressStart2p(fontSize: 9, color: AppTheme.text),
           ),
           const SizedBox(width: 12),
           GestureDetector(
@@ -326,25 +323,30 @@ class _MobileLanguagePicker extends StatelessWidget {
           ),
         ],
       ),
-      itemBuilder: (ctx) => _kMobileLanguages.map((lang) {
-        return PopupMenuItem<String>(
-          value: lang.$1,
-          height: 32,
-          child: Row(
-            children: [
-              Text(lang.$2, style: const TextStyle(fontSize: 14)),
-              const SizedBox(width: 8),
-              Text(
-                lang.$3,
-                style: GoogleFonts.spaceMono(
-                  fontSize: 11,
-                  color: lang.$1 == currentCode ? AppTheme.blue : AppTheme.text,
-                ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
+      itemBuilder:
+          (ctx) =>
+              _kMobileLanguages.map((lang) {
+                return PopupMenuItem<String>(
+                  value: lang.$1,
+                  height: 32,
+                  child: Row(
+                    children: [
+                      Text(lang.$2, style: const TextStyle(fontSize: 14)),
+                      const SizedBox(width: 8),
+                      Text(
+                        lang.$3,
+                        style: GoogleFonts.spaceMono(
+                          fontSize: 11,
+                          color:
+                              lang.$1 == currentCode
+                                  ? AppTheme.blue
+                                  : AppTheme.text,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
     );
   }
 }
@@ -491,7 +493,8 @@ class _MobileAppGrid extends StatelessWidget {
     required String title,
     required Color accent,
     required Widget child,
-  }) onOpenApp;
+  })
+  onOpenApp;
   final void Function(void Function(SoundService)) onPlaySound;
   final Future<void> Function(String) onLaunch;
 
@@ -714,10 +717,7 @@ class _MobileAppCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.pressStart2p(
-                    fontSize: 8.5,
-                    color: accent,
-                  ),
+                  style: GoogleFonts.pressStart2p(fontSize: 8.5, color: accent),
                 ),
                 const SizedBox(height: 3),
                 Text(
@@ -762,10 +762,7 @@ class _MobileExperienceList extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppSizes.radiusMd),
             border: Border.all(color: AppTheme.surface0),
           ),
-          child: ExperienceWindowContent(
-            experience: exp,
-            accentColor: color,
-          ),
+          child: ExperienceWindowContent(experience: exp, accentColor: color),
         );
       },
     );
@@ -828,10 +825,7 @@ class _MobileProjectsList extends StatelessWidget {
             children: [
               Text(
                 p.$1,
-                style: GoogleFonts.pressStart2p(
-                  fontSize: 10,
-                  color: p.$5,
-                ),
+                style: GoogleFonts.pressStart2p(fontSize: 10, color: p.$5),
               ),
               const SizedBox(height: 8),
               Text(
@@ -882,10 +876,7 @@ class _MobileProjectsList extends StatelessWidget {
 }
 
 class _MobileQuickDock extends StatelessWidget {
-  const _MobileQuickDock({
-    required this.onPlaySound,
-    required this.onLaunch,
-  });
+  const _MobileQuickDock({required this.onPlaySound, required this.onLaunch});
 
   final void Function(void Function(SoundService)) onPlaySound;
   final Future<void> Function(String) onLaunch;
@@ -940,33 +931,34 @@ class _MobileQuickDock extends StatelessWidget {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: links.map((link) {
-          return GestureDetector(
-            onTap: () {
-              onPlaySound((s) => s.playClick());
-              onLaunch(link.$3);
-            },
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SvgPicture.asset(
-                  link.$2,
-                  width: 22,
-                  height: 22,
-                  colorFilter: ColorFilter.mode(link.$4, BlendMode.srcIn),
+        children:
+            links.map((link) {
+              return GestureDetector(
+                onTap: () {
+                  onPlaySound((s) => s.playClick());
+                  onLaunch(link.$3);
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      link.$2,
+                      width: 22,
+                      height: 22,
+                      colorFilter: ColorFilter.mode(link.$4, BlendMode.srcIn),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      link.$1,
+                      style: GoogleFonts.spaceMono(
+                        fontSize: 8.5,
+                        color: AppTheme.subtext,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  link.$1,
-                  style: GoogleFonts.spaceMono(
-                    fontSize: 8.5,
-                    color: AppTheme.subtext,
-                  ),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
+              );
+            }).toList(),
       ),
     );
   }
@@ -1091,9 +1083,9 @@ class _MobileAppWindow extends StatelessWidget {
             // Full screen window content
             Expanded(
               child: Theme(
-                data: Theme.of(context).copyWith(
-                  scaffoldBackgroundColor: AppTheme.background,
-                ),
+                data: Theme.of(
+                  context,
+                ).copyWith(scaffoldBackgroundColor: AppTheme.background),
                 child: child,
               ),
             ),

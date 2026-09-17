@@ -512,7 +512,10 @@ class _SoundToggleWidgetState extends State<_SoundToggleWidget> {
   @override
   Widget build(BuildContext context) {
     return Tooltip(
-      message: _muted ? 'Sound: Muted (Click to Unmute)' : 'Sound: Active (Click to Mute)',
+      message:
+          _muted
+              ? 'Sound: Muted (Click to Unmute)'
+              : 'Sound: Active (Click to Mute)',
       child: GestureDetector(
         onTap: _toggle,
         child: MouseRegion(
@@ -527,4 +530,3 @@ class _SoundToggleWidgetState extends State<_SoundToggleWidget> {
     );
   }
 }
-

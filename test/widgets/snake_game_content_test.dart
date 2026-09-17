@@ -169,44 +169,43 @@ void main() {
     expect(find.byIcon(Icons.arrow_right), findsNothing);
   });
 
-  testWidgets('SnakeGameContent displays D-pad and controls snake when showDpad is true', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(body: SnakeGameContent(showDpad: true)),
-      ),
-    );
-    await tester.pumpAndSettle();
+  testWidgets(
+    'SnakeGameContent displays D-pad and controls snake when showDpad is true',
+    (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(body: SnakeGameContent(showDpad: true)),
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    expect(find.byIcon(Icons.arrow_drop_up), findsOneWidget);
-    expect(find.byIcon(Icons.arrow_drop_down), findsOneWidget);
-    expect(find.byIcon(Icons.arrow_left), findsOneWidget);
-    expect(find.byIcon(Icons.arrow_right), findsOneWidget);
-    expect(find.textContaining('TAP TO START'), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_drop_up), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_drop_down), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_left), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_right), findsOneWidget);
+      expect(find.textContaining('TAP TO START'), findsOneWidget);
 
-    // Tapping D-pad starts game
-    await tester.tap(find.byIcon(Icons.arrow_drop_up));
-    await tester.pump();
+      // Tapping D-pad starts game
+      await tester.tap(find.byIcon(Icons.arrow_drop_up));
+      await tester.pump();
 
-    expect(find.textContaining('SWIPE / DPAD'), findsOneWidget);
+      expect(find.textContaining('SWIPE / DPAD'), findsOneWidget);
 
-    // Test other directions
-    await tester.tap(find.byIcon(Icons.arrow_left));
-    await tester.pump();
-    await tester.tap(find.byIcon(Icons.arrow_drop_down));
-    await tester.pump();
-    await tester.tap(find.byIcon(Icons.arrow_right));
-    await tester.pump();
-  });
+      // Test other directions
+      await tester.tap(find.byIcon(Icons.arrow_left));
+      await tester.pump();
+      await tester.tap(find.byIcon(Icons.arrow_drop_down));
+      await tester.pump();
+      await tester.tap(find.byIcon(Icons.arrow_right));
+      await tester.pump();
+    },
+  );
 
   testWidgets('SnakeGameContent starts and controls with swipe gestures', (
     tester,
   ) async {
     await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(body: SnakeGameContent(showDpad: true)),
-      ),
+      const MaterialApp(home: Scaffold(body: SnakeGameContent(showDpad: true))),
     );
     await tester.pumpAndSettle();
 
