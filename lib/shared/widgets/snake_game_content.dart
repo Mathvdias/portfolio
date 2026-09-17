@@ -260,18 +260,31 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
               // Game canvas — CustomPainter.repaint drives paint() directly,
               // child is built once so _SnakePainter is never recreated mid-game.
               Expanded(
-                child: AspectRatio(
-                  aspectRatio: _kCols / _kRows,
-                  child: ValueListenableBuilder<_GameState>(
-                    valueListenable: _state,
-                    child: RepaintBoundary(
-                      child: CustomPaint(painter: _SnakePainter(_state)),
+                child: Center(
+                  child: AspectRatio(
+                    aspectRatio: _kCols / _kRows,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppTheme.surface.withValues(alpha: 0.25),
+                        borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                        border: Border.all(
+                          color: AppTheme.surface0.withValues(alpha: 0.6),
+                          width: 1.5,
+                        ),
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: ValueListenableBuilder<_GameState>(
+                        valueListenable: _state,
+                        child: RepaintBoundary(
+                          child: CustomPaint(painter: _SnakePainter(_state)),
+                        ),
+                        builder:
+                            (_, s, gameCanvas) =>
+                                (s.running || s.gameOver)
+                                    ? gameCanvas!
+                                    : _StartScreen(onStart: _start),
+                      ),
                     ),
-                    builder:
-                        (_, s, gameCanvas) =>
-                            (s.running || s.gameOver)
-                                ? gameCanvas!
-                                : _StartScreen(onStart: _start),
                   ),
                 ),
               ),
@@ -440,15 +453,13 @@ class _StartScreen extends StatelessWidget {
     return GestureDetector(
       onTap: onStart,
       child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: AppTheme.surface0, width: 1),
-        ),
+        color: Colors.transparent,
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'SNAKE',
+                AppStrings.snakeTitle,
                 style: GoogleFonts.pressStart2p(
                   fontSize: 20,
                   color: AppTheme.green,
@@ -493,40 +504,59 @@ class _SnakePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final s = _state.value;
-    final cw = size.width / _kCols;
-    final ch = size.height / _kRows;
+    final cellSize = min(size.width / _kCols, size.height / _kRows);
+    final boardW = cellSize * _kCols;
+    final boardH = cellSize * _kRows;
+    final ox = (size.width - boardW) / 2;
+    final oy = (size.height - boardH) / 2;
 
-    // grid
+    // grid lines
     for (int r = 0; r <= _kRows; r++) {
       canvas.drawLine(
-        Offset(0, r * ch),
-        Offset(size.width, r * ch),
+        Offset(ox, oy + r * cellSize),
+        Offset(ox + boardW, oy + r * cellSize),
         _gridPaint,
       );
     }
     for (int c = 0; c <= _kCols; c++) {
       canvas.drawLine(
-        Offset(c * cw, 0),
-        Offset(c * cw, size.height),
+        Offset(ox + c * cellSize, oy),
+        Offset(ox + c * cellSize, oy + boardH),
         _gridPaint,
       );
     }
 
-    // food
+    // food (soft rounded pixel)
     _fillPaint.color = AppTheme.red;
-    canvas.drawRect(
-      Rect.fromLTWH(s.food.x * cw + 2, s.food.y * ch + 2, cw - 4, ch - 4),
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(
+          ox + s.food.x * cellSize + 2,
+          oy + s.food.y * cellSize + 2,
+          cellSize - 4,
+          cellSize - 4,
+        ),
+        const Radius.circular(3),
+      ),
       _fillPaint,
     );
 
-    // snake body
+    // snake body with rounded head and segments
     final bodyColor = s.gameOver ? AppTheme.subtext : AppTheme.teal;
     final headColor = s.gameOver ? AppTheme.red : AppTheme.green;
     for (int i = s.snake.length - 1; i >= 0; i--) {
       final p = s.snake[i];
       _fillPaint.color = i == 0 ? headColor : bodyColor;
-      canvas.drawRect(
-        Rect.fromLTWH(p.x * cw + 1, p.y * ch + 1, cw - 2, ch - 2),
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(
+            ox + p.x * cellSize + 1.5,
+            oy + p.y * cellSize + 1.5,
+            cellSize - 3,
+            cellSize - 3,
+          ),
+          Radius.circular(i == 0 ? 4 : 2),
+        ),
         _fillPaint,
       );
     }
