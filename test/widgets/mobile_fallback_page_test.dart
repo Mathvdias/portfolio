@@ -21,7 +21,33 @@ void main() {
     testWidgets('has a TextButton for GitHub', (tester) async {
       await tester.pumpWidget(const MaterialApp(home: MobileFallbackPage()));
 
-      expect(find.byType(TextButton), findsOneWidget);
+      expect(find.byType(TextButton), findsAtLeastNWidgets(1));
+    });
+
+    testWidgets('renders Pocket Apps grid and sections', (tester) async {
+      await tester.pumpWidget(const MaterialApp(home: MobileFallbackPage()));
+
+      expect(find.text('POCKET APPS'), findsOneWidget);
+      expect(find.text('ABOUT'), findsOneWidget);
+      expect(find.text('EXPERIENCE'), findsOneWidget);
+      expect(find.text('SKILLS'), findsOneWidget);
+      expect(find.text('PROJECTS'), findsOneWidget);
+      expect(find.text('GUESTBOOK'), findsOneWidget);
+      expect(find.text('TERMINAL'), findsOneWidget);
+      expect(find.text('SNAKE'), findsOneWidget);
+      expect(find.text('CALC'), findsOneWidget);
+      expect(find.text('METRICS'), findsOneWidget);
+    });
+
+    testWidgets('renders quick dock links', (tester) async {
+      await tester.pumpWidget(const MaterialApp(home: MobileFallbackPage()));
+
+      expect(find.text('GitHub'), findsOneWidget);
+      expect(find.text('LinkedIn'), findsOneWidget);
+      expect(find.text('Medium'), findsOneWidget);
+      expect(find.text('pub.dev'), findsOneWidget);
+      expect(find.text('Resume'), findsOneWidget);
+      expect(find.text('Email'), findsOneWidget);
     });
   });
 }

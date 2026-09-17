@@ -6,6 +6,7 @@ import 'package:flutter_lazy_load_web/flutter_lazy_load_web.dart';
 
 import '../../../../core/di/app_dependencies.dart';
 import '../../../../core/services/analytics_service.dart';
+import '../../../../core/services/sound_service.dart';
 import '../../../../features/desktop/presentation/viewmodels/desktop_viewmodel.dart';
 import '../../../../features/guestbook/presentation/widgets/guestbook_content.dart'
     deferred as guestbook_content;
@@ -65,6 +66,7 @@ class _DesktopPageState extends State<DesktopPage> {
   late DesktopViewModel _desktopVM;
   late AnalyticsService _analytics;
   late VisitorViewModel _visitorVM;
+  late SoundService _sound;
   bool _initialized = false;
 
   // Local rubber-band state — never calls notifyListeners during drag.
@@ -81,6 +83,7 @@ class _DesktopPageState extends State<DesktopPage> {
     final deps = AppDependencies.of(context);
     _desktopVM = deps.desktopViewModel;
     _analytics = deps.analyticsService;
+    _sound = deps.soundService;
 
     // Register window handler
     _desktopVM.onOpenWindowById ??= (id, ctx) {
@@ -229,6 +232,7 @@ class _DesktopPageState extends State<DesktopPage> {
   // ── Analytics helpers ────────────────────────────────────────────
 
   void _trackWindowOpen(String id) {
+    _sound.playWindowOpen();
     if (!_firstWindowOpened) {
       _firstWindowOpened = true;
       unawaited(_analytics.logFirstWindow(id));
@@ -238,6 +242,7 @@ class _DesktopPageState extends State<DesktopPage> {
   }
 
   void _trackWindowClose(String id) {
+    _sound.playWindowClose();
     unawaited(_analytics.logWindowClose(id));
     final openTime = _windowOpenTimes.remove(id);
     if (openTime != null) {

@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../core/di/app_dependencies.dart';
+import '../../core/services/sound_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../../theme/app_theme.dart';
 import '../constants/app_sizes.dart';
@@ -61,6 +63,8 @@ class MacMenuBar extends StatelessWidget {
           const _WifiIndicator(),
           const SizedBox(width: AppSizes.spacingBase),
           const _BatteryIndicator(level: 0.82),
+          const SizedBox(width: AppSizes.spacingBase),
+          const _SoundToggleWidget(),
           const SizedBox(width: AppSizes.font2xl),
 
           _CompactLanguagePicker(
@@ -471,3 +475,56 @@ class _BatteryPainter extends CustomPainter {
   @override
   bool shouldRepaint(_BatteryPainter old) => old.level != level;
 }
+
+class _SoundToggleWidget extends StatefulWidget {
+  const _SoundToggleWidget();
+
+  @override
+  State<_SoundToggleWidget> createState() => _SoundToggleWidgetState();
+}
+
+class _SoundToggleWidgetState extends State<_SoundToggleWidget> {
+  SoundService? _sound;
+  bool _muted = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    try {
+      _sound = AppDependencies.of(context).soundService;
+    } catch (_) {
+      _sound = SoundService();
+    }
+    _muted = _sound?.isMuted ?? false;
+  }
+
+  void _toggle() {
+    final s = _sound ?? SoundService();
+    s.toggleMute();
+    setState(() {
+      _muted = s.isMuted;
+    });
+    if (!_muted) {
+      s.playClick();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: _muted ? 'Sound: Muted (Click to Unmute)' : 'Sound: Active (Click to Mute)',
+      child: GestureDetector(
+        onTap: _toggle,
+        child: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: Icon(
+            _muted ? Icons.volume_off : Icons.volume_up,
+            size: 15,
+            color: _muted ? AppTheme.subtext : AppTheme.teal,
+          ),
+        ),
+      ),
+    );
+  }
+}
+

@@ -93,6 +93,17 @@
       z-index: 9999;
       transition: opacity 0.6s ease;
     }
+    #boot::before {
+      content: " ";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%),
+                  radial-gradient(circle at center, transparent 65%, rgba(0,0,0,0.6) 100%);
+      background-size: 100% 4px, 100% 100%;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0.85;
+    }
     #boot.fade-out { opacity: 0; pointer-events: none; }
 
     /* BIOS header block */
@@ -264,7 +275,7 @@
     <div id="boot-bios">
       <div class="brand">MathOS  v1.0.0</div>
       <div class="dim">Copyright (C) 2026 Matheus Dias. All rights reserved.</div>
-      <div>CPU: Flutter Engine &nbsp;|&nbsp; RAM: 8192 MB OK &nbsp;|&nbsp; DISPLAY: 1920x1080</div>
+      <div id="boot-hw">CPU: Flutter WasmGC &nbsp;|&nbsp; RAM: 8192 MB OK &nbsp;|&nbsp; DISPLAY: 1920x1080</div>
       <div class="dim">BIOS v2.26 &nbsp;—&nbsp; Press [F2] to enter Setup &nbsp;|&nbsp; [DEL] Boot Menu</div>
     </div>
 
@@ -290,6 +301,132 @@
       <div id="boot-track"><div id="boot-fill"></div></div>
     </div>
   </div>
+
+  <script>
+    // ── Web Audio API Synthesizer (Zero-dependency Sound Engine) ────────
+    window.mathOsAudio = (function () {
+      var ctx = null;
+      var muted = false;
+
+      function getCtx() {
+        if (!ctx) {
+          var AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) ctx = new AudioCtx();
+        }
+        if (ctx && ctx.state === 'suspended') {
+          ctx.resume();
+        }
+        return ctx;
+      }
+
+      return {
+        isMuted: function () { return muted; },
+        toggleMute: function () { muted = !muted; return muted; },
+        setMuted: function (val) { muted = !!val; },
+        playClick: function () {
+          if (muted) return;
+          var c = getCtx();
+          if (!c) return;
+          var osc = c.createOscillator();
+          var gain = c.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(820, c.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(180, c.currentTime + 0.035);
+          gain.gain.setValueAtTime(0.06, c.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.035);
+          osc.connect(gain);
+          gain.connect(c.destination);
+          osc.start();
+          osc.stop(c.currentTime + 0.035);
+        },
+        playWindowOpen: function () {
+          if (muted) return;
+          var c = getCtx();
+          if (!c) return;
+          var osc = c.createOscillator();
+          var gain = c.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(320, c.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(680, c.currentTime + 0.08);
+          gain.gain.setValueAtTime(0.06, c.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.08);
+          osc.connect(gain);
+          gain.connect(c.destination);
+          osc.start();
+          osc.stop(c.currentTime + 0.08);
+        },
+        playWindowClose: function () {
+          if (muted) return;
+          var c = getCtx();
+          if (!c) return;
+          var osc = c.createOscillator();
+          var gain = c.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(540, c.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(220, c.currentTime + 0.08);
+          gain.gain.setValueAtTime(0.06, c.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.08);
+          osc.connect(gain);
+          gain.connect(c.destination);
+          osc.start();
+          osc.stop(c.currentTime + 0.08);
+        },
+        playKeypress: function () {
+          if (muted) return;
+          var c = getCtx();
+          if (!c) return;
+          var osc = c.createOscillator();
+          var gain = c.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(1200, c.currentTime);
+          gain.gain.setValueAtTime(0.02, c.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.02);
+          osc.connect(gain);
+          gain.connect(c.destination);
+          osc.start();
+          osc.stop(c.currentTime + 0.02);
+        },
+        playChime: function () {
+          if (muted) return;
+          var c = getCtx();
+          if (!c) return;
+          // Macintosh classic boot chord: F# Major with harmonics
+          var freqs = [185.00, 233.08, 277.18, 369.99];
+          freqs.forEach(function (f, idx) {
+            var osc = c.createOscillator();
+            var gain = c.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(f, c.currentTime);
+            gain.gain.setValueAtTime(0.08 / freqs.length, c.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 1.8 + idx * 0.1);
+            osc.connect(gain);
+            gain.connect(c.destination);
+            osc.start(c.currentTime + 0.02);
+            osc.stop(c.currentTime + 2.0);
+          });
+        }
+      };
+    })();
+
+    // Dynamic Hardware Specs on Boot Screen
+    try {
+      var cores = navigator.hardwareConcurrency || 4;
+      var dpr = window.devicePixelRatio || 1;
+      var w = window.innerWidth;
+      var h = window.innerHeight;
+      var hwEl = document.getElementById('boot-hw');
+      if (hwEl) {
+        hwEl.innerHTML = 'CPU: ' + cores + ' Cores WasmGC &nbsp;|&nbsp; RAM: 8192 MB OK &nbsp;|&nbsp; DISPLAY: ' + w + 'x' + h + ' @' + dpr + 'x';
+      }
+    } catch (_) {}
+
+    // Boot audio trigger on first interaction
+    function triggerBootChime() {
+      if (window.mathOsAudio) window.mathOsAudio.playChime();
+    }
+    document.addEventListener('pointerdown', triggerBootChime, { once: true });
+    document.addEventListener('keydown', triggerBootChime, { once: true });
+  </script>
 
   <script src="flutter_bootstrap.js" async></script>
   <script>

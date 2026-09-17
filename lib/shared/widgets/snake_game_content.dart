@@ -192,7 +192,26 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
       autofocus: true,
       onKeyEvent: _onKey,
       child: GestureDetector(
-        onTap: () => _focusNode.requestFocus(),
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          _focusNode.requestFocus();
+          final s = _state.value;
+          if (!s.running || s.gameOver) _start();
+        },
+        onVerticalDragEnd: (details) {
+          final v = details.primaryVelocity;
+          if (v != null) {
+            if (v < -100 && _dir != _Dir.down) _nextDir = _Dir.up;
+            if (v > 100 && _dir != _Dir.up) _nextDir = _Dir.down;
+          }
+        },
+        onHorizontalDragEnd: (details) {
+          final v = details.primaryVelocity;
+          if (v != null) {
+            if (v < -100 && _dir != _Dir.right) _nextDir = _Dir.left;
+            if (v > 100 && _dir != _Dir.left) _nextDir = _Dir.right;
+          }
+        },
         child: Container(
           color: AppTheme.background,
           padding: const EdgeInsets.all(AppSizes.spacingLg),
@@ -279,6 +298,44 @@ class _SnakeGameContentState extends State<SnakeGameContent> {
                               ),
                             )
                             : const SizedBox.shrink(),
+              ),
+              // Touch D-pad for mobile gameplay
+              Padding(
+                padding: const EdgeInsets.only(top: AppSizes.spacingMd),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_left, color: AppTheme.blue, size: 28),
+                      onPressed: () {
+                        if (_dir != _Dir.right) _nextDir = _Dir.left;
+                      },
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_drop_up, color: AppTheme.blue, size: 28),
+                          onPressed: () {
+                            if (_dir != _Dir.down) _nextDir = _Dir.up;
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.arrow_drop_down, color: AppTheme.blue, size: 28),
+                          onPressed: () {
+                            if (_dir != _Dir.up) _nextDir = _Dir.down;
+                          },
+                        ),
+                      ],
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.arrow_right, color: AppTheme.blue, size: 28),
+                      onPressed: () {
+                        if (_dir != _Dir.left) _nextDir = _Dir.right;
+                      },
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
