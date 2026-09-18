@@ -11,16 +11,16 @@ class LavaInteractive extends StatefulWidget {
     super.key,
     required this.child,
     this.controller,
-    this.maxTiltAngle = 0.26,
-    this.pressedScale = 0.92,
-    this.returnDuration = const Duration(milliseconds: 250),
-    this.bounceDuration = const Duration(milliseconds: 350),
-    this.perspective = 0.0015,
+    this.maxTiltAngle = 0.20,
+    this.pressedScale = 0.94,
+    this.returnDuration = const Duration(milliseconds: 240),
+    this.bounceDuration = const Duration(milliseconds: 320),
+    this.perspective = 0.0012,
     this.enableTilt = true,
     this.enableBounce = true,
     this.enableHaptics = true,
     this.dragToRotate = true,
-    this.scrubOnHover = true,
+    this.scrubOnHover = false,
     this.onTap,
     this.onStateChanged,
   });
@@ -231,26 +231,35 @@ class _LavaInteractiveState extends State<LavaInteractive>
     _isDragging = true;
     _dragAccumulator = 0.0;
     _dragStartFrame = widget.controller!.currentFrame;
+    _tiltReturnController.stop();
     _frameReturnController.stop();
     if (widget.controller!.isPlaying) {
       widget.controller!.pause();
     }
+    _updateState(LavaInteractiveState.pressed);
+    setState(() {});
   }
 
   void _onPanUpdate(DragUpdateDetails details) {
     if (widget.controller == null || !widget.dragToRotate) return;
     _dragAccumulator += details.delta.dx;
 
-    // Advance 1 frame per 7 pixels of horizontal drag
-    const pixelsPerFrame = 7.0;
+    // Smooth weighted rotation: 20 pixels per frame (480px = full 360 degree turn)
+    const pixelsPerFrame = 20.0;
     final frameDelta = (_dragAccumulator / pixelsPerFrame).round();
     final total = widget.controller!.totalFrames;
     final target = ((_dragStartFrame + frameDelta) % total + total) % total;
-    widget.controller!.seekToFrame(target);
+    if (widget.controller!.currentFrame != target) {
+      widget.controller!.seekToFrame(target);
+    }
   }
 
   void _onPanEnd(DragEndDetails details) {
     _isDragging = false;
+    _updateState(
+      _isHovered ? LavaInteractiveState.hover : LavaInteractiveState.idle,
+    );
+    setState(() {});
   }
 
   void _onTapDown(TapDownDetails details) {
@@ -301,11 +310,13 @@ class _LavaInteractiveState extends State<LavaInteractive>
           onHover: (e) => _onPointerHover(e, constraints),
           onExit: _onPointerExit,
           cursor:
-              widget.dragToRotate
-                  ? SystemMouseCursors.grab
-                  : (widget.onTap != null
-                      ? SystemMouseCursors.click
-                      : MouseCursor.defer),
+              _isDragging
+                  ? SystemMouseCursors.grabbing
+                  : (widget.dragToRotate
+                      ? SystemMouseCursors.grab
+                      : (widget.onTap != null
+                          ? SystemMouseCursors.click
+                          : MouseCursor.defer)),
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onPanStart: widget.dragToRotate ? _onPanStart : null,

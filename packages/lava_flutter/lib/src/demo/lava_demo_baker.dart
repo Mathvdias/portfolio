@@ -89,63 +89,68 @@ abstract final class LavaDemoBaker {
   }) {
     final t = frameIndex / totalFrames;
     final cx = width / 2.0;
-    final cy = (height / 2.0) - 2.0;
+    final cy = height / 2.0;
 
-    // Levitation physics (subtle vertical bobbing)
-    final bobbing = math.sin(t * 2 * math.pi) * 3.8;
-    final currentCy = cy + bobbing;
-
-    // Turntable rotation and isometric pitch
+    // Turntable rotation and isometric pitch (~18 degrees pitch downward)
     final rotY = t * 2 * math.pi;
-    const pitch = 0.38; // ~22 degrees downward pitch angle
+    const pitch = -0.32;
 
-    // Ambient Occlusion Ground Drop Shadow
-    final shadowScale = 1.0 - (bobbing / 28.0);
-    final shadowWidth = (54.0 + math.cos(rotY * 2).abs() * 6.0) * shadowScale;
-    final shadowHeight = (18.0 - math.sin(rotY * 2).abs() * 2.5) * shadowScale;
-    final shadowOpacity = (0.28 * shadowScale).clamp(0.10, 0.36);
+    // Ambient Occlusion Ground Drop Shadow directly under the chassis base
+    final shadowWidth = 50.0 + math.cos(rotY * 2).abs() * 5.0;
+    final shadowHeight = 14.0 + math.sin(rotY * 2).abs() * 2.0;
 
     final shadowPaint =
         Paint()
-          ..color = Color.from(
-            alpha: shadowOpacity,
+          ..color = const Color.from(
+            alpha: 0.28,
             red: 0.05,
             green: 0.08,
             blue: 0.16,
           )
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7.0);
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6.0);
 
     final shadowRect = Rect.fromCenter(
-      center: Offset(cx, height - 16.0),
+      center: Offset(cx, cy + 26.0),
       width: shadowWidth,
       height: shadowHeight,
     );
     canvas.drawOval(shadowRect, shadowPaint);
 
-    // Light direction (Top-Left-Front key light)
-    final lightDir = const _Vec3(-0.45, -0.75, -0.48).normalized();
+    // Directional Key Light vector pointing towards light source (Top-Left-Front)
+    final lightDir = const _Vec3(-0.4, -0.6, 0.7).normalized();
 
     // 3D Model Definition: Classic Macintosh 128K
     final faces = _buildMacintoshFaces();
 
-    // Depth sort visible faces (Painter's algorithm)
+    // Determine if the front chassis is visible to the camera
+    const frontNormal = _Vec3(0, 0.05, 1.0);
+    final isFrontFacing = frontNormal.rotateY(rotY).rotateX(pitch).z > 0.001;
+
+    // Visible faces with back-face culling (tn.z > 0.001)
     final visibleFaces = <_RenderFace>[];
 
     for (final face in faces) {
+      // Front bezel, chin, and screen are only evaluated when front faces the camera
+      if ((face.type == _FaceType.bezel ||
+              face.type == _FaceType.chin ||
+              face.type == _FaceType.screen) &&
+          !isFrontFacing) {
+        continue;
+      }
+
       final tn = face.normal.rotateY(rotY).rotateX(pitch);
-      // Back-face culling: camera looks down +Z
-      if (tn.z < 0.0) {
+      if (tn.z > 0.001) {
         final projected = <Offset>[];
         double totalZ = 0.0;
 
         for (final v in face.vertices) {
           final r = v.rotateY(rotY).rotateX(pitch);
-          projected.add(Offset(cx + r.x, currentCy + r.y));
+          projected.add(Offset(cx + r.x, cy + r.y));
           totalZ += r.z;
         }
 
         final avgZ = totalZ / face.vertices.length;
-        final diffuse = (0.38 + 0.62 * tn.dot(lightDir)).clamp(0.22, 1.0);
+        final diffuse = (0.36 + 0.64 * tn.dot(lightDir)).clamp(0.20, 1.0);
         final shadedColor = _shadeColor(face.color, diffuse);
 
         visibleFaces.add(
@@ -161,7 +166,8 @@ abstract final class LavaDemoBaker {
       }
     }
 
-    visibleFaces.sort((a, b) => b.avgZ.compareTo(a.avgZ));
+    // Depth sort (Painter's algorithm): furthest faces first, closest faces last on top
+    visibleFaces.sort((a, b) => a.avgZ.compareTo(b.avgZ));
 
     final facePaint = Paint()..style = PaintingStyle.fill;
     final edgePaint =
@@ -181,7 +187,7 @@ abstract final class LavaDemoBaker {
       canvas.drawPath(path, facePaint);
 
       // Specular edge highlight
-      final rimFactor = (rf.diffuse * 0.45).clamp(0.12, 0.55);
+      final rimFactor = (rf.diffuse * 0.40).clamp(0.10, 0.50);
       edgePaint.color = Color.from(
         alpha: rimFactor,
         red: 1.0,
@@ -195,7 +201,7 @@ abstract final class LavaDemoBaker {
         case _FaceType.screen:
           _drawCrtContent(canvas, rf.projected, path, t);
         case _FaceType.chin:
-          _drawChinDetails(canvas, rf.projected, cx, currentCy, rotY, pitch);
+          _drawChinDetails(canvas, cx, cy, rotY, pitch);
         case _FaceType.back:
           _drawBackVentilation(canvas, rf.projected);
         case _FaceType.top:
@@ -208,31 +214,31 @@ abstract final class LavaDemoBaker {
 
   static List<_Face> _buildMacintoshFaces() {
     // Coordinate dimensions
-    // Height: top = -24, bottom = 22
-    // Width: bottom = ±18, top = ±16.5 (tapered)
-    // Depth: back = -15, front bottom = 15, front top = 12.5 (wedge tilt)
-    const vBackBotLeft = _Vec3(-18.0, 22.0, -15.0);
-    const vBackBotRight = _Vec3(18.0, 22.0, -15.0);
-    const vBackTopRight = _Vec3(16.5, -24.0, -15.0);
-    const vBackTopLeft = _Vec3(-16.5, -24.0, -15.0);
+    // Height: top = -22.0, bottom = 22.0
+    // Width: bottom = ±18.0, top = ±16.5 (tapered)
+    // Depth: back = -14.0, front bottom = 14.0, front top = 11.5 (wedge tilt)
+    const vBackBotLeft = _Vec3(-18.0, 22.0, -14.0);
+    const vBackBotRight = _Vec3(18.0, 22.0, -14.0);
+    const vBackTopRight = _Vec3(16.5, -22.0, -14.0);
+    const vBackTopLeft = _Vec3(-16.5, -22.0, -14.0);
 
-    const vFrontBotLeft = _Vec3(-18.0, 22.0, 15.0);
-    const vFrontBotRight = _Vec3(18.0, 22.0, 15.0);
-    const vFrontTopRight = _Vec3(16.5, -24.0, 12.5);
-    const vFrontTopLeft = _Vec3(-16.5, -24.0, 12.5);
+    const vFrontBotLeft = _Vec3(-18.0, 22.0, 14.0);
+    const vFrontBotRight = _Vec3(18.0, 22.0, 14.0);
+    const vFrontTopRight = _Vec3(16.5, -22.0, 11.5);
+    const vFrontTopLeft = _Vec3(-16.5, -22.0, 11.5);
 
     // Front Brow & Chin transition points
-    const vBrowBotLeft = _Vec3(-16.8, -16.0, 13.0);
-    const vBrowBotRight = _Vec3(16.8, -16.0, 13.0);
+    const vBrowBotLeft = _Vec3(-16.5, -15.0, 12.0);
+    const vBrowBotRight = _Vec3(16.5, -15.0, 12.0);
 
-    const vChinTopLeft = _Vec3(-17.6, 7.0, 14.5);
-    const vChinTopRight = _Vec3(17.6, 7.0, 14.5);
+    const vChinTopLeft = _Vec3(-17.5, 6.5, 13.5);
+    const vChinTopRight = _Vec3(17.5, 6.5, 13.5);
 
-    // Recessed Screen corners (recessed into bezel)
-    const vScreenTopLeft = _Vec3(-11.5, -14.5, 11.2);
-    const vScreenTopRight = _Vec3(11.5, -14.5, 11.2);
-    const vScreenBotRight = _Vec3(11.5, 5.5, 12.8);
-    const vScreenBotLeft = _Vec3(-11.5, 5.5, 12.8);
+    // Recessed Screen corners
+    const vScreenTopLeft = _Vec3(-12.0, -14.0, 11.0);
+    const vScreenTopRight = _Vec3(12.0, -14.0, 11.0);
+    const vScreenBotRight = _Vec3(12.0, 5.5, 12.5);
+    const vScreenBotLeft = _Vec3(-12.0, 5.5, 12.5);
 
     // Colors (Apple Vintage Platinum / Warm Beige)
     const cTop = Color(0xFFECE6DA);
@@ -240,10 +246,8 @@ abstract final class LavaDemoBaker {
     const cBack = Color(0xFFC7BFA8);
     const cLeft = Color(0xFFBFB7A6);
     const cRight = Color(0xFFD6CEC0);
-    const cBezel = Color(0xFFD9D2C4);
-    const cChamferDark = Color(0xFF8B8476);
-    const cChamferLight = Color(0xFFB5ADA0);
-    const cScreenBg = Color(0xFF071913);
+    const cBezel = Color(0xFFDDD6C7);
+    const cScreenBg = Color(0xFF041810);
 
     return const [
       // 1. Bottom shell
@@ -299,8 +303,8 @@ abstract final class LavaDemoBaker {
       _Face(
         [
           vChinTopLeft,
-          _Vec3(-11.5, 7.0, 14.5),
-          _Vec3(-11.5, -16.0, 13.0),
+          _Vec3(-12.0, 6.5, 13.5),
+          _Vec3(-12.0, -15.0, 12.0),
           vBrowBotLeft,
         ],
         _Vec3(0, 0.05, 1.0),
@@ -310,64 +314,16 @@ abstract final class LavaDemoBaker {
       // 9. Right Bezel Cheek
       _Face(
         [
-          _Vec3(11.5, 7.0, 14.5),
+          _Vec3(12.0, 6.5, 13.5),
           vChinTopRight,
           vBrowBotRight,
-          _Vec3(11.5, -16.0, 13.0),
+          _Vec3(12.0, -15.0, 12.0),
         ],
         _Vec3(0, 0.05, 1.0),
         cBezel,
         _FaceType.bezel,
       ),
-      // 10. Recessed Screen Top Chamfer
-      _Face(
-        [
-          _Vec3(-11.5, -16.0, 13.0),
-          _Vec3(11.5, -16.0, 13.0),
-          vScreenTopRight,
-          vScreenTopLeft,
-        ],
-        _Vec3(0, -0.7, 0.7),
-        cChamferDark,
-        _FaceType.bezel,
-      ),
-      // 11. Recessed Screen Bottom Chamfer
-      _Face(
-        [
-          vScreenBotLeft,
-          vScreenBotRight,
-          _Vec3(11.5, 7.0, 14.5),
-          _Vec3(-11.5, 7.0, 14.5),
-        ],
-        _Vec3(0, 0.7, 0.7),
-        cChamferLight,
-        _FaceType.bezel,
-      ),
-      // 12. Recessed Screen Left Chamfer
-      _Face(
-        [
-          _Vec3(-11.5, 7.0, 14.5),
-          _Vec3(-11.5, -16.0, 13.0),
-          vScreenTopLeft,
-          vScreenBotLeft,
-        ],
-        _Vec3(-0.7, 0, 0.7),
-        cChamferDark,
-        _FaceType.bezel,
-      ),
-      // 13. Recessed Screen Right Chamfer
-      _Face(
-        [
-          _Vec3(11.5, -16.0, 13.0),
-          _Vec3(11.5, 7.0, 14.5),
-          vScreenBotRight,
-          vScreenTopRight,
-        ],
-        _Vec3(0.7, 0, 0.7),
-        cChamferLight,
-        _FaceType.bezel,
-      ),
-      // 14. Phosphor CRT Screen Face
+      // 10. Phosphor CRT Screen Face
       _Face(
         [vScreenBotLeft, vScreenBotRight, vScreenTopRight, vScreenTopLeft],
         _Vec3(0, 0.05, 1.0),
@@ -397,6 +353,14 @@ abstract final class LavaDemoBaker {
             const [0.0, 0.5, 1.0],
           );
     canvas.drawRect(crtBounds, crtBgPaint);
+
+    // Inner bezel shadow giving recessed depth
+    final innerShadowPaint =
+        Paint()
+          ..color = const Color(0x77000000)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.5;
+    canvas.drawRect(crtBounds.deflate(0.75), innerShadowPaint);
 
     // CRT Scanlines
     final scanlinePaint =
@@ -488,36 +452,35 @@ abstract final class LavaDemoBaker {
 
   static void _drawChinDetails(
     Canvas canvas,
-    List<Offset> pts,
     double cx,
-    double currentCy,
+    double cy,
     double rotY,
     double pitch,
   ) {
     // 3D Floppy Drive Slot
-    final slotP1 = const _Vec3(-7.5, 13.5, 15.2).rotateY(rotY).rotateX(pitch);
-    final slotP2 = const _Vec3(7.5, 13.5, 15.2).rotateY(rotY).rotateX(pitch);
-    final slotP3 = const _Vec3(7.5, 15.2, 15.2).rotateY(rotY).rotateX(pitch);
-    final slotP4 = const _Vec3(-7.5, 15.2, 15.2).rotateY(rotY).rotateX(pitch);
+    final slotP1 = const _Vec3(-7.5, 13.0, 13.8).rotateY(rotY).rotateX(pitch);
+    final slotP2 = const _Vec3(7.5, 13.0, 13.8).rotateY(rotY).rotateX(pitch);
+    final slotP3 = const _Vec3(7.5, 14.8, 13.8).rotateY(rotY).rotateX(pitch);
+    final slotP4 = const _Vec3(-7.5, 14.8, 13.8).rotateY(rotY).rotateX(pitch);
 
     final slotPath =
         Path()
-          ..moveTo(cx + slotP1.x, currentCy + slotP1.y)
-          ..lineTo(cx + slotP2.x, currentCy + slotP2.y)
-          ..lineTo(cx + slotP3.x, currentCy + slotP3.y)
-          ..lineTo(cx + slotP4.x, currentCy + slotP4.y)
+          ..moveTo(cx + slotP1.x, cy + slotP1.y)
+          ..lineTo(cx + slotP2.x, cy + slotP2.y)
+          ..lineTo(cx + slotP3.x, cy + slotP3.y)
+          ..lineTo(cx + slotP4.x, cy + slotP4.y)
           ..close();
 
     final slotPaint = Paint()..color = const Color(0xFF262420);
     canvas.drawPath(slotPath, slotPaint);
 
     // Drive read activity LED (emerald green dot)
-    final ledPt = const _Vec3(9.2, 14.3, 15.2).rotateY(rotY).rotateX(pitch);
+    final ledPt = const _Vec3(9.2, 13.9, 13.8).rotateY(rotY).rotateX(pitch);
     final ledPaint =
         Paint()
           ..color = const Color(0xFF00FF66)
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.2);
-    canvas.drawCircle(Offset(cx + ledPt.x, currentCy + ledPt.y), 1.2, ledPaint);
+    canvas.drawCircle(Offset(cx + ledPt.x, cy + ledPt.y), 1.2, ledPaint);
 
     // Retro Rainbow Badge (6 iconic stripes)
     const rainbowColors = [
@@ -530,19 +493,19 @@ abstract final class LavaDemoBaker {
     ];
 
     for (int s = 0; s < rainbowColors.length; s++) {
-      final y0 = 12.8 + (s * 0.5);
+      final y0 = 12.5 + (s * 0.5);
       final y1 = y0 + 0.45;
-      final b1 = _Vec3(-14.2, y0, 15.2).rotateY(rotY).rotateX(pitch);
-      final b2 = _Vec3(-12.2, y0, 15.2).rotateY(rotY).rotateX(pitch);
-      final b3 = _Vec3(-12.2, y1, 15.2).rotateY(rotY).rotateX(pitch);
-      final b4 = _Vec3(-14.2, y1, 15.2).rotateY(rotY).rotateX(pitch);
+      final b1 = _Vec3(-14.2, y0, 13.8).rotateY(rotY).rotateX(pitch);
+      final b2 = _Vec3(-12.2, y0, 13.8).rotateY(rotY).rotateX(pitch);
+      final b3 = _Vec3(-12.2, y1, 13.8).rotateY(rotY).rotateX(pitch);
+      final b4 = _Vec3(-14.2, y1, 13.8).rotateY(rotY).rotateX(pitch);
 
       final badgePath =
           Path()
-            ..moveTo(cx + b1.x, currentCy + b1.y)
-            ..lineTo(cx + b2.x, currentCy + b2.y)
-            ..lineTo(cx + b3.x, currentCy + b3.y)
-            ..lineTo(cx + b4.x, currentCy + b4.y)
+            ..moveTo(cx + b1.x, cy + b1.y)
+            ..lineTo(cx + b2.x, cy + b2.y)
+            ..lineTo(cx + b3.x, cy + b3.y)
+            ..lineTo(cx + b4.x, cy + b4.y)
             ..close();
 
       canvas.drawPath(badgePath, Paint()..color = rainbowColors[s]);
@@ -552,9 +515,11 @@ abstract final class LavaDemoBaker {
   static void _drawBackVentilation(Canvas canvas, List<Offset> pts) {
     if (pts.length < 4) return;
     // Horizontal ventilation grille lines
-    final pTopLeft = pts[1];
-    final pTopRight = pts[2];
-    final pBotLeft = pts[0];
+    // Face vertices: [vBackBotRight, vBackBotLeft, vBackTopLeft, vBackTopRight]
+    final pBotRight = pts[0];
+    final pBotLeft = pts[1];
+    final pTopLeft = pts[2];
+    final pTopRight = pts[3];
 
     final ventPaint =
         Paint()
@@ -564,11 +529,39 @@ abstract final class LavaDemoBaker {
     for (int i = 2; i <= 6; i++) {
       final frac = i / 10.0;
       final start = Offset.lerp(pTopLeft, pBotLeft, frac)!;
-      final end = Offset.lerp(pTopRight, pts[3], frac)!;
+      final end = Offset.lerp(pTopRight, pBotRight, frac)!;
       final leftInset = Offset.lerp(start, end, 0.22)!;
       final rightInset = Offset.lerp(start, end, 0.78)!;
       canvas.drawLine(leftInset, rightInset, ventPaint);
     }
+
+    // Lower ports panel
+    final portStart = Offset.lerp(pTopLeft, pBotLeft, 0.75)!;
+    final portEnd = Offset.lerp(pTopRight, pBotRight, 0.75)!;
+    final portBotStart = Offset.lerp(pTopLeft, pBotLeft, 0.90)!;
+    final portBotEnd = Offset.lerp(pTopRight, pBotRight, 0.90)!;
+
+    final portPath =
+        Path()
+          ..moveTo(
+            Offset.lerp(portStart, portEnd, 0.20)!.dx,
+            Offset.lerp(portStart, portEnd, 0.20)!.dy,
+          )
+          ..lineTo(
+            Offset.lerp(portStart, portEnd, 0.80)!.dx,
+            Offset.lerp(portStart, portEnd, 0.80)!.dy,
+          )
+          ..lineTo(
+            Offset.lerp(portBotStart, portBotEnd, 0.80)!.dx,
+            Offset.lerp(portBotStart, portBotEnd, 0.80)!.dy,
+          )
+          ..lineTo(
+            Offset.lerp(portBotStart, portBotEnd, 0.20)!.dx,
+            Offset.lerp(portBotStart, portBotEnd, 0.20)!.dy,
+          )
+          ..close();
+
+    canvas.drawPath(portPath, Paint()..color = const Color(0xFF4A443A));
   }
 
   static void _drawTopHandle(Canvas canvas, List<Offset> pts) {
