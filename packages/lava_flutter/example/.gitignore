@@ -3,3 +3,7 @@
 .packages
 build/
 pubspec.lock
+.metadata
+.idea/
+*.iml
+
