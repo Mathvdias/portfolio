@@ -24,3 +24,12 @@ enum LavaInteractiveState {
   /// Pointer is actively pressing the icon (spring compression active).
   pressed,
 }
+
+/// Built-in procedural 3D demo icon types.
+enum LavaDemoType {
+  /// Classic 1984 Macintosh 128K with glowing phosphor CRT screen, scanlines, and retro badge.
+  macintosh,
+
+  /// Stylized procedural 3D nature tree with foliage canopy puffs, wind sway physics, and ruby apples.
+  tree,
+}

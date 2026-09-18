@@ -22,6 +22,7 @@ class LavaStudioContent extends StatefulWidget {
 
 class _LavaStudioContentState extends State<LavaStudioContent> {
   late final LavaController _controller;
+  LavaDemoType _selectedType = LavaDemoType.macintosh;
   double _speed = 1.0;
 
   @override
@@ -105,11 +106,59 @@ class _LavaStudioContentState extends State<LavaStudioContent> {
           const Divider(color: AppTheme.surface0, thickness: 1),
           const SizedBox(height: AppSizes.spacingLg),
 
+          // Airbnb-Style Category Navigation Bar
+          Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSizes.spacingLg,
+                vertical: AppSizes.spacingSm,
+              ),
+              decoration: BoxDecoration(
+                color: AppTheme.surface.withValues(alpha: 0.6),
+                borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+                border: Border.all(color: AppTheme.surface0, width: 1.0),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _AirbnbCategoryTab(
+                    label: AppStrings.lavaModelMacintosh,
+                    demoType: LavaDemoType.macintosh,
+                    isSelected: _selectedType == LavaDemoType.macintosh,
+                    onTap: () {
+                      if (_selectedType != LavaDemoType.macintosh) {
+                        setState(() {
+                          _selectedType = LavaDemoType.macintosh;
+                          _controller.reset();
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(width: AppSizes.spacingXl),
+                  _AirbnbCategoryTab(
+                    label: AppStrings.lavaModelTree,
+                    demoType: LavaDemoType.tree,
+                    isSelected: _selectedType == LavaDemoType.tree,
+                    onTap: () {
+                      if (_selectedType != LavaDemoType.tree) {
+                        setState(() {
+                          _selectedType = LavaDemoType.tree;
+                          _controller.reset();
+                        });
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSizes.spacingXl),
+
           // Interactive Stage Box
           Center(
             child: Container(
               width: double.infinity,
-              constraints: const BoxConstraints(maxWidth: 420),
+              constraints: const BoxConstraints(maxWidth: 440),
               padding: const EdgeInsets.symmetric(
                 vertical: AppSizes.spacing3xl,
                 horizontal: AppSizes.spacingLg,
@@ -130,11 +179,35 @@ class _LavaStudioContentState extends State<LavaStudioContent> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   LavaIcon.demo(
+                    key: ValueKey(_selectedType),
+                    demoType: _selectedType,
                     controller: _controller,
                     size: 140,
                     interactive: true,
                   ),
                   const SizedBox(height: AppSizes.spacingMd),
+                  Text(
+                    _selectedType == LavaDemoType.macintosh
+                        ? AppStrings.lavaModelMacintosh
+                        : AppStrings.lavaModelTree,
+                    style: GoogleFonts.spaceMono(
+                      fontSize: AppSizes.fontSm,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.peach,
+                    ),
+                  ),
+                  const SizedBox(height: AppSizes.spacingXxs),
+                  Text(
+                    _selectedType == LavaDemoType.macintosh
+                        ? AppStrings.lavaModelMacintoshDesc
+                        : AppStrings.lavaModelTreeDesc,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.spaceMono(
+                      fontSize: AppSizes.fontXs,
+                      color: AppTheme.subtext,
+                    ),
+                  ),
+                  const SizedBox(height: AppSizes.spacingSm),
                   Text(
                     AppStrings.lavaStudioHint,
                     textAlign: TextAlign.center,
@@ -356,6 +429,79 @@ class _Badge extends StatelessWidget {
           fontSize: AppSizes.fontXs,
           fontWeight: FontWeight.bold,
           color: color,
+        ),
+      ),
+    );
+  }
+}
+
+class _AirbnbCategoryTab extends StatefulWidget {
+  const _AirbnbCategoryTab({
+    required this.label,
+    required this.demoType,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final String label;
+  final LavaDemoType demoType;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  State<_AirbnbCategoryTab> createState() => _AirbnbCategoryTabState();
+}
+
+class _AirbnbCategoryTabState extends State<_AirbnbCategoryTab> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSizes.spacingMd,
+            vertical: AppSizes.spacingXs,
+          ),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: widget.isSelected ? AppTheme.peach : Colors.transparent,
+                width: 2.0,
+              ),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              LavaIcon.demo(
+                demoType: widget.demoType,
+                size: 44,
+                autoPlay: _isHovered || widget.isSelected,
+                interactive: false,
+              ),
+              const SizedBox(height: AppSizes.spacingXs),
+              Text(
+                widget.label,
+                style: GoogleFonts.spaceMono(
+                  fontSize: AppSizes.fontXs,
+                  fontWeight:
+                      widget.isSelected ? FontWeight.bold : FontWeight.normal,
+                  color:
+                      widget.isSelected
+                          ? AppTheme.peach
+                          : (_isHovered ? AppTheme.text : AppTheme.subtext),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

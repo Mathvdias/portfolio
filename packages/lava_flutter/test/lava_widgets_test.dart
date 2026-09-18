@@ -25,6 +25,24 @@ void main() {
       LavaDemoBaker.clearCache();
     });
 
+    testWidgets('LavaIcon.demoTree renders without errors', (tester) async {
+      await tester.pumpWidget(
+        const Directionality(
+          textDirection: TextDirection.ltr,
+          child: Center(child: LavaIcon.demoTree(size: 64, interactive: true)),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.byType(LavaIcon), findsOneWidget);
+      expect(find.byType(CustomPaint), findsOneWidget);
+      expect(find.byType(LavaInteractive), findsOneWidget);
+
+      LavaDemoBaker.clearCache();
+    });
+
     testWidgets('LavaInteractive handles taps and state transitions', (
       tester,
     ) async {

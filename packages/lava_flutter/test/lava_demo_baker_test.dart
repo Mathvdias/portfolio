@@ -23,6 +23,23 @@ void main() {
       },
     );
 
+    test(
+      'bakeTreeAtlas generates valid nature tree 3D texture atlas',
+      () async {
+        LavaDemoBaker.clearCache();
+
+        final treeAtlas = await LavaDemoBaker.bakeTreeAtlas();
+        expect(treeAtlas, isNotNull);
+        expect(treeAtlas.width, 6 * 128);
+        expect(treeAtlas.height, 4 * 128);
+
+        final cachedTreeAtlas = await LavaDemoBaker.bakeTreeAtlas();
+        expect(identical(treeAtlas, cachedTreeAtlas), isTrue);
+
+        LavaDemoBaker.clearCache();
+      },
+    );
+
     test('defaultManifest matches baked atlas geometry', () {
       const manifest = LavaDemoBaker.defaultManifest;
       expect(manifest.totalFrames, 24);

@@ -284,4 +284,11 @@ abstract final class AppStrings {
   static const String lavaStudioFrame = 'FRAME';
   static const String lavaStudioStatus = 'STATUS';
   static const String lavaStudioFps = '30 FPS';
+  static const String lavaStudioAirbnbNav = 'Airbnb-Inspired Category Showcase';
+  static const String lavaModelMacintosh = 'Macintosh 128K';
+  static const String lavaModelTree = 'Nature Bonsai';
+  static const String lavaModelMacintoshDesc =
+      'Procedural Cyberdeck • CRT Phosphor Scanlines';
+  static const String lavaModelTreeDesc =
+      'Procedural 3D Flora • Organic Wind Sway & Apples';
 }

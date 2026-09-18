@@ -3,16 +3,14 @@ import 'dart:ui' as ui;
 import 'package:flutter/painting.dart';
 
 import '../model/lava_manifest.dart';
+import '../model/lava_types.dart';
 
-/// Procedural rasterizer that generates a 24-frame 3D dimensional
-/// Macintosh / Cyberdeck micro-animation atlas with 32-bit alpha channel
+/// Procedural rasterizer that generates 24-frame 3D dimensional
+/// micro-animation atlases (Macintosh Cyberdeck and Nature Tree) with 32-bit alpha channel
 /// entirely in memory.
-///
-/// Models the iconic 1984 Macintosh chassis with backward wedge tilt,
-/// recessed phosphor CRT screen with cyan/green scanline glow, floppy drive slot,
-/// rainbow badge, top carrying handle, and soft ambient occlusion ground shadow.
 abstract final class LavaDemoBaker {
-  static ui.Image? _cachedImage;
+  static ui.Image? _cachedMacImage;
+  static ui.Image? _cachedTreeImage;
 
   /// Default manifest configuration corresponding to the baked atlas.
   static const LavaManifest defaultManifest = LavaManifest(
@@ -26,11 +24,12 @@ abstract final class LavaDemoBaker {
     loop: true,
   );
 
-  /// Bakes the 24-frame 3D texture atlas.
+  /// Bakes the 24-frame 3D texture atlas for the requested [type].
   ///
   /// Subsequent calls return the cached [ui.Image] instance unless [forceRegenerate]
   /// is set to true.
   static Future<ui.Image> bakeAtlas({
+    LavaDemoType type = LavaDemoType.macintosh,
     int tileWidth = 128,
     int tileHeight = 128,
     int columns = 6,
@@ -38,8 +37,13 @@ abstract final class LavaDemoBaker {
     int totalFrames = 24,
     bool forceRegenerate = false,
   }) async {
-    if (_cachedImage != null && !forceRegenerate) {
-      return _cachedImage!;
+    final cached = switch (type) {
+      LavaDemoType.macintosh => _cachedMacImage,
+      LavaDemoType.tree => _cachedTreeImage,
+    };
+
+    if (cached != null && !forceRegenerate) {
+      return cached;
     }
 
     final totalWidth = columns * tileWidth;
@@ -56,13 +60,24 @@ abstract final class LavaDemoBaker {
 
       canvas.save();
       canvas.translate(xOffset, yOffset);
-      _renderFrame(
-        canvas: canvas,
-        frameIndex: i,
-        totalFrames: totalFrames,
-        width: tileWidth.toDouble(),
-        height: tileHeight.toDouble(),
-      );
+      switch (type) {
+        case LavaDemoType.macintosh:
+          _renderFrame(
+            canvas: canvas,
+            frameIndex: i,
+            totalFrames: totalFrames,
+            width: tileWidth.toDouble(),
+            height: tileHeight.toDouble(),
+          );
+        case LavaDemoType.tree:
+          _renderTreeFrame(
+            canvas: canvas,
+            frameIndex: i,
+            totalFrames: totalFrames,
+            width: tileWidth.toDouble(),
+            height: tileHeight.toDouble(),
+          );
+      }
       canvas.restore();
     }
 
@@ -70,14 +85,39 @@ abstract final class LavaDemoBaker {
     final image = await picture.toImage(totalWidth, totalHeight);
     picture.dispose();
 
-    _cachedImage = image;
+    switch (type) {
+      case LavaDemoType.macintosh:
+        _cachedMacImage = image;
+      case LavaDemoType.tree:
+        _cachedTreeImage = image;
+    }
     return image;
   }
 
-  /// Clears the cached texture atlas to free GPU memory.
+  /// Convenience shortcut to bake the 3D nature tree atlas.
+  static Future<ui.Image> bakeTreeAtlas({
+    int tileWidth = 128,
+    int tileHeight = 128,
+    int columns = 6,
+    int rows = 4,
+    int totalFrames = 24,
+    bool forceRegenerate = false,
+  }) => bakeAtlas(
+    type: LavaDemoType.tree,
+    tileWidth: tileWidth,
+    tileHeight: tileHeight,
+    columns: columns,
+    rows: rows,
+    totalFrames: totalFrames,
+    forceRegenerate: forceRegenerate,
+  );
+
+  /// Clears the cached texture atlases to free GPU memory.
   static void clearCache() {
-    _cachedImage?.dispose();
-    _cachedImage = null;
+    _cachedMacImage?.dispose();
+    _cachedMacImage = null;
+    _cachedTreeImage?.dispose();
+    _cachedTreeImage = null;
   }
 
   static void _renderFrame({
@@ -584,6 +624,339 @@ abstract final class LavaDemoBaker {
     );
   }
 
+  static void _renderTreeFrame({
+    required Canvas canvas,
+    required int frameIndex,
+    required int totalFrames,
+    required double width,
+    required double height,
+  }) {
+    final t = frameIndex / totalFrames;
+    final cx = width / 2.0;
+    final cy = height / 2.0;
+
+    // Turntable rotation and isometric pitch (~18 degrees pitch downward)
+    final rotY = t * 2 * math.pi;
+    const pitch = -0.32;
+
+    // Wind sway physics (gentle sinusoidal harmonic breeze)
+    final wind = math.sin(t * 2 * math.pi) * 0.08;
+
+    // Ambient Occlusion Ground Drop Shadow
+    final shadowWidth = 50.0 + math.cos(rotY * 2).abs() * 4.0;
+    final shadowHeight = 14.0 + math.sin(rotY * 2).abs() * 2.0;
+    final shadowPaint =
+        Paint()
+          ..color = const Color.from(
+            alpha: 0.28,
+            red: 0.04,
+            green: 0.09,
+            blue: 0.05,
+          )
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6.0);
+
+    final shadowRect = Rect.fromCenter(
+      center: Offset(cx, cy + 28.0),
+      width: shadowWidth,
+      height: shadowHeight,
+    );
+    canvas.drawOval(shadowRect, shadowPaint);
+
+    // 1. Grassy Lawn Mound Base
+    final moundCenter = const _Vec3(0, 24.0, 0).rotateY(rotY).rotateX(pitch);
+    final moundRect = Rect.fromCenter(
+      center: Offset(cx + moundCenter.x, cy + moundCenter.y),
+      width: 38.0,
+      height: 12.0,
+    );
+    final moundPaint =
+        Paint()
+          ..shader = ui.Gradient.linear(
+            moundRect.topLeft,
+            moundRect.bottomRight,
+            const [Color(0xFF66BB6A), Color(0xFF388E3C), Color(0xFF1B5E20)],
+            const [0.0, 0.5, 1.0],
+          );
+    canvas.drawOval(moundRect, moundPaint);
+
+    // 2. 3D Wooden Trunk & Branches
+    _drawTreeTrunk(canvas, cx, cy, rotY, pitch, wind);
+
+    // 3. Volumetric Foliage Canopy Puffs
+    _drawTreeCanopy(canvas, cx, cy, rotY, pitch, wind, t);
+  }
+
+  static void _drawTreeTrunk(
+    Canvas canvas,
+    double cx,
+    double cy,
+    double rotY,
+    double pitch,
+    double wind,
+  ) {
+    // 3D Trunk definition: vertical sections
+    final trunkBot = const _Vec3(0, 24.0, 0);
+    final trunkMid = _Vec3(wind * 4.0, 10.0, 0);
+    final trunkFork = _Vec3(wind * 8.0, -2.0, 0);
+
+    final b1 = trunkBot.rotateY(rotY).rotateX(pitch);
+    final b2 = trunkMid.rotateY(rotY).rotateX(pitch);
+    final b3 = trunkFork.rotateY(rotY).rotateX(pitch);
+
+    // Main Trunk Segment
+    final trunkPath =
+        Path()
+          ..moveTo(cx + b1.x - 4.5, cy + b1.y)
+          ..lineTo(cx + b2.x - 3.8, cy + b2.y)
+          ..lineTo(cx + b3.x - 3.0, cy + b3.y)
+          ..lineTo(cx + b3.x + 3.0, cy + b3.y)
+          ..lineTo(cx + b2.x + 3.8, cy + b2.y)
+          ..lineTo(cx + b1.x + 4.5, cy + b1.y)
+          ..close();
+
+    final trunkPaint =
+        Paint()
+          ..shader = ui.Gradient.linear(
+            Offset(cx - 5.0, cy),
+            Offset(cx + 5.0, cy),
+            const [Color(0xFF8D6E63), Color(0xFF6D4C41), Color(0xFF4E342E)],
+            const [0.0, 0.5, 1.0],
+          );
+    canvas.drawPath(trunkPath, trunkPaint);
+
+    // Bark highlight streak
+    final barkHighlight =
+        Paint()
+          ..color = const Color(0x33FFF8E1)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.2;
+    final barkPath =
+        Path()
+          ..moveTo(cx + b1.x - 1.5, cy + b1.y)
+          ..quadraticBezierTo(
+            cx + b2.x - 1.0,
+            cy + b2.y,
+            cx + b3.x - 0.5,
+            cy + b3.y,
+          );
+    canvas.drawPath(barkPath, barkHighlight);
+
+    // Left and Right branches
+    final leftBranchTip = _Vec3(
+      -8.0 + (wind * 10.0),
+      -10.0,
+      3.0,
+    ).rotateY(rotY).rotateX(pitch);
+    final rightBranchTip = _Vec3(
+      8.0 + (wind * 10.0),
+      -8.0,
+      -3.0,
+    ).rotateY(rotY).rotateX(pitch);
+
+    final branchPaint =
+        Paint()
+          ..color = const Color(0xFF5D4037)
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round;
+
+    canvas.drawLine(
+      Offset(cx + b3.x, cy + b3.y),
+      Offset(cx + leftBranchTip.x, cy + leftBranchTip.y),
+      branchPaint..strokeWidth = 2.8,
+    );
+    canvas.drawLine(
+      Offset(cx + b3.x, cy + b3.y),
+      Offset(cx + rightBranchTip.x, cy + rightBranchTip.y),
+      branchPaint..strokeWidth = 2.4,
+    );
+  }
+
+  static void _drawTreeCanopy(
+    Canvas canvas,
+    double cx,
+    double cy,
+    double rotY,
+    double pitch,
+    double wind,
+    double t,
+  ) {
+    // 4 3D Foliage Clusters: center, left, right, top
+    final clusters = [
+      const _FoliageCluster(
+        center: _Vec3(0.0, 4.0, 0.0),
+        radius: 17.5,
+        windFactor: 0.3,
+      ),
+      const _FoliageCluster(
+        center: _Vec3(-11.5, -6.0, 3.0),
+        radius: 14.5,
+        windFactor: 0.7,
+      ),
+      const _FoliageCluster(
+        center: _Vec3(11.5, -4.0, -3.0),
+        radius: 13.5,
+        windFactor: 0.6,
+      ),
+      const _FoliageCluster(
+        center: _Vec3(0.0, -17.5, 0.0),
+        radius: 15.5,
+        windFactor: 1.0,
+      ),
+    ];
+
+    // Project and depth sort canopy puffs (Painter's algorithm: lowest Z first)
+    final renderedClusters = <_RenderCluster>[];
+    for (final c in clusters) {
+      final shiftedCenter = _Vec3(
+        c.center.x + (wind * 12.0 * c.windFactor),
+        c.center.y,
+        c.center.z,
+      );
+      final r = shiftedCenter.rotateY(rotY).rotateX(pitch);
+      renderedClusters.add(
+        _RenderCluster(
+          pos: Offset(cx + r.x, cy + r.y),
+          depthZ: r.z,
+          radius: c.radius,
+        ),
+      );
+    }
+    renderedClusters.sort((a, b) => a.depthZ.compareTo(b.depthZ));
+
+    for (final rc in renderedClusters) {
+      // 3D Spherical Radial Gradient
+      final lightOffset = rc.pos + Offset(-rc.radius * 0.35, -rc.radius * 0.35);
+      final puffPaint =
+          Paint()
+            ..shader = ui.Gradient.radial(
+              lightOffset,
+              rc.radius * 1.35,
+              const [
+                Color(0xFF81C784), // Highlight mint
+                Color(0xFF43A047), // Lush forest green
+                Color(0xFF1B5E20), // Deep pine shadow
+              ],
+              const [0.0, 0.55, 1.0],
+            );
+      canvas.drawCircle(rc.pos, rc.radius, puffPaint);
+
+      // Specular rim crescent
+      final rimPaint =
+          Paint()
+            ..color = const Color(0x33E8F5E9)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.0;
+      canvas.drawCircle(rc.pos, rc.radius, rimPaint);
+    }
+
+    // 4. Red Ruby Apples / Fruits in 3D
+    _drawTreeFruits(canvas, cx, cy, rotY, pitch, wind);
+
+    // 5. Fluttering Golden Leaf
+    _drawFlutteringLeaf(canvas, cx, cy, rotY, pitch, t);
+  }
+
+  static void _drawTreeFruits(
+    Canvas canvas,
+    double cx,
+    double cy,
+    double rotY,
+    double pitch,
+    double wind,
+  ) {
+    const fruits = [
+      _Vec3(-8.0, -7.0, 14.0),
+      _Vec3(9.0, -4.0, 13.0),
+      _Vec3(-1.0, -18.0, 15.0),
+      _Vec3(8.0, -11.0, -10.0),
+      _Vec3(-10.0, -3.0, -11.0),
+      _Vec3(1.0, -19.0, -14.0),
+    ];
+
+    final fruitPaint = Paint()..style = PaintingStyle.fill;
+    final glintPaint = Paint()..color = const Color(0xCCFFFFFF);
+    final stemPaint =
+        Paint()
+          ..color = const Color(0xFF33691E)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 0.9;
+
+    for (final f in fruits) {
+      final shifted = _Vec3(f.x + (wind * 10.0), f.y, f.z);
+      final r = shifted.rotateY(rotY).rotateX(pitch);
+
+      // Only draw fruits facing toward camera (+Z)
+      if (r.z > 0.0) {
+        final pos = Offset(cx + r.x, cy + r.y);
+        const radius = 2.6;
+
+        // Apple body
+        fruitPaint.color = const Color(0xFFE53935);
+        canvas.drawCircle(pos, radius, fruitPaint);
+
+        // Specular glint
+        canvas.drawCircle(pos + const Offset(-0.8, -0.8), 0.7, glintPaint);
+
+        // Mini stem
+        canvas.drawLine(
+          pos + const Offset(0, -radius),
+          pos + const Offset(0.8, -radius - 1.2),
+          stemPaint,
+        );
+      }
+    }
+  }
+
+  static void _drawFlutteringLeaf(
+    Canvas canvas,
+    double cx,
+    double cy,
+    double rotY,
+    double pitch,
+    double t,
+  ) {
+    // Orbital fluttering autumn leaf
+    final leafAngle = (t * 2 * math.pi) + 1.2;
+    const leafRadius = 24.0;
+    final leafY = -16.0 + math.sin(t * 4 * math.pi) * 4.0;
+    final leafVec = _Vec3(
+      math.cos(leafAngle) * leafRadius,
+      leafY,
+      math.sin(leafAngle) * leafRadius,
+    ).rotateY(rotY).rotateX(pitch);
+
+    if (leafVec.z > -4.0) {
+      final pos = Offset(cx + leafVec.x, cy + leafVec.y);
+      final leafTilt = math.sin(t * 6 * math.pi) * 0.45;
+
+      canvas.save();
+      canvas.translate(pos.dx, pos.dy);
+      canvas.rotate(leafTilt);
+
+      final leafPath =
+          Path()
+            ..moveTo(0, -3.0)
+            ..quadraticBezierTo(2.4, -1.0, 0, 3.0)
+            ..quadraticBezierTo(-2.4, -1.0, 0, -3.0)
+            ..close();
+
+      final leafPaint =
+          Paint()
+            ..color = const Color(0xFFFFB300)
+            ..style = PaintingStyle.fill;
+      canvas.drawPath(leafPath, leafPaint);
+
+      final veinPaint =
+          Paint()
+            ..color = const Color(0xFFE65100)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 0.6;
+      canvas.drawLine(const Offset(0, -2.5), const Offset(0, 2.5), veinPaint);
+
+      canvas.restore();
+    }
+  }
+
   static Color _shadeColor(Color base, double factor) {
     return Color.from(
       alpha: base.a,
@@ -592,6 +965,28 @@ abstract final class LavaDemoBaker {
       blue: (base.b * factor).clamp(0.0, 1.0),
     );
   }
+}
+
+class _FoliageCluster {
+  const _FoliageCluster({
+    required this.center,
+    required this.radius,
+    required this.windFactor,
+  });
+  final _Vec3 center;
+  final double radius;
+  final double windFactor;
+}
+
+class _RenderCluster {
+  const _RenderCluster({
+    required this.pos,
+    required this.depthZ,
+    required this.radius,
+  });
+  final Offset pos;
+  final double depthZ;
+  final double radius;
 }
 
 enum _FaceType { body, top, bottom, back, left, right, bezel, chin, screen }

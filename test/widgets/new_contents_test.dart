@@ -317,7 +317,14 @@ void main() {
       expect(find.text(AppStrings.lavaStudioBadgeTile), findsOneWidget);
       expect(find.text(AppStrings.lavaStudioBadgeAlpha), findsOneWidget);
       expect(find.text(AppStrings.lavaStudioArchitecture), findsOneWidget);
-      expect(find.byType(LavaIcon), findsOneWidget);
+      expect(find.byType(LavaIcon), findsNWidgets(3));
+      expect(find.text(AppStrings.lavaModelMacintosh), findsWidgets);
+      expect(find.text(AppStrings.lavaModelTree), findsWidgets);
+
+      // Tap Tree category tab to switch model
+      await tester.tap(find.text(AppStrings.lavaModelTree).first);
+      await tester.pump();
+      expect(find.text(AppStrings.lavaModelTreeDesc), findsOneWidget);
 
       // Tap speed selector
       await tester.tap(find.text('2.0x'));

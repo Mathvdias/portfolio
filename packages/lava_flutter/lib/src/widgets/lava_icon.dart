@@ -28,13 +28,39 @@ class LavaIcon extends StatefulWidget {
     this.scrubOnHover = false,
     this.onTap,
     this.onStateChanged,
-  }) : _isDemo = false,
+  }) : demoType = LavaDemoType.macintosh,
+       _isDemo = false,
        _imageAsset = null,
        _manifestAsset = null,
        _assetBundle = null;
 
   /// Creates a [LavaIcon] rendering the built-in 3D procedural demo animation.
   const LavaIcon.demo({
+    super.key,
+    this.demoType = LavaDemoType.macintosh,
+    this.controller,
+    this.size,
+    this.width,
+    this.height,
+    this.fit = BoxFit.contain,
+    this.alignment = Alignment.center,
+    this.color,
+    this.blendMode = BlendMode.srcIn,
+    this.filterQuality = FilterQuality.medium,
+    this.interactive = false,
+    this.autoPlay,
+    this.dragToRotate = true,
+    this.scrubOnHover = false,
+    this.onTap,
+    this.onStateChanged,
+  }) : bundle = null,
+       _isDemo = true,
+       _imageAsset = null,
+       _manifestAsset = null,
+       _assetBundle = null;
+
+  /// Creates a [LavaIcon] rendering the built-in 3D procedural nature tree animation.
+  const LavaIcon.demoTree({
     super.key,
     this.controller,
     this.size,
@@ -52,6 +78,7 @@ class LavaIcon extends StatefulWidget {
     this.onTap,
     this.onStateChanged,
   }) : bundle = null,
+       demoType = LavaDemoType.tree,
        _isDemo = true,
        _imageAsset = null,
        _manifestAsset = null,
@@ -79,6 +106,7 @@ class LavaIcon extends StatefulWidget {
     this.onTap,
     this.onStateChanged,
   }) : bundle = null,
+       demoType = LavaDemoType.macintosh,
        _isDemo = false,
        _imageAsset = imageAsset,
        _manifestAsset = manifestAsset,
@@ -134,6 +162,9 @@ class LavaIcon extends StatefulWidget {
   /// Callback fired when interactive state transitions.
   final ValueChanged<LavaInteractiveState>? onStateChanged;
 
+  /// The procedural 3D model variant when rendering demo icons.
+  final LavaDemoType demoType;
+
   final bool _isDemo;
   final String? _imageAsset;
   final String? _manifestAsset;
@@ -176,6 +207,8 @@ class _LavaIconState extends State<LavaIcon>
     if (widget.bundle != oldWidget.bundle && widget.bundle != null) {
       _bundle = widget.bundle;
       _initControllerIfNeeded();
+    } else if (widget._isDemo && widget.demoType != oldWidget.demoType) {
+      _loadBundleAsync();
     }
   }
 
@@ -187,7 +220,7 @@ class _LavaIconState extends State<LavaIcon>
     try {
       final loadedBundle =
           widget._isDemo
-              ? await LavaBundle.demo()
+              ? await LavaBundle.demo(type: widget.demoType)
               : await LavaBundle.fromAsset(
                 imageAsset: widget._imageAsset!,
                 manifestAsset: widget._manifestAsset!,

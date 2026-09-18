@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 
 import '../demo/lava_demo_baker.dart';
 import '../model/lava_manifest.dart';
+import '../model/lava_types.dart';
 
 /// Container encapsulating a decoded texture atlas [ui.Image] and its
 /// associated [LavaManifest] layout parameters.
@@ -17,12 +18,20 @@ class LavaBundle {
   final LavaManifest manifest;
 
   /// Loads the procedurally generated 3D demo icon bundle.
-  static Future<LavaBundle> demo({bool forceRegenerate = false}) async {
+  static Future<LavaBundle> demo({
+    LavaDemoType type = LavaDemoType.macintosh,
+    bool forceRegenerate = false,
+  }) async {
     final image = await LavaDemoBaker.bakeAtlas(
+      type: type,
       forceRegenerate: forceRegenerate,
     );
     return LavaBundle(atlas: image, manifest: LavaDemoBaker.defaultManifest);
   }
+
+  /// Convenience shortcut to load the 3D nature tree demo bundle.
+  static Future<LavaBundle> demoTree({bool forceRegenerate = false}) =>
+      demo(type: LavaDemoType.tree, forceRegenerate: forceRegenerate);
 
   /// Loads a [LavaBundle] from application asset files.
   static Future<LavaBundle> fromAsset({
