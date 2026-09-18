@@ -635,58 +635,62 @@ abstract final class LavaDemoBaker {
     final cx = width / 2.0;
     final cy = height / 2.0;
 
-    // Turntable rotation and isometric pitch (~18 degrees pitch downward)
+    // Full 360-degree turntable rotation around Y-axis
     final rotY = t * 2 * math.pi;
-    const pitch = -0.32;
+    const pitch = -0.28;
 
-    // Wind sway physics (gentle sinusoidal harmonic breeze)
-    final wind = math.sin(t * 2 * math.pi) * 0.08;
+    // Dynamic wind sway (primary harmonic sway + secondary flutter)
+    final wind = math.sin(t * 2 * math.pi) * 0.12;
+    final windOffset = math.sin(t * 2 * math.pi) * 8.0;
+    final windCanopy = math.sin(t * 2 * math.pi - 0.4) * 12.0;
 
-    // Ambient Occlusion Ground Drop Shadow
-    final shadowWidth = 50.0 + math.cos(rotY * 2).abs() * 4.0;
-    final shadowHeight = 14.0 + math.sin(rotY * 2).abs() * 2.0;
+    // 1. Soft Ground Ambient Occlusion Shadow
+    final shadowWidth = 54.0 + math.cos(rotY * 2).abs() * 6.0;
+    final shadowHeight = 16.0 + math.sin(rotY * 2).abs() * 3.0;
     final shadowPaint =
         Paint()
           ..color = const Color.from(
-            alpha: 0.28,
-            red: 0.04,
-            green: 0.09,
-            blue: 0.05,
+            alpha: 0.32,
+            red: 0.05,
+            green: 0.10,
+            blue: 0.06,
           )
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6.0);
-
-    final shadowRect = Rect.fromCenter(
-      center: Offset(cx, cy + 28.0),
-      width: shadowWidth,
-      height: shadowHeight,
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7.0);
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(cx, cy + 34.0),
+        width: shadowWidth,
+        height: shadowHeight,
+      ),
+      shadowPaint,
     );
-    canvas.drawOval(shadowRect, shadowPaint);
 
-    // 1. Grassy Lawn Mound Base
-    final moundCenter = const _Vec3(0, 24.0, 0).rotateY(rotY).rotateX(pitch);
-    final moundRect = Rect.fromCenter(
-      center: Offset(cx + moundCenter.x, cy + moundCenter.y),
-      width: 38.0,
-      height: 12.0,
+    // 2. 3D Floating Hexagonal Island Base (Earth strata & lush grass cap)
+    _drawTreeGroundBase(canvas, cx, cy, rotY, pitch, wind);
+
+    // 3. 3D Trunk, Root Buttresses, and Branches (with front/back depth sorting)
+    _drawTreeTrunkAndBranches(
+      canvas,
+      cx,
+      cy,
+      rotY,
+      pitch,
+      windOffset,
+      windCanopy,
+      t,
     );
-    final moundPaint =
-        Paint()
-          ..shader = ui.Gradient.linear(
-            moundRect.topLeft,
-            moundRect.bottomRight,
-            const [Color(0xFF66BB6A), Color(0xFF388E3C), Color(0xFF1B5E20)],
-            const [0.0, 0.5, 1.0],
-          );
-    canvas.drawOval(moundRect, moundPaint);
 
-    // 2. 3D Wooden Trunk & Branches
-    _drawTreeTrunk(canvas, cx, cy, rotY, pitch, wind);
+    // 4. Volumetric Foliage Canopy (5 Asymmetrical Clusters with 3D Key Lighting)
+    _drawTreeCanopy(canvas, cx, cy, rotY, pitch, windCanopy, t);
 
-    // 3. Volumetric Foliage Canopy Puffs
-    _drawTreeCanopy(canvas, cx, cy, rotY, pitch, wind, t);
+    // 5. Ruby Apples with 3D Depth
+    _drawTreeFruits(canvas, cx, cy, rotY, pitch, windCanopy);
+
+    // 6. Fluttering Golden Leaves Orbiting in 3D
+    _drawFlutteringLeaves(canvas, cx, cy, rotY, pitch, t);
   }
 
-  static void _drawTreeTrunk(
+  static void _drawTreeGroundBase(
     Canvas canvas,
     double cx,
     double cy,
@@ -694,64 +698,136 @@ abstract final class LavaDemoBaker {
     double pitch,
     double wind,
   ) {
-    // 3D Trunk definition: vertical sections
-    final trunkBot = const _Vec3(0, 24.0, 0);
-    final trunkMid = _Vec3(wind * 4.0, 10.0, 0);
-    final trunkFork = _Vec3(wind * 8.0, -2.0, 0);
+    const segments = 6;
+    const topRadius = 26.0;
+    const botRadius = 17.0;
+    const topY = 22.0;
+    const botY = 30.0;
+
+    final topPts = <Offset>[];
+    final botPts = <Offset>[];
+
+    for (int k = 0; k < segments; k++) {
+      final angle = (k * 2 * math.pi) / segments;
+      final topV = _Vec3(
+        math.cos(angle) * topRadius,
+        topY,
+        math.sin(angle) * topRadius,
+      ).rotateY(rotY).rotateX(pitch);
+      final botV = _Vec3(
+        math.cos(angle) * botRadius,
+        botY,
+        math.sin(angle) * botRadius,
+      ).rotateY(rotY).rotateX(pitch);
+
+      topPts.add(Offset(cx + topV.x, cy + topV.y));
+      botPts.add(Offset(cx + botV.x, cy + botV.y));
+    }
+
+    // Draw earthen strata side quads facing the camera
+    for (int k = 0; k < segments; k++) {
+      final nextK = (k + 1) % segments;
+      final angleMid = ((k + 0.5) * 2 * math.pi) / segments;
+      final faceNorm = _Vec3(
+        math.cos(angleMid),
+        0.3,
+        math.sin(angleMid),
+      ).rotateY(rotY).rotateX(pitch);
+
+      if (faceNorm.z > 0.0) {
+        final quad =
+            Path()
+              ..moveTo(topPts[k].dx, topPts[k].dy)
+              ..lineTo(topPts[nextK].dx, topPts[nextK].dy)
+              ..lineTo(botPts[nextK].dx, botPts[nextK].dy)
+              ..lineTo(botPts[k].dx, botPts[k].dy)
+              ..close();
+
+        final diff = (0.55 + faceNorm.z * 0.45).clamp(0.4, 1.0);
+        final dirtColor =
+            Color.lerp(const Color(0xFF3E2723), const Color(0xFF795548), diff)!;
+
+        canvas.drawPath(quad, Paint()..color = dirtColor);
+      }
+    }
+
+    // Top lush grass hexagonal lawn cap
+    final grassPath = Path()..moveTo(topPts[0].dx, topPts[0].dy);
+    for (int k = 1; k < segments; k++) {
+      grassPath.lineTo(topPts[k].dx, topPts[k].dy);
+    }
+    grassPath.close();
+
+    final grassPaint =
+        Paint()
+          ..shader = ui.Gradient.linear(
+            Offset(cx - 20, cy + 18),
+            Offset(cx + 20, cy + 26),
+            const [Color(0xFF81C784), Color(0xFF43A047), Color(0xFF2E7D32)],
+            const [0.0, 0.5, 1.0],
+          );
+    canvas.drawPath(grassPath, grassPaint);
+
+    // Grassy edge rim highlight
+    canvas.drawPath(
+      grassPath,
+      Paint()
+        ..color = const Color(0x66A5D6A7)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.0,
+    );
+  }
+
+  static void _drawTreeTrunkAndBranches(
+    Canvas canvas,
+    double cx,
+    double cy,
+    double rotY,
+    double pitch,
+    double windOffset,
+    double windCanopy,
+    double t,
+  ) {
+    // 3D Trunk Centerline
+    final trunkBot = const _Vec3(0, 22.0, 0);
+    final trunkMid = _Vec3(windOffset * 0.4, 9.0, 0);
+    final trunkFork = _Vec3(windOffset * 0.8, -4.0, 0);
 
     final b1 = trunkBot.rotateY(rotY).rotateX(pitch);
     final b2 = trunkMid.rotateY(rotY).rotateX(pitch);
     final b3 = trunkFork.rotateY(rotY).rotateX(pitch);
 
-    // Main Trunk Segment
-    final trunkPath =
-        Path()
-          ..moveTo(cx + b1.x - 4.5, cy + b1.y)
-          ..lineTo(cx + b2.x - 3.8, cy + b2.y)
-          ..lineTo(cx + b3.x - 3.0, cy + b3.y)
-          ..lineTo(cx + b3.x + 3.0, cy + b3.y)
-          ..lineTo(cx + b2.x + 3.8, cy + b2.y)
-          ..lineTo(cx + b1.x + 4.5, cy + b1.y)
-          ..close();
-
-    final trunkPaint =
-        Paint()
-          ..shader = ui.Gradient.linear(
-            Offset(cx - 5.0, cy),
-            Offset(cx + 5.0, cy),
-            const [Color(0xFF8D6E63), Color(0xFF6D4C41), Color(0xFF4E342E)],
-            const [0.0, 0.5, 1.0],
-          );
-    canvas.drawPath(trunkPath, trunkPaint);
-
-    // Bark highlight streak
-    final barkHighlight =
-        Paint()
-          ..color = const Color(0x33FFF8E1)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.2;
-    final barkPath =
-        Path()
-          ..moveTo(cx + b1.x - 1.5, cy + b1.y)
-          ..quadraticBezierTo(
-            cx + b2.x - 1.0,
-            cy + b2.y,
-            cx + b3.x - 0.5,
-            cy + b3.y,
-          );
-    canvas.drawPath(barkPath, barkHighlight);
-
-    // Left and Right branches
-    final leftBranchTip = _Vec3(
-      -8.0 + (wind * 10.0),
-      -10.0,
-      3.0,
-    ).rotateY(rotY).rotateX(pitch);
-    final rightBranchTip = _Vec3(
-      8.0 + (wind * 10.0),
-      -8.0,
-      -3.0,
-    ).rotateY(rotY).rotateX(pitch);
+    // 4 Extended 3D Branches with distinct 3D azimuths
+    final branches = [
+      // Branch A: Front-Right (+X, +Z)
+      (
+        tip: _Vec3(18.0 + windCanopy, -8.0, 14.0).rotateY(rotY).rotateX(pitch),
+        width: 3.2,
+        isFront: true,
+      ),
+      // Branch B: Left Reach (-X, +Z)
+      (
+        tip: _Vec3(-20.0 + windCanopy, -4.0, 2.0).rotateY(rotY).rotateX(pitch),
+        width: 3.0,
+        isFront: true,
+      ),
+      // Branch C: Back-Right (+X, -Z)
+      (
+        tip: _Vec3(
+          14.0 + windCanopy,
+          -10.0,
+          -16.0,
+        ).rotateY(rotY).rotateX(pitch),
+        width: 2.6,
+        isFront: false,
+      ),
+      // Branch D: High Crown Fork (-X, -Z)
+      (
+        tip: _Vec3(-2.0 + windCanopy, -18.0, -4.0).rotateY(rotY).rotateX(pitch),
+        width: 2.8,
+        isFront: false,
+      ),
+    ];
 
     final branchPaint =
         Paint()
@@ -759,16 +835,142 @@ abstract final class LavaDemoBaker {
           ..style = PaintingStyle.stroke
           ..strokeCap = StrokeCap.round;
 
-    canvas.drawLine(
-      Offset(cx + b3.x, cy + b3.y),
-      Offset(cx + leftBranchTip.x, cy + leftBranchTip.y),
-      branchPaint..strokeWidth = 2.8,
-    );
-    canvas.drawLine(
-      Offset(cx + b3.x, cy + b3.y),
-      Offset(cx + rightBranchTip.x, cy + rightBranchTip.y),
-      branchPaint..strokeWidth = 2.4,
-    );
+    // Draw Back Branches first (Z < 0)
+    for (final b in branches) {
+      if (b.tip.z < b3.z) {
+        branchPaint.strokeWidth = b.width;
+        canvas.drawLine(
+          Offset(cx + b3.x, cy + b3.y),
+          Offset(cx + b.tip.x, cy + b.tip.y),
+          branchPaint,
+        );
+      }
+    }
+
+    // Draw Main Trunk Segment with dynamic bark lighting
+    final trunkPath =
+        Path()
+          ..moveTo(cx + b1.x - 5.0, cy + b1.y)
+          ..lineTo(cx + b2.x - 3.8, cy + b2.y)
+          ..lineTo(cx + b3.x - 3.0, cy + b3.y)
+          ..lineTo(cx + b3.x + 3.0, cy + b3.y)
+          ..lineTo(cx + b2.x + 3.8, cy + b2.y)
+          ..lineTo(cx + b1.x + 5.0, cy + b1.y)
+          ..close();
+
+    // Shifting bark highlight based on rotation
+    final lightShift = math.cos(rotY) * 3.5;
+    final trunkPaint =
+        Paint()
+          ..shader = ui.Gradient.linear(
+            Offset(cx + b2.x - 5.0 + lightShift, cy + b2.y),
+            Offset(cx + b2.x + 5.0 + lightShift, cy + b2.y),
+            const [Color(0xFF8D6E63), Color(0xFF5D4037), Color(0xFF3E2723)],
+            const [0.0, 0.5, 1.0],
+          );
+    canvas.drawPath(trunkPath, trunkPaint);
+
+    // Front/Back Distinct 3D Landmarks:
+    // Front: Moss patch when facing viewer (cos(rotY) > 0.2)
+    final facingFront = math.cos(rotY);
+    if (facingFront > 0.2) {
+      final mossPaint =
+          Paint()
+            ..color = const Color(0x9981C784)
+            ..style = PaintingStyle.fill;
+      canvas.drawCircle(
+        Offset(cx + b2.x - 1.2, cy + b2.y + 2.0),
+        2.2,
+        mossPaint,
+      );
+    }
+    // Back: Owl hollow tree knot when facing away (cos(rotY) < -0.2)
+    if (facingFront < -0.2) {
+      final hollowPaint = Paint()..color = const Color(0xFF271A14);
+      final knotPos = Offset(cx + b2.x, cy + b2.y + 1.0);
+      canvas.drawOval(
+        Rect.fromCenter(center: knotPos, width: 3.4, height: 4.8),
+        hollowPaint,
+      );
+      // Glowing amber eyes inside knot
+      final eyePaint = Paint()..color = const Color(0xFFFFD54F);
+      canvas.drawCircle(knotPos + const Offset(-0.8, -0.6), 0.5, eyePaint);
+      canvas.drawCircle(knotPos + const Offset(0.8, -0.6), 0.5, eyePaint);
+    }
+
+    // Draw Front Branches (Z >= 0)
+    for (final b in branches) {
+      if (b.tip.z >= b3.z) {
+        branchPaint.strokeWidth = b.width;
+        canvas.drawLine(
+          Offset(cx + b3.x, cy + b3.y),
+          Offset(cx + b.tip.x, cy + b.tip.y),
+          branchPaint,
+        );
+      }
+    }
+
+    // 3D Hanging Birdhouse on Branch A (tip of Front-Right branch)
+    final birdhouseTip = branches[0].tip;
+    _drawBirdhouse(canvas, cx, cy, birdhouseTip, t);
+  }
+
+  static void _drawBirdhouse(
+    Canvas canvas,
+    double cx,
+    double cy,
+    _Vec3 branchTip,
+    double t,
+  ) {
+    final tipPos = Offset(cx + branchTip.x, cy + branchTip.y);
+    final swing = math.sin(t * 4 * math.pi) * 2.0;
+
+    // Hanging cord
+    final houseCenter = tipPos + Offset(swing, 13.0);
+    final cordPaint =
+        Paint()
+          ..color = const Color(0xFFD7CCC8)
+          ..strokeWidth = 0.9;
+    canvas.drawLine(tipPos, houseCenter + const Offset(0, -5.0), cordPaint);
+
+    // Only draw detailed birdhouse if in front of back-plane
+    if (branchTip.z > -10.0) {
+      // House body
+      final bodyRect = Rect.fromCenter(
+        center: houseCenter,
+        width: 8.0,
+        height: 8.5,
+      );
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(bodyRect, const Radius.circular(1.5)),
+        Paint()..color = const Color(0xFFBCAAA4),
+      );
+
+      // Red pitched roof
+      final roofPath =
+          Path()
+            ..moveTo(houseCenter.dx, houseCenter.dy - 7.5)
+            ..lineTo(houseCenter.dx + 5.5, houseCenter.dy - 3.5)
+            ..lineTo(houseCenter.dx - 5.5, houseCenter.dy - 3.5)
+            ..close();
+      canvas.drawPath(roofPath, Paint()..color = const Color(0xFFE53935));
+
+      // Circular entry hole
+      canvas.drawCircle(
+        houseCenter + const Offset(0, -0.5),
+        1.4,
+        Paint()..color = const Color(0xFF3E2723),
+      );
+
+      // Perch peg
+      canvas.drawLine(
+        houseCenter + const Offset(0, 1.8),
+        houseCenter + const Offset(0, 3.2),
+        Paint()
+          ..color = const Color(0xFF8D6E63)
+          ..strokeWidth = 1.0,
+      );
+    }
   }
 
   static void _drawTreeCanopy(
@@ -777,83 +979,102 @@ abstract final class LavaDemoBaker {
     double cy,
     double rotY,
     double pitch,
-    double wind,
+    double windCanopy,
     double t,
   ) {
-    // 4 3D Foliage Clusters: center, left, right, top
+    // 5 Asymmetrical 3D Foliage Clusters
     final clusters = [
-      const _FoliageCluster(
-        center: _Vec3(0.0, 4.0, 0.0),
+      // 1. High Crown
+      (
+        center: const _Vec3(0.0, -22.0, 0.0),
         radius: 17.5,
-        windFactor: 0.3,
+        windFactor: 1.0,
+        colors: const [Color(0xFFA5D6A7), Color(0xFF66BB6A), Color(0xFF2E7D32)],
       ),
-      const _FoliageCluster(
-        center: _Vec3(-11.5, -6.0, 3.0),
+      // 2. Front-Right
+      (
+        center: const _Vec3(16.0, -10.0, 10.0),
+        radius: 15.0,
+        windFactor: 0.8,
+        colors: const [Color(0xFF81C784), Color(0xFF43A047), Color(0xFF1B5E20)],
+      ),
+      // 3. Front-Left
+      (
+        center: const _Vec3(-16.0, -6.0, 12.0),
         radius: 14.5,
         windFactor: 0.7,
+        colors: const [Color(0xFFA5D6A7), Color(0xFF4CAF50), Color(0xFF2E7D32)],
       ),
-      const _FoliageCluster(
-        center: _Vec3(11.5, -4.0, -3.0),
+      // 4. Back-Right
+      (
+        center: const _Vec3(14.0, -14.0, -12.0),
         radius: 13.5,
         windFactor: 0.6,
+        colors: const [Color(0xFF66BB6A), Color(0xFF388E3C), Color(0xFF1B5E20)],
       ),
-      const _FoliageCluster(
-        center: _Vec3(0.0, -17.5, 0.0),
-        radius: 15.5,
-        windFactor: 1.0,
+      // 5. Back-Left
+      (
+        center: const _Vec3(-14.0, -12.0, -12.0),
+        radius: 14.0,
+        windFactor: 0.7,
+        colors: const [Color(0xFF4CAF50), Color(0xFF2E7D32), Color(0xFF0D3813)],
       ),
     ];
 
-    // Project and depth sort canopy puffs (Painter's algorithm: lowest Z first)
-    final renderedClusters = <_RenderCluster>[];
+    // Project and depth-sort foliage clusters (Painter's Algorithm: lowest Z first)
+    final rendered = <_RenderClusterWithColors>[];
     for (final c in clusters) {
-      final shiftedCenter = _Vec3(
-        c.center.x + (wind * 12.0 * c.windFactor),
+      final shifted = _Vec3(
+        c.center.x + (windCanopy * c.windFactor),
         c.center.y,
         c.center.z,
       );
-      final r = shiftedCenter.rotateY(rotY).rotateX(pitch);
-      renderedClusters.add(
-        _RenderCluster(
+      final r = shifted.rotateY(rotY).rotateX(pitch);
+      rendered.add(
+        _RenderClusterWithColors(
           pos: Offset(cx + r.x, cy + r.y),
           depthZ: r.z,
           radius: c.radius,
+          colors: c.colors,
         ),
       );
     }
-    renderedClusters.sort((a, b) => a.depthZ.compareTo(b.depthZ));
+    rendered.sort((a, b) => a.depthZ.compareTo(b.depthZ));
 
-    for (final rc in renderedClusters) {
-      // 3D Spherical Radial Gradient
+    for (final rc in rendered) {
+      // 3D Spherical Radial Key Lighting
       final lightOffset = rc.pos + Offset(-rc.radius * 0.35, -rc.radius * 0.35);
       final puffPaint =
           Paint()
             ..shader = ui.Gradient.radial(
               lightOffset,
               rc.radius * 1.35,
-              const [
-                Color(0xFF81C784), // Highlight mint
-                Color(0xFF43A047), // Lush forest green
-                Color(0xFF1B5E20), // Deep pine shadow
-              ],
+              rc.colors,
               const [0.0, 0.55, 1.0],
             );
       canvas.drawCircle(rc.pos, rc.radius, puffPaint);
 
+      // Fluffy Studio Ghibli style cloud scalloping around perimeter
+      final floretPaint = Paint()..color = rc.colors[1].withValues(alpha: 0.85);
+      for (int i = 0; i < 6; i++) {
+        final floretAngle = (i * 2 * math.pi / 6.0) + (t * 0.5);
+        final floretPos =
+            rc.pos +
+            Offset(
+              math.cos(floretAngle) * (rc.radius * 0.75),
+              math.sin(floretAngle) * (rc.radius * 0.75),
+            );
+        canvas.drawCircle(floretPos, rc.radius * 0.45, floretPaint);
+      }
+
       // Specular rim crescent
       final rimPaint =
           Paint()
-            ..color = const Color(0x33E8F5E9)
+            ..color = const Color(0x33FFFFFF)
             ..style = PaintingStyle.stroke
             ..strokeWidth = 1.0;
       canvas.drawCircle(rc.pos, rc.radius, rimPaint);
     }
-
-    // 4. Red Ruby Apples / Fruits in 3D
-    _drawTreeFruits(canvas, cx, cy, rotY, pitch, wind);
-
-    // 5. Fluttering Golden Leaf
-    _drawFlutteringLeaf(canvas, cx, cy, rotY, pitch, t);
   }
 
   static void _drawTreeFruits(
@@ -862,19 +1083,21 @@ abstract final class LavaDemoBaker {
     double cy,
     double rotY,
     double pitch,
-    double wind,
+    double windCanopy,
   ) {
     const fruits = [
-      _Vec3(-8.0, -7.0, 14.0),
-      _Vec3(9.0, -4.0, 13.0),
-      _Vec3(-1.0, -18.0, 15.0),
-      _Vec3(8.0, -11.0, -10.0),
-      _Vec3(-10.0, -3.0, -11.0),
-      _Vec3(1.0, -19.0, -14.0),
+      _Vec3(-10.0, -8.0, 15.0),
+      _Vec3(12.0, -4.0, 14.0),
+      _Vec3(-2.0, -20.0, 16.0),
+      _Vec3(10.0, -12.0, -11.0),
+      _Vec3(-12.0, -4.0, -12.0),
+      _Vec3(2.0, -21.0, -15.0),
+      _Vec3(18.0, -7.0, 6.0),
+      _Vec3(-18.0, -3.0, 8.0),
     ];
 
     final fruitPaint = Paint()..style = PaintingStyle.fill;
-    final glintPaint = Paint()..color = const Color(0xCCFFFFFF);
+    final glintPaint = Paint()..color = const Color(0xEEFFFFFF);
     final stemPaint =
         Paint()
           ..color = const Color(0xFF33691E)
@@ -882,22 +1105,22 @@ abstract final class LavaDemoBaker {
           ..strokeWidth = 0.9;
 
     for (final f in fruits) {
-      final shifted = _Vec3(f.x + (wind * 10.0), f.y, f.z);
+      final shifted = _Vec3(f.x + (windCanopy * 0.7), f.y, f.z);
       final r = shifted.rotateY(rotY).rotateX(pitch);
 
       // Only draw fruits facing toward camera (+Z)
       if (r.z > 0.0) {
         final pos = Offset(cx + r.x, cy + r.y);
-        const radius = 2.6;
+        const radius = 2.8;
 
         // Apple body
         fruitPaint.color = const Color(0xFFE53935);
         canvas.drawCircle(pos, radius, fruitPaint);
 
         // Specular glint
-        canvas.drawCircle(pos + const Offset(-0.8, -0.8), 0.7, glintPaint);
+        canvas.drawCircle(pos + const Offset(-0.8, -0.8), 0.8, glintPaint);
 
-        // Mini stem
+        // Stem
         canvas.drawLine(
           pos + const Offset(0, -radius),
           pos + const Offset(0.8, -radius - 1.2),
@@ -907,7 +1130,7 @@ abstract final class LavaDemoBaker {
     }
   }
 
-  static void _drawFlutteringLeaf(
+  static void _drawFlutteringLeaves(
     Canvas canvas,
     double cx,
     double cy,
@@ -915,45 +1138,50 @@ abstract final class LavaDemoBaker {
     double pitch,
     double t,
   ) {
-    // Orbital fluttering autumn leaf
-    final leafAngle = (t * 2 * math.pi) + 1.2;
-    const leafRadius = 24.0;
-    final leafY = -16.0 + math.sin(t * 4 * math.pi) * 4.0;
-    final leafVec = _Vec3(
-      math.cos(leafAngle) * leafRadius,
-      leafY,
-      math.sin(leafAngle) * leafRadius,
-    ).rotateY(rotY).rotateX(pitch);
+    // 3 Fluttering golden autumn leaves orbiting around the tree
+    const leafCount = 3;
+    for (int k = 0; k < leafCount; k++) {
+      final phase = (k * 2 * math.pi) / leafCount;
+      final leafAngle = (t * 2 * math.pi) + phase;
+      const leafRadius = 26.0;
+      final leafY = -14.0 + math.sin(leafAngle * 2.0) * 8.0;
 
-    if (leafVec.z > -4.0) {
-      final pos = Offset(cx + leafVec.x, cy + leafVec.y);
-      final leafTilt = math.sin(t * 6 * math.pi) * 0.45;
+      final leafVec = _Vec3(
+        math.cos(leafAngle) * leafRadius,
+        leafY,
+        math.sin(leafAngle) * leafRadius,
+      ).rotateY(rotY).rotateX(pitch);
 
-      canvas.save();
-      canvas.translate(pos.dx, pos.dy);
-      canvas.rotate(leafTilt);
+      if (leafVec.z > -6.0) {
+        final pos = Offset(cx + leafVec.x, cy + leafVec.y);
+        final leafTilt = math.sin(t * 6 * math.pi + phase) * 0.45;
 
-      final leafPath =
-          Path()
-            ..moveTo(0, -3.0)
-            ..quadraticBezierTo(2.4, -1.0, 0, 3.0)
-            ..quadraticBezierTo(-2.4, -1.0, 0, -3.0)
-            ..close();
+        canvas.save();
+        canvas.translate(pos.dx, pos.dy);
+        canvas.rotate(leafTilt);
 
-      final leafPaint =
-          Paint()
-            ..color = const Color(0xFFFFB300)
-            ..style = PaintingStyle.fill;
-      canvas.drawPath(leafPath, leafPaint);
+        final leafPath =
+            Path()
+              ..moveTo(0, -3.2)
+              ..quadraticBezierTo(2.6, -1.0, 0, 3.2)
+              ..quadraticBezierTo(-2.6, -1.0, 0, -3.2)
+              ..close();
 
-      final veinPaint =
-          Paint()
-            ..color = const Color(0xFFE65100)
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 0.6;
-      canvas.drawLine(const Offset(0, -2.5), const Offset(0, 2.5), veinPaint);
+        final leafPaint =
+            Paint()
+              ..color = const Color(0xFFFFB300)
+              ..style = PaintingStyle.fill;
+        canvas.drawPath(leafPath, leafPaint);
 
-      canvas.restore();
+        final veinPaint =
+            Paint()
+              ..color = const Color(0xFFE65100)
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 0.6;
+        canvas.drawLine(const Offset(0, -2.8), const Offset(0, 2.8), veinPaint);
+
+        canvas.restore();
+      }
     }
   }
 
@@ -967,26 +1195,17 @@ abstract final class LavaDemoBaker {
   }
 }
 
-class _FoliageCluster {
-  const _FoliageCluster({
-    required this.center,
-    required this.radius,
-    required this.windFactor,
-  });
-  final _Vec3 center;
-  final double radius;
-  final double windFactor;
-}
-
-class _RenderCluster {
-  const _RenderCluster({
+class _RenderClusterWithColors {
+  const _RenderClusterWithColors({
     required this.pos,
     required this.depthZ,
     required this.radius,
+    required this.colors,
   });
   final Offset pos;
   final double depthZ;
   final double radius;
+  final List<Color> colors;
 }
 
 enum _FaceType { body, top, bottom, back, left, right, bezel, chin, screen }

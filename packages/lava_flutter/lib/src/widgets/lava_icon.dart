@@ -209,6 +209,22 @@ class _LavaIconState extends State<LavaIcon>
       _initControllerIfNeeded();
     } else if (widget._isDemo && widget.demoType != oldWidget.demoType) {
       _loadBundleAsync();
+    } else if (_effectiveAutoPlay !=
+        (oldWidget.autoPlay ?? !oldWidget.interactive)) {
+      if (widget.controller != null) {
+        if (_effectiveAutoPlay && !widget.controller!.isPlaying) {
+          widget.controller!.play();
+        } else if (!_effectiveAutoPlay && widget.controller!.isPlaying) {
+          widget.controller!.pause();
+        }
+      } else if (_internalController != null) {
+        if (_effectiveAutoPlay) {
+          _internalController!.play();
+        } else {
+          _internalController!.pause();
+          _internalController!.reset();
+        }
+      }
     }
   }
 

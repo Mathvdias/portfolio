@@ -11,6 +11,11 @@ class LavaManifest {
     this.loop = true,
     this.loopStartFrame = 0,
     int? loopEndFrame,
+    this.cellSize,
+    this.diffImageSize,
+    this.alpha = true,
+    this.images = const [],
+    this.rawFrames = const [],
   }) : loopEndFrame = loopEndFrame ?? (totalFrames - 1);
 
   /// Schema version identifier.
@@ -43,6 +48,21 @@ class LavaManifest {
   /// Ending frame index for loop iterations (inclusive).
   final int loopEndFrame;
 
+  /// Cell / tile size in pixels (OpenLava specification).
+  final int? cellSize;
+
+  /// Width / height of diff tileset in pixels (OpenLava specification).
+  final int? diffImageSize;
+
+  /// Whether alpha transparency is enabled (OpenLava specification).
+  final bool alpha;
+
+  /// Relative URLs or identifiers of atlas images (OpenLava specification).
+  final List<String> images;
+
+  /// Raw frames metadata list (OpenLava specification).
+  final List<dynamic> rawFrames;
+
   /// Duration of a single frame based on the configured [frameRate].
   Duration get frameDuration {
     final effectiveFps = frameRate > 0 ? frameRate : 30;
@@ -52,18 +72,52 @@ class LavaManifest {
   /// Total duration of one complete playback sequence.
   Duration get totalDuration => frameDuration * totalFrames;
 
-  /// Parses a [LavaManifest] from a JSON map.
+  /// Parses a [LavaManifest] from either an OpenLava or standard Grid Atlas JSON map.
   factory LavaManifest.fromJson(Map<String, dynamic> json) {
-    final tileWidth = (json['tileWidth'] as num?)?.toInt() ?? 64;
-    final tileHeight = (json['tileHeight'] as num?)?.toInt() ?? 64;
-    final columns = (json['columns'] as num?)?.toInt() ?? 1;
-    final rows = (json['rows'] as num?)?.toInt() ?? 1;
+    final rawFramesList =
+        (json['frames'] is List)
+            ? (json['frames'] as List<dynamic>)
+            : const <dynamic>[];
+    final hasOpenLavaFrames = rawFramesList.isNotEmpty;
+
+    final fps =
+        (json['fps'] as num?)?.toInt() ??
+        (json['frameRate'] as num?)?.toInt() ??
+        30;
+
+    final tileWidth =
+        (json['tileWidth'] as num?)?.toInt() ??
+        (json['width'] as num?)?.toInt() ??
+        64;
+    final tileHeight =
+        (json['tileHeight'] as num?)?.toInt() ??
+        (json['height'] as num?)?.toInt() ??
+        64;
+
+    final columns =
+        (json['columns'] as num?)?.toInt() ?? (hasOpenLavaFrames ? 1 : 6);
+    final rows =
+        (json['rows'] as num?)?.toInt() ??
+        (hasOpenLavaFrames ? rawFramesList.length : 4);
+
     final totalFrames =
-        (json['totalFrames'] as num?)?.toInt() ?? (columns * rows);
+        (json['totalFrames'] as num?)?.toInt() ??
+        (hasOpenLavaFrames ? rawFramesList.length : (columns * rows));
+
+    final imagesList = <String>[];
+    if (json['images'] is List) {
+      for (final item in json['images'] as List) {
+        if (item is Map && item['url'] is String) {
+          imagesList.add(item['url'] as String);
+        } else if (item is String) {
+          imagesList.add(item);
+        }
+      }
+    }
 
     return LavaManifest(
       version: (json['version'] as num?)?.toInt() ?? 1,
-      frameRate: (json['frameRate'] as num?)?.toInt() ?? 30,
+      frameRate: fps,
       tileWidth: tileWidth,
       tileHeight: tileHeight,
       columns: columns,
@@ -73,6 +127,11 @@ class LavaManifest {
       loopStartFrame: (json['loopStartFrame'] as num?)?.toInt() ?? 0,
       loopEndFrame:
           (json['loopEndFrame'] as num?)?.toInt() ?? (totalFrames - 1),
+      cellSize: (json['cellSize'] as num?)?.toInt(),
+      diffImageSize: (json['diffImageSize'] as num?)?.toInt(),
+      alpha: json['alpha'] as bool? ?? true,
+      images: imagesList,
+      rawFrames: rawFramesList,
     );
   }
 
@@ -88,6 +147,10 @@ class LavaManifest {
     'loop': loop,
     'loopStartFrame': loopStartFrame,
     'loopEndFrame': loopEndFrame,
+    if (cellSize != null) 'cellSize': cellSize,
+    if (diffImageSize != null) 'diffImageSize': diffImageSize,
+    'alpha': alpha,
+    if (images.isNotEmpty) 'images': images.map((u) => {'url': u}).toList(),
   };
 
   LavaManifest copyWith({

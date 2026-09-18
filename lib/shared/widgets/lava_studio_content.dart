@@ -484,7 +484,7 @@ class _AirbnbCategoryTabState extends State<_AirbnbCategoryTab> {
               LavaIcon.demo(
                 demoType: widget.demoType,
                 size: 44,
-                autoPlay: _isHovered || widget.isSelected,
+                autoPlay: _isHovered,
                 interactive: false,
               ),
               const SizedBox(height: AppSizes.spacingXs),

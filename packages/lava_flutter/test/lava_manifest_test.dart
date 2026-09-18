@@ -79,5 +79,44 @@ void main() {
       expect(modified.loop, isFalse);
       expect(modified.tileWidth, original.tileWidth);
     });
+
+    test('parses official OpenLava format manifest correctly', () {
+      final openLavaJson = {
+        'version': 1,
+        'fps': 30,
+        'cellSize': 32,
+        'diffImageSize': 2048,
+        'width': 180,
+        'height': 162,
+        'density': 2,
+        'alpha': true,
+        'images': [
+          {'url': 'image_1.avif'},
+          {'url': 'image_2.avif'},
+        ],
+        'frames': [
+          {'type': 'key', 'imageIndex': 0},
+          {
+            'type': 'diff',
+            'diffs': [
+              [0, 0, 6, 1, 0],
+              [1, 0, 3, 4, 7],
+            ],
+          },
+        ],
+      };
+
+      final manifest = LavaManifest.fromJson(openLavaJson);
+
+      expect(manifest.version, 1);
+      expect(manifest.frameRate, 30);
+      expect(manifest.cellSize, 32);
+      expect(manifest.diffImageSize, 2048);
+      expect(manifest.tileWidth, 180);
+      expect(manifest.tileHeight, 162);
+      expect(manifest.totalFrames, 2);
+      expect(manifest.images, ['image_1.avif', 'image_2.avif']);
+      expect(manifest.rawFrames.length, 2);
+    });
   });
 }
