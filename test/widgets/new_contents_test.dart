@@ -323,7 +323,11 @@ void main() {
       await tester.tap(find.text('2.0x'));
       await tester.pump();
 
-      // Tap Play/Pause button
+      // Tap Play button to start auto-rotate, then pause to stop
+      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+      await tester.tap(find.byIcon(Icons.play_arrow));
+      await tester.pump();
+      expect(find.byIcon(Icons.pause), findsOneWidget);
       await tester.tap(find.byIcon(Icons.pause));
       await tester.pump();
       expect(find.byIcon(Icons.play_arrow), findsOneWidget);

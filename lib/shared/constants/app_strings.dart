@@ -269,7 +269,8 @@ abstract final class AppStrings {
   static const String lavaStudioSubtitle =
       'Native 32-bit Alpha • Tile Atlas Blitting • Interactive Tactile Physics';
   static const String lavaStudioHint =
-      'Hover to tilt in 3D • Tap for spring compression bounce';
+      'Drag to rotate 360° • Hover to track • Tap for tactile bounce';
+  static const String lavaStudioAutoRotate = 'Auto-Rotate';
   static const String lavaStudioArchitecture = 'Why Lava?';
   static const String lavaStudioArchitectureDesc =
       'Standard Lottie cannot render photorealistic 3D lighting, while video players lack native cross-platform alpha channel support. Lava solves this by packing 3D raster frames into a GPU tile atlas, blitting at 60/120 FPS with zero heap allocations.';

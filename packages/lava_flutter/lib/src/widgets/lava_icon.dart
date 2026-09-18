@@ -7,7 +7,7 @@ import '../model/lava_types.dart';
 import 'lava_interactive.dart';
 
 /// Renders a high-performance tile-based Lava animation with optional
-/// tactile 3D interactivity and zero-allocation paint loops.
+/// tactile 3D interactivity, drag rotation, and zero-allocation paint loops.
 class LavaIcon extends StatefulWidget {
   /// Creates a [LavaIcon] using a preloaded [LavaBundle].
   const LavaIcon({
@@ -23,6 +23,9 @@ class LavaIcon extends StatefulWidget {
     this.blendMode = BlendMode.srcIn,
     this.filterQuality = FilterQuality.medium,
     this.interactive = false,
+    this.autoPlay,
+    this.dragToRotate = true,
+    this.scrubOnHover = true,
     this.onTap,
     this.onStateChanged,
   }) : _isDemo = false,
@@ -43,6 +46,9 @@ class LavaIcon extends StatefulWidget {
     this.blendMode = BlendMode.srcIn,
     this.filterQuality = FilterQuality.medium,
     this.interactive = false,
+    this.autoPlay,
+    this.dragToRotate = true,
+    this.scrubOnHover = true,
     this.onTap,
     this.onStateChanged,
   }) : bundle = null,
@@ -67,6 +73,9 @@ class LavaIcon extends StatefulWidget {
     this.blendMode = BlendMode.srcIn,
     this.filterQuality = FilterQuality.medium,
     this.interactive = false,
+    this.autoPlay,
+    this.dragToRotate = true,
+    this.scrubOnHover = true,
     this.onTap,
     this.onStateChanged,
   }) : bundle = null,
@@ -78,8 +87,7 @@ class LavaIcon extends StatefulWidget {
   /// The preloaded bundle containing atlas texture and manifest metadata.
   final LavaBundle? bundle;
 
-  /// Optional playback controller. If omitted, an internal controller
-  /// is created with auto-play enabled.
+  /// Optional playback controller. If omitted, an internal controller is created.
   final LavaController? controller;
 
   /// Shorthand dimension setting both width and height equally.
@@ -109,6 +117,17 @@ class LavaIcon extends StatefulWidget {
   /// Whether to enable tactile 3D perspective tilt and spring compression.
   final bool interactive;
 
+  /// Whether to automatically play the animation loop continuously.
+  /// When [interactive] is true, defaults to `false` so the user can interact
+  /// with the model directly via touch or drag.
+  final bool? autoPlay;
+
+  /// Whether horizontal dragging rotates the 3D model 360 degrees.
+  final bool dragToRotate;
+
+  /// Whether cursor hover tilts and tracks the 3D model toward the pointer.
+  final bool scrubOnHover;
+
   /// Callback executed when tapped.
   final VoidCallback? onTap;
 
@@ -133,6 +152,11 @@ class _LavaIconState extends State<LavaIcon>
   LavaController get _effectiveController {
     if (widget.controller != null) return widget.controller!;
     return _internalController!;
+  }
+
+  bool get _effectiveAutoPlay {
+    if (widget.autoPlay != null) return widget.autoPlay!;
+    return !widget.interactive;
   }
 
   @override
@@ -195,7 +219,7 @@ class _LavaIconState extends State<LavaIcon>
         loop: _bundle!.manifest.loop,
         loopStartFrame: _bundle!.manifest.loopStartFrame,
         loopEndFrame: _bundle!.manifest.loopEndFrame,
-        autoPlay: true,
+        autoPlay: _effectiveAutoPlay,
         vsync: this,
       );
     } else if (widget.controller != null) {
@@ -236,6 +260,9 @@ class _LavaIconState extends State<LavaIcon>
 
     if (widget.interactive) {
       content = LavaInteractive(
+        controller: _effectiveController,
+        dragToRotate: widget.dragToRotate,
+        scrubOnHover: widget.scrubOnHover,
         onTap: widget.onTap,
         onStateChanged: widget.onStateChanged,
         child: content,

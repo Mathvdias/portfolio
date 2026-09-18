@@ -30,7 +30,7 @@ class _LavaStudioContentState extends State<LavaStudioContent> {
     _controller = LavaController(
       totalFrames: 24,
       fps: 30,
-      autoPlay: true,
+      autoPlay: false,
       loop: true,
     );
   }
@@ -214,6 +214,7 @@ class _LavaStudioContentState extends State<LavaStudioContent> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       IconButton.filled(
+                        tooltip: AppStrings.lavaStudioAutoRotate,
                         onPressed: () {
                           if (_controller.isPlaying) {
                             _controller.pause();

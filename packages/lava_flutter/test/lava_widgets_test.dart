@@ -59,6 +59,35 @@ void main() {
       expect(states, contains(LavaInteractiveState.pressed));
     });
 
+    testWidgets('LavaInteractive rotates frames via horizontal pan drag', (
+      tester,
+    ) async {
+      final controller = LavaController(totalFrames: 24, autoPlay: false);
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: Center(
+            child: LavaInteractive(
+              controller: controller,
+              dragToRotate: true,
+              child: const SizedBox(width: 100, height: 100),
+            ),
+          ),
+        ),
+      );
+
+      expect(controller.currentFrame, 0);
+
+      // Drag right by 40 pixels (advances frames)
+      await tester.drag(find.byType(LavaInteractive), const Offset(40, 0));
+      await tester.pump();
+
+      expect(controller.currentFrame, greaterThan(0));
+
+      controller.dispose();
+    });
+
     test('LavaPainter shouldRepaint reflects property changes', () async {
       final bundle = await LavaBundle.demo();
       final controller1 = LavaController(totalFrames: 24, autoPlay: false);

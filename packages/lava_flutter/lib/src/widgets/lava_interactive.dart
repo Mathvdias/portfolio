@@ -1,14 +1,16 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import '../engine/lava_controller.dart';
 import '../model/lava_types.dart';
 
-/// Wraps a widget with tactile 3D perspective tilt and spring compression
-/// physics inspired by modern micro-interaction standards.
+/// Wraps a widget with tactile 3D perspective tilt, horizontal rotation drag,
+/// hover tracking, and spring compression physics.
 class LavaInteractive extends StatefulWidget {
   const LavaInteractive({
     super.key,
     required this.child,
+    this.controller,
     this.maxTiltAngle = 0.26,
     this.pressedScale = 0.92,
     this.returnDuration = const Duration(milliseconds: 250),
@@ -17,6 +19,8 @@ class LavaInteractive extends StatefulWidget {
     this.enableTilt = true,
     this.enableBounce = true,
     this.enableHaptics = true,
+    this.dragToRotate = true,
+    this.scrubOnHover = true,
     this.onTap,
     this.onStateChanged,
   });
@@ -24,13 +28,16 @@ class LavaInteractive extends StatefulWidget {
   /// The child widget to transform.
   final Widget child;
 
+  /// Optional [LavaController] to drive frame rotation via drag or hover.
+  final LavaController? controller;
+
   /// Maximum angular rotation in radians during hover tilt.
   final double maxTiltAngle;
 
   /// Scale factor applied while the user is actively pressing.
   final double pressedScale;
 
-  /// Duration to return tilt to origin when pointer exits.
+  /// Duration to return tilt and frames to origin when pointer exits.
   final Duration returnDuration;
 
   /// Duration of the elastic spring release animation.
@@ -47,6 +54,12 @@ class LavaInteractive extends StatefulWidget {
 
   /// Whether to invoke light haptic feedback on touch down.
   final bool enableHaptics;
+
+  /// Whether dragging or panning horizontally rotates the 3D model.
+  final bool dragToRotate;
+
+  /// Whether moving the cursor over the widget tilts and turns the 3D model toward the cursor.
+  final bool scrubOnHover;
 
   /// Callback fired when the interactive surface is tapped.
   final VoidCallback? onTap;
@@ -66,8 +79,14 @@ class _LavaInteractiveState extends State<LavaInteractive>
   late final AnimationController _tiltReturnController;
   Animation<Offset>? _tiltReturnAnimation;
 
+  late final AnimationController _frameReturnController;
+  Animation<double>? _frameReturnAnimation;
+
   Offset _currentTilt = Offset.zero;
   bool _isHovered = false;
+  bool _isDragging = false;
+  double _dragAccumulator = 0.0;
+  int _dragStartFrame = 0;
   LavaInteractiveState _state = LavaInteractiveState.idle;
 
   @override
@@ -95,12 +114,25 @@ class _LavaInteractiveState extends State<LavaInteractive>
         });
       }
     });
+
+    _frameReturnController = AnimationController(
+      vsync: this,
+      duration: widget.returnDuration,
+    )..addListener(() {
+      if (_frameReturnAnimation != null && widget.controller != null) {
+        final total = widget.controller!.totalFrames;
+        final f =
+            (_frameReturnAnimation!.value.round() % total + total) % total;
+        widget.controller!.seekToFrame(f);
+      }
+    });
   }
 
   @override
   void dispose() {
     _bounceController.dispose();
     _tiltReturnController.dispose();
+    _frameReturnController.dispose();
     super.dispose();
   }
 
@@ -112,9 +144,7 @@ class _LavaInteractiveState extends State<LavaInteractive>
   }
 
   void _onPointerHover(PointerHoverEvent event, BoxConstraints constraints) {
-    if (!widget.enableTilt ||
-        constraints.maxWidth == 0 ||
-        constraints.maxHeight == 0) {
+    if (constraints.maxWidth == 0 || constraints.maxHeight == 0) {
       return;
     }
 
@@ -124,14 +154,28 @@ class _LavaInteractiveState extends State<LavaInteractive>
     final normalizedY = ((localPos.dy / constraints.maxHeight) * 2.0 - 1.0)
         .clamp(-1.0, 1.0);
 
-    setState(() {
-      _currentTilt = Offset(normalizedX, normalizedY);
-    });
+    if (widget.enableTilt) {
+      setState(() {
+        _currentTilt = Offset(normalizedX, normalizedY);
+      });
+    }
+
+    if (widget.scrubOnHover &&
+        widget.controller != null &&
+        !widget.controller!.isPlaying &&
+        !_isDragging) {
+      final total = widget.controller!.totalFrames;
+      final maxOffset = (total / 4.0).round(); // ±90 degree rotation
+      final offset = (normalizedX * maxOffset).round();
+      final targetFrame = (offset % total + total) % total;
+      widget.controller!.seekToFrame(targetFrame);
+    }
   }
 
   void _onPointerEnter(PointerEnterEvent event) {
     _isHovered = true;
     _tiltReturnController.stop();
+    _frameReturnController.stop();
     _updateState(LavaInteractiveState.hover);
   }
 
@@ -151,6 +195,62 @@ class _LavaInteractiveState extends State<LavaInteractive>
       );
       _tiltReturnController.forward(from: 0.0);
     }
+
+    if (widget.scrubOnHover &&
+        widget.controller != null &&
+        !widget.controller!.isPlaying &&
+        !_isDragging) {
+      _animateFrameToRest();
+    }
+  }
+
+  void _animateFrameToRest() {
+    final current = widget.controller!.currentFrame;
+    if (current == 0) return;
+
+    final total = widget.controller!.totalFrames;
+    int diff = current;
+    if (diff > total / 2) {
+      diff = diff - total;
+    }
+
+    _frameReturnAnimation = Tween<double>(
+      begin: diff.toDouble(),
+      end: 0.0,
+    ).animate(
+      CurvedAnimation(
+        parent: _frameReturnController,
+        curve: Curves.easeOutCubic,
+      ),
+    );
+    _frameReturnController.forward(from: 0.0);
+  }
+
+  void _onPanStart(DragStartDetails details) {
+    if (widget.controller == null || !widget.dragToRotate) return;
+    _isDragging = true;
+    _dragAccumulator = 0.0;
+    _dragStartFrame = widget.controller!.currentFrame;
+    _frameReturnController.stop();
+    if (widget.controller!.isPlaying) {
+      widget.controller!.pause();
+    }
+  }
+
+  void _onPanUpdate(DragUpdateDetails details) {
+    if (widget.controller == null || !widget.dragToRotate) return;
+    _dragAccumulator += details.delta.dx;
+
+    // Advance 1 frame per 7 pixels of horizontal drag
+    const pixelsPerFrame = 7.0;
+    final frameDelta = (_dragAccumulator / pixelsPerFrame).round();
+    final total = widget.controller!.totalFrames;
+    final target = ((_dragStartFrame + frameDelta) % total + total) % total;
+    widget.controller!.seekToFrame(target);
+  }
+
+  void _onPanEnd(DragEndDetails details) {
+    _isDragging = false;
   }
 
   void _onTapDown(TapDownDetails details) {
@@ -201,11 +301,16 @@ class _LavaInteractiveState extends State<LavaInteractive>
           onHover: (e) => _onPointerHover(e, constraints),
           onExit: _onPointerExit,
           cursor:
-              widget.onTap != null
-                  ? SystemMouseCursors.click
-                  : MouseCursor.defer,
+              widget.dragToRotate
+                  ? SystemMouseCursors.grab
+                  : (widget.onTap != null
+                      ? SystemMouseCursors.click
+                      : MouseCursor.defer),
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
+            onPanStart: widget.dragToRotate ? _onPanStart : null,
+            onPanUpdate: widget.dragToRotate ? _onPanUpdate : null,
+            onPanEnd: widget.dragToRotate ? _onPanEnd : null,
             onTapDown: _onTapDown,
             onTapUp: _onTapUp,
             onTapCancel: _onTapCancel,
