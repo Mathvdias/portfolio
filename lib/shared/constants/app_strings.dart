@@ -296,14 +296,14 @@ abstract final class AppStrings {
   static const String lavaModelLavaLampDesc =
       'OpenLava Diff Tileset • 48-Frame Thermal Loop • Glowing Internal Bulb';
   static const String lavaModelCampfireDesc =
-      'OpenLava Diff Tileset • 48-Frame Fire Loop • Radiant Light & Embers';
+      'OpenLava Diff Tileset • 48-Frame Fire Loop • Flame Relights Logs & Stones';
   static const String lavaModelRocket = 'Retro Rocket';
   static const String lavaModelRocketDesc =
       'OpenLava Diff Tileset • 48-Frame Thrust Loop • Fire Plume & Embers';
   static const String lavaModelSenna = 'Capacete do Senna';
   static const String lavaModelSennaDesc =
-      'OpenLava Diff Tileset • 48-Frame 3D Rotation • Visor Reflections & Lacquer Gleam';
+      'OpenLava Diff Tileset • 72-Frame 360° Turntable • Drag to Spin';
   static const String lavaModelChristmasTree = 'Árvore de Natal';
   static const String lavaModelChristmasTreeDesc =
-      'OpenLava Diff Tileset • 48-Frame Winter Loop • Falling Snow & Fairy Lights';
+      'OpenLava Diff Tileset • 60-Frame Winter Loop • Blinking Fairy Lights & Snow';
 }

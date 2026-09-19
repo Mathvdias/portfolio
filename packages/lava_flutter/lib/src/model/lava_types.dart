@@ -40,21 +40,19 @@ enum LavaDemoType {
   /// brushed aluminum cone base (`assets/lava/lavalamp`).
   lavaLamp,
 
-  /// Cozy outdoor campfire with glowing embers, organic flame flickers,
-  /// volumetric warm light bloom, and rising incandescent sparks (`assets/lava/campfire`).
+  /// Campfire in a stone ring: the flame sways and its flickering light
+  /// really relights the logs and stones (`assets/lava/campfire`).
   campfire,
 
   /// Classic 1950s atomic sci-fi retro space rocket with fire thruster plume,
   /// mach diamonds, and incandescent glowing sparks (`assets/lava/rocket`).
   rocket,
 
-  /// Ayrton Senna's legendary Formula 1 helmet with iconic yellow lacquer,
-  /// green and blue stripes, moving 3D perspective, visor reflections, and
-  /// dynamic lacquer specular gleam (`assets/lava/senna`).
+  /// Yellow racing helmet with green and blue bands, rendered in real 3D and
+  /// turning 360 degrees on its own axis (`assets/lava/senna`, 72 frames @ 24 fps).
   senna,
 
-  /// Magical Christmas tree dusted with snow, wrapped in colorful blinking
-  /// fairy lights (pisca-piscas), gently falling snowflakes, and radiant golden
-  /// star topper (`assets/lava/christmastree`).
+  /// Snow-dusted Christmas tree whose fairy lights blink one by one, each
+  /// casting its own pool of light, under falling snow (`assets/lava/christmastree`).
   christmasTree,
 }
