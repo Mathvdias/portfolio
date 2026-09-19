@@ -60,27 +60,63 @@ new icon. Geometric transforms go through the premultiplied-alpha helpers (`rota
 ## 3. Encode to OpenLava
 
 ```sh
-python3 tool/openlava_encode.py assets/lava/sunflower sunflower_frames/frame_*.png
-python3 tool/openlava_encode.py assets/lava/macintosh mac_frames/frame_*.png
+python3 tool/openlava_encode.py assets/lava/sunflower --avif 70 --fallback-webp 90 sunflower_frames/frame_*.png
+python3 tool/openlava_encode.py assets/lava/senna     --avif 70 --fallback-webp 95 --fps 24 senna_frames/frame_*.png
+python3 tool/openlava_encode.py assets/lava/rocket    --from-bundle <lossless rocket bundle> --avif 70 --fallback-webp 90
 ```
 
-Produces `image_1.png` (key frame), `image_2.png` (2048px-wide diff tile atlas, 32px cells)
-and `manifest.json` (`{"type":"key"}` + `{"type":"diff","diffs":[[srcImage,
-srcTile, countX, countY, dstTile], ...]}` per frame), exactly the layout `LavaPainter` consumes.
-Packing matters for rendering quality, not just size: every diff entry is a separate
-`drawImageRect`, and bilinear sampling reads across tile borders in the atlas. The encoder therefore
-stores each frame's changed region as one contiguous block (interior borders stay coherent), copies
-the unchanged surroundings from the key frame as at most four bands, and separates blocks with a
-one-tile transparent gutter so nothing opaque bleeds in. It re-decodes every frame the way the
-painter does and reports the max pixel error (must be 0). Then list the directory under `flutter.assets` in the host `pubspec.yaml` and map it
-in `LavaBundle.demoAssetPaths` (or load it directly with `LavaBundle.openLavaAsset`).
+Produces `image_1` (key frame), `image_2` (2048px-wide diff tile atlas, 32px cells) and
+`manifest.json` (`{"type":"key"}` + `{"type":"diff","diffs":[[srcImage, srcTile, countX, countY,
+dstTile], ...]}` per frame), the layout of the Airbnb samples. Then list the directory under
+`flutter.assets` in the host `pubspec.yaml` and map it in `LavaBundle.demoAssetPaths` (or load it
+directly with `LavaBundle.openLavaAsset`).
 
-Photographic icons whose light changes every pixel of every frame pack badly as PNG (about 2 MB).
-`--webp 90` stores the key frame as lossless WebP and the diff atlas as lossy WebP with a lossless
-alpha plane - the trade the Airbnb assets make with AVIF - which brings them to about 0.5 MB. 4:2:0
-chroma washes out thin saturated lines, so flat hard-edged art (the helmet stripes) takes
-`--webp 100` (lossless WebP). `--fps N` sets the manifest frame rate. The decode check reports the
-premultiplied error: it must be 0 for lossless bundles and stays around 1/255 on average at q90.
+**Packing** follows OpenLava's `Docs/packing.md`. Every tile of every frame gets an id (identical
+pixels, same id; colour under alpha 0 is zeroed first). Per frame, fully transparent tiles cost
+nothing (the canvas starts cleared), tiles found in the key image are copied from it, tiles already
+in the atlas are referenced again - growing the largest rectangle contiguous both in the frame and
+in its source - and only tiles never seen before become a new patch; patches are shelf-packed
+tallest first. Against one bounding block per frame this stores 20-57 % fewer tiles on the demo
+icons (sunflower 690 -> 296, rocket 924 -> 374, helmet 2130 -> 1612), which also shrinks the decoded
+atlas (the helmet's went from 12.3 MB to 7.3 MB of texture). `lava_flutter` composes frames 1:1 with
+nearest sampling before scaling, so neighbouring atlas tiles cannot bleed and no gutter is needed;
+`--gutter 1` restores one for players that blit scaled tiles straight from the atlas.
+
+**Design for tile reuse.** A 180x162 canvas is only 6x6 tiles, so anything that changes every pixel
+every frame (a whole-object bob or rock, a continuously varying light) defeats the packer. Loops
+that pass through the same pose twice (any sin-driven motion) are stored once; light that takes a
+few discrete levels (`Campfire.LIGHT_LEVELS`, `ChristmasTree.BLINK_LEVELS`) lets every tile away
+from the emitter repeat; glow tails below visibility are clamped to zero so they do not dirty far
+tiles. That is how the Airbnb samples stay near 100 KB.
+
+**Formats.** `--avif Q` writes 4:4:4 AVIF (what Airbnb ships): at the same size as WebP it has a
+third of the peak error, and it is the only lossy option that keeps thin saturated lines (the helmet
+stripes) because WebP is 4:2:0 only. `--fallback-webp Q` writes a second copy of both images and
+lists it as `fallbackUrl` in the manifest; `--webp Q` / `--png` write a single format (`--webp 100`
+is lossless). The decode check reports the premultiplied error of every variant: 0 for lossless,
+around 0.3-1.2 / 255 on average for the shipped bundles. Repacking with `--from-bundle` must start
+from a lossless bundle (the PNG versions are in git history), never from a lossy one.
+
+**Large previews.** `LAVA_SCALE=2` makes every generator (`animate_icon.py`, `relight_icon.py`,
+`sdf_scenes.py`, `generate_authentic_icons.py`) render the same animation at 360x324; encode it
+next to the standard bundle as `<name>_hd` with `--density 4`. `LavaIcon.demo` switches to it when
+the icon is painted well above 180 device pixels and shows the standard bundle while it decodes.
+
+```sh
+LAVA_SCALE=2 python3 tool/relight_icon.py campfire tool/stills/campfire_lit.webp tool/stills/campfire_unlit.webp fire_hd
+python3 tool/openlava_encode.py assets/lava/campfire_hd --density 4 --avif 58 --fallback-webp 84 fire_hd/frame_*.png
+```
+
+The Macintosh, sunflower, lava lamp and rocket come from `generate_authentic_icons.py <name>
+tool/stills/<name>.* <frames_dir>` (it composes on a fixed 720x648 canvas, so both sizes are the
+same animation).
+
+Who loads what: on the **web** the AVIF is tried first - only the requested file is downloaded, and
+because Flutter web's `ImageDecoder` call rejects every still AVIF on Chrome
+(flutter/flutter#160600) the loader decodes it through `createImageBitmap` instead. **Native**
+platforms load the `fallbackUrl` directly (`LavaBundle.preferFallbackImages`): Android 12-15 decode
+AVIF but silently drop its alpha channel, Linux and older Android cannot decode it at all, and
+assets are embedded in native apps anyway. A native-only app can delete the `.avif` files.
 
 ## 4. Icons that emit light: lit / unlit pair
 
@@ -94,17 +130,18 @@ real light pass - what the source adds to every surface around it - and the fram
 ```sh
 python3 tool/relight_icon.py campfire      tool/stills/campfire_lit.webp      tool/stills/campfire_unlit.webp      fire_frames
 python3 tool/relight_icon.py christmastree tool/stills/christmastree_lit.webp tool/stills/christmastree_unlit.webp tree_frames
-python3 tool/openlava_encode.py assets/lava/campfire      --webp 90 fire_frames/frame_*.png
-python3 tool/openlava_encode.py assets/lava/christmastree --webp 90 tree_frames/frame_*.png
+python3 tool/openlava_encode.py assets/lava/campfire      --avif 65 --fallback-webp 88 fire_frames/frame_*.png
+python3 tool/openlava_encode.py assets/lava/christmastree --avif 65 --fallback-webp 88 tree_frames/frame_*.png
 ```
 
 - `Campfire`: the flame is lifted out of the lit still by colour (a morphological opening drops the
   glowing log ends that hang off it, the pointed tip is kept), then bent row by row, stretched and
-  redrawn over the unlit logs; the light pass follows the same flicker with a small radial delay,
+  redrawn over the unlit logs; the light pass follows the same flicker in 8 discrete levels,
   bloom feeds the alpha channel so the glow survives on dark backgrounds, sparks rise and fade.
 - `ChristmasTree`: the bright cores of the light pass are split into connected components, one
-  per bulb, each owning the pool of light around it; pools blink in sequence along the string and
-  the star breathes. Snow falls in front and the whole tree rocks with the pseudo-3D yaw.
+  per bulb, each owning the pool of light around it; pools switch off / half / on in sequence along
+  the string and the star breathes. Snow falls in front; the tree itself stands still so its tiles
+  repeat (`ROCK_DEGREES` brings the pseudo-3D rock back at the cost of a much larger atlas).
 
 Backdrop: white is fine for the campfire (the smooth baked drop shadow is flood-filled away, the
 textured stones stop the fill). Anything white at the silhouette (snow) needs a chroma backdrop:
@@ -123,7 +160,7 @@ painted in object space. Every motion is a whole multiple of the loop phase, so 
 ```sh
 python3 tool/sdf_scenes.py senna --still 0.1 preview.png     # look-dev, about 3 s
 python3 tool/sdf_scenes.py senna assets/lava/senna           # 72 frames on all cores, about 10 s
-python3 tool/openlava_encode.py assets/lava/senna --fps 24 --webp 100 <frames_dir>/frame_*.png
+python3 tool/openlava_encode.py assets/lava/senna --fps 24 --avif 70 --fallback-webp 95 <frames_dir>/frame_*.png
 ```
 
 The helmet makes one turn in 72 frames at 24 fps; in the app, `dragToRotate` scrubs those frames, so
