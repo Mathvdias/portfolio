@@ -150,5 +150,19 @@ void main() {
       expect(await _pixel(frame, 70, 16), red);
       overlap.dispose();
     });
+
+    test('blits describe where every block of a frame comes from', () {
+      final keyFrame = compositor.blits(0);
+      expect(keyFrame, hasLength(1));
+      expect(keyFrame.single.imageIndex, 0);
+      expect(keyFrame.single.destination, const ui.Rect.fromLTWH(0, 0, 80, 48));
+
+      final diff = compositor.blits(1);
+      expect(diff.map((b) => b.imageIndex), [0, 1]);
+      // Tile 1 of the atlas lands on tile 5 of the frame, clamped to its edge.
+      expect(diff.last.source, const ui.Rect.fromLTWH(32, 0, 16, 16));
+      expect(diff.last.destination, const ui.Rect.fromLTWH(64, 32, 16, 16));
+      expect(compositor.frameCount, 3);
+    });
   });
 }

@@ -54,6 +54,48 @@ class LavaFrameCompositor {
   /// Number of composed frames currently held.
   int get cachedFrameCount => _cache.length;
 
+  /// Number of frames in the animation.
+  int get frameCount => _plans.length;
+
+  /// The copies that build [frameIndex], in paint order: which image each block
+  /// of tiles comes from, where it sits there and where it lands in the frame.
+  /// A key frame is a single blit of the whole image. Meant for inspectors and
+  /// debug overlays; playback never allocates these.
+  List<LavaTileBlit> blits(int frameIndex) {
+    if (_plans.isEmpty) return const [];
+    final plan = _plans[frameIndex % _plans.length];
+    if (plan == null) return const [];
+    if (plan.keyImageIndex >= 0) {
+      final image = images[plan.keyImageIndex];
+      final full = ui.Rect.fromLTWH(
+        0,
+        0,
+        image.width.toDouble(),
+        image.height.toDouble(),
+      );
+      return [LavaTileBlit(plan.keyImageIndex, full, full)];
+    }
+    return [
+      for (final batch in plan.batches)
+        for (var i = 0; i < batch.rects.length; i += 4)
+          LavaTileBlit(
+            batch.imageIndex,
+            ui.Rect.fromLTRB(
+              batch.rects[i],
+              batch.rects[i + 1],
+              batch.rects[i + 2],
+              batch.rects[i + 3],
+            ),
+            ui.Rect.fromLTWH(
+              batch.transforms[i + 2],
+              batch.transforms[i + 3],
+              batch.rects[i + 2] - batch.rects[i],
+              batch.rects[i + 3] - batch.rects[i + 1],
+            ),
+          ),
+    ];
+  }
+
   /// Returns the full image for [frameIndex], or `null` when the frame cannot
   /// be resolved. Key frames hand back the source image untouched.
   ui.Image? frame(int frameIndex) {
@@ -205,6 +247,20 @@ class LavaFrameCompositor {
     }
     _cache.clear();
   }
+}
+
+/// One block of tiles copied from a bundle image into a frame.
+class LavaTileBlit {
+  const LavaTileBlit(this.imageIndex, this.source, this.destination);
+
+  /// Index into the bundle images: 0 is the key frame, 1 the diff atlas.
+  final int imageIndex;
+
+  /// Pixels read from that image.
+  final ui.Rect source;
+
+  /// Pixels written in the frame.
+  final ui.Rect destination;
 }
 
 class _FramePlan {
