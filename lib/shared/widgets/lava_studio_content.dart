@@ -84,6 +84,10 @@ class _LavaStudioContentState extends State<LavaStudioContent>
   bool _xray = false;
   LavaBundle? _bundle;
 
+  /// The bundle on stage, unless it was given back since: a large preview is
+  /// disposed when its last icon lets go, and its images must not be painted.
+  LavaBundle? get _liveBundle => (_bundle?.isDisposed ?? true) ? null : _bundle;
+
   static const _names = {
     LavaDemoType.macintosh: AppStrings.lavaModelMacintosh,
     LavaDemoType.sunflower: AppStrings.lavaModelTree,
@@ -212,7 +216,7 @@ class _LavaStudioContentState extends State<LavaStudioContent>
 
   // --------------------------------------------------------------------- stage
   Widget _buildStage(_Metrics m) {
-    final bundle = _bundle;
+    final bundle = _liveBundle;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -450,7 +454,7 @@ class _LavaStudioContentState extends State<LavaStudioContent>
 
   // ----------------------------------------------------------------- inspector
   Widget _buildInspector(_Metrics m) {
-    final bundle = _bundle;
+    final bundle = _liveBundle;
     final stats = LavaFormatStats.byIcon[_selectedType];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
