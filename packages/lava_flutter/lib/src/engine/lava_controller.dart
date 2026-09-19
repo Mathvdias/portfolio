@@ -70,7 +70,11 @@ class LavaController implements Listenable {
     if (_currentFrameNotifier.value >= totalFrames) {
       _currentFrameNotifier.value = 0;
     }
+    _configNotifier.value++;
   }
+
+  // Bumped by [configure] so listeners (timelines, sliders) pick up new bounds.
+  final ValueNotifier<int> _configNotifier = ValueNotifier<int>(0);
 
   double _speed;
   Ticker? _ticker;
@@ -220,12 +224,14 @@ class LavaController implements Listenable {
   void addListener(VoidCallback listener) {
     _currentFrameNotifier.addListener(listener);
     _statusNotifier.addListener(listener);
+    _configNotifier.addListener(listener);
   }
 
   @override
   void removeListener(VoidCallback listener) {
     _currentFrameNotifier.removeListener(listener);
     _statusNotifier.removeListener(listener);
+    _configNotifier.removeListener(listener);
   }
 
   /// Disposes internal tickers and notifiers.
@@ -234,5 +240,6 @@ class LavaController implements Listenable {
     _ticker = null;
     _statusNotifier.dispose();
     _currentFrameNotifier.dispose();
+    _configNotifier.dispose();
   }
 }
