@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:ui' as ui;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import '../demo/lava_demo_baker.dart';
 import '../engine/lava_frame_compositor.dart';
 import '../model/lava_manifest.dart';
 import '../model/lava_types.dart';
+import 'browser_image_decoder_stub.dart'
+    if (dart.library.js_interop) 'browser_image_decoder_web.dart';
 
 /// Container encapsulating a decoded texture atlas [ui.Image] and its
 /// associated [LavaManifest] layout parameters.
@@ -47,6 +50,16 @@ class LavaBundle {
     LavaDemoType.christmasTree: 'assets/lava/christmastree',
   };
 
+  /// Canvas width of the standard demo bundles (the Airbnb size, density 2).
+  static const int demoBaseWidth = 180;
+
+  /// Large-preview variant of [demoAssetPaths]: the same animation rendered at
+  /// 360x324 (`"density": 4`), for icons painted well above [demoBaseWidth]
+  /// device pixels. Only fetched when asked for with `hd: true`.
+  static Map<LavaDemoType, String> get demoHdAssetPaths => {
+    for (final entry in demoAssetPaths.entries) entry.key: '${entry.value}_hd',
+  };
+
   /// Loads the built-in demo bundle for [type].
   ///
   /// Every demo is an OpenLava diff tileset (`manifest.json` + `image_1.png`
@@ -57,8 +70,19 @@ class LavaBundle {
   static Future<LavaBundle> demo({
     LavaDemoType type = LavaDemoType.macintosh,
     bool forceRegenerate = false,
+    bool hd = false,
     AssetBundle? bundle,
   }) async {
+    if (hd) {
+      try {
+        return await openLavaAsset(
+          assetPath: demoHdAssetPaths[type]!,
+          bundle: bundle,
+        );
+      } catch (_) {
+        // Hosts that only ship the standard bundles still get an icon.
+      }
+    }
     try {
       return await openLavaAsset(
         assetPath: demoAssetPaths[type]!,
@@ -128,8 +152,150 @@ class LavaBundle {
   static void evictOpenLavaCache() {
     final pending = _openLavaCache.values.toList();
     _openLavaCache.clear();
+    _undecodableExtensions.clear();
     for (final future in pending) {
       future.then((bundle) => bundle.dispose(), onError: (Object _) {});
+    }
+  }
+
+  // File extensions this process already failed to decode (an AVIF atlas on a
+  // system without an AV1 decoder): later bundles go straight to the fallback
+  // instead of fetching and rejecting the primary file again.
+  static final Set<String> _undecodableExtensions = {};
+
+  /// File extensions that failed to decode in this process and are now served
+  /// from their `fallbackUrl` (diagnostics: `{'avif'}` means no AV1 decoder).
+  static Set<String> get undecodableExtensions =>
+      Set.unmodifiable(_undecodableExtensions);
+
+  /// Whether a manifest's `fallbackUrl` is loaded *instead of* its `url`.
+  ///
+  /// Defaults to `true` off the web. The primary image of a bundle is usually
+  /// AVIF, and native decoders cannot be trusted with it behind a try/catch:
+  /// Android 12 to 15 decode AVIF but silently drop the alpha channel (the
+  /// atlas comes back opaque, no exception), Linux and older Android have no
+  /// AV1 decoder at all, and assets are embedded in native apps anyway, so
+  /// nothing is saved by preferring the smaller file. On the web only the file
+  /// that is actually requested gets downloaded, and the browser decodes AVIF.
+  static bool preferFallbackImages = !kIsWeb;
+
+  static String _extensionOf(String name) =>
+      name.contains('.')
+          ? name.substring(name.lastIndexOf('.') + 1).toLowerCase()
+          : '';
+
+  static Future<ui.Image> _decodeWithFallback(
+    AssetBundle bundle,
+    String assetPath,
+    String name,
+    String? fallback, {
+    int? expectedWidth,
+  }) async {
+    Future<ui.Image> decode(String file) async => _decodeImage(
+      await _loadBytes(bundle, '$assetPath/$file'),
+      mimeType: _mimeTypes[_extensionOf(file)],
+    );
+
+    if (fallback == null) return decode(name);
+
+    final extension = _extensionOf(name);
+    if (preferFallbackImages || _undecodableExtensions.contains(extension)) {
+      try {
+        return await decode(fallback);
+      } catch (_) {
+        // A bundle shipped without its fallback file still has its primary.
+        return decode(name);
+      }
+    }
+
+    final Uint8List bytes;
+    try {
+      bytes = await _loadBytes(bundle, '$assetPath/$name');
+    } catch (_) {
+      // A missing file or a network error says nothing about the decoder.
+      return decode(fallback);
+    }
+
+    ui.Image? image;
+    try {
+      image = await _decodeImage(bytes, mimeType: _mimeTypes[extension]);
+    } catch (_) {
+      // Only blame the decoder for bytes that really are that format: a host
+      // with an SPA rewrite answers a missing asset with 200 + index.html, and
+      // one broken file must not switch every other bundle to its fallback.
+      if (_sniffExtension(bytes) == extension) {
+        _undecodableExtensions.add(extension);
+      }
+    }
+    // Some platform decoders hand back a bogus image instead of failing.
+    if (image != null &&
+        expectedWidth != null &&
+        image.width != expectedWidth) {
+      image.dispose();
+      image = null;
+    }
+    return image ?? decode(fallback);
+  }
+
+  /// Container signature -> extension (`null` when the bytes are none of the
+  /// formats bundles use).
+  static String? _sniffExtension(Uint8List bytes) {
+    bool at(int offset, String ascii) {
+      if (bytes.length < offset + ascii.length) return false;
+      for (var i = 0; i < ascii.length; i++) {
+        if (bytes[offset + i] != ascii.codeUnitAt(i)) return false;
+      }
+      return true;
+    }
+
+    if (at(4, 'ftypavif') || at(4, 'ftypavis')) return 'avif';
+    if (at(0, 'RIFF') && at(8, 'WEBP')) return 'webp';
+    if (at(1, 'PNG')) return 'png';
+    if (bytes.length > 2 && bytes[0] == 0xFF && bytes[1] == 0xD8) return 'jpg';
+    return null;
+  }
+
+  static Future<Uint8List> _loadBytes(AssetBundle bundle, String key) async {
+    final byteData = await bundle.load(key);
+    return byteData.buffer.asUint8List(
+      byteData.offsetInBytes,
+      byteData.lengthInBytes,
+    );
+  }
+
+  static const Map<String, String> _mimeTypes = {
+    'avif': 'image/avif',
+    'webp': 'image/webp',
+    'png': 'image/png',
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+  };
+
+  static Future<ui.Image> _decodeImage(
+    Uint8List bytes, {
+    String? mimeType,
+  }) async {
+    try {
+      final codec = await ui.instantiateImageCodec(bytes);
+      try {
+        return (await codec.getNextFrame()).image;
+      } finally {
+        codec.dispose();
+      }
+    } catch (_) {
+      // On the web the engine's decoder refuses files the browser itself
+      // decodes fine (every still AVIF on Chrome, flutter/flutter#160600):
+      // ask the browser directly. If it cannot either, the engine's error is
+      // the one worth reporting.
+      final type = mimeType ?? _mimeTypes[_sniffExtension(bytes)];
+      ui.Image? image;
+      try {
+        image = type == null ? null : await decodeImageInBrowser(bytes, type);
+      } catch (_) {
+        image = null;
+      }
+      if (image == null) rethrow;
+      return image;
     }
   }
 
@@ -143,17 +309,38 @@ class LavaBundle {
     final manifestJson = jsonDecode(jsonStr) as Map<String, dynamic>;
     final manifest = LavaManifest.fromJson(manifestJson);
 
+    final keyImages = <int>{
+      for (final frame in manifest.rawFrames)
+        if (frame is Map && frame['type'] == 'key')
+          (frame['imageIndex'] as num?)?.toInt() ?? 0,
+    };
+
     final loadedImages = <ui.Image>[];
-    for (final imgName in manifest.images) {
-      final byteData = await effectiveBundle.load('$assetPath/$imgName');
-      final bytes = byteData.buffer.asUint8List(
-        byteData.offsetInBytes,
-        byteData.lengthInBytes,
-      );
-      final codec = await ui.instantiateImageCodec(bytes);
-      final frame = await codec.getNextFrame();
-      codec.dispose();
-      loadedImages.add(frame.image);
+    for (var i = 0; i < manifest.images.length; i++) {
+      final fallback =
+          i < manifest.imageFallbacks.length
+              ? manifest.imageFallbacks[i]
+              : null;
+      try {
+        loadedImages.add(
+          await _decodeWithFallback(
+            effectiveBundle,
+            assetPath,
+            manifest.images[i],
+            fallback,
+            // A key image is the canvas itself; any other image is a diff atlas.
+            expectedWidth:
+                keyImages.contains(i)
+                    ? manifest.tileWidth
+                    : manifest.diffImageSize,
+          ),
+        );
+      } catch (_) {
+        for (final image in loadedImages) {
+          image.dispose();
+        }
+        rethrow;
+      }
     }
 
     return LavaBundle(
@@ -175,17 +362,11 @@ class LavaBundle {
     final manifestJson = jsonDecode(jsonStr) as Map<String, dynamic>;
     final manifest = LavaManifest.fromJson(manifestJson);
 
-    final byteData = await effectiveBundle.load(imageAsset);
-    final bytes = byteData.buffer.asUint8List(
-      byteData.offsetInBytes,
-      byteData.lengthInBytes,
+    final image = await _decodeImage(
+      await _loadBytes(effectiveBundle, imageAsset),
+      mimeType: _mimeTypes[_extensionOf(imageAsset)],
     );
-
-    final codec = await ui.instantiateImageCodec(bytes);
-    final frame = await codec.getNextFrame();
-    codec.dispose();
-
-    return LavaBundle(atlas: frame.image, manifest: manifest);
+    return LavaBundle(atlas: image, manifest: manifest);
   }
 
   /// Creates a [LavaBundle] from raw in-memory encoded image bytes.
@@ -193,11 +374,10 @@ class LavaBundle {
     required Uint8List imageBytes,
     required LavaManifest manifest,
   }) async {
-    final codec = await ui.instantiateImageCodec(imageBytes);
-    final frame = await codec.getNextFrame();
-    codec.dispose();
-
-    return LavaBundle(atlas: frame.image, manifest: manifest);
+    return LavaBundle(
+      atlas: await _decodeImage(imageBytes),
+      manifest: manifest,
+    );
   }
 
   /// Releases the GPU texture resources.
