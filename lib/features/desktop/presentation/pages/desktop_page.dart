@@ -129,11 +129,30 @@ class _DesktopPageState extends State<DesktopPage> {
 
   // ── Deferred load timing ─────────────────────────────────────────
 
+  /// One loader per window, kept for the life of the page: [DeferredWidget]
+  /// recognises a library it already loaded by the identity of its loader, so
+  /// a fresh closure on every open would send a window that is already in
+  /// memory through the placeholder and the cross-fade again.
+  final Map<String, Future<void> Function()> _trackedLoaders = {};
+
   Future<void> Function() _trackedLoad(
     String windowId,
     Future<void> Function() loader,
   ) {
-    return () async {
+    final known = _trackedLoaders[windowId];
+    if (known != null) {
+      if (DeferredWidget.isLoaded(known)) {
+        unawaited(
+          _analytics.logDeferredLoad(
+            windowId: windowId,
+            durationMs: 0,
+            fromCache: true,
+          ),
+        );
+      }
+      return known;
+    }
+    return _trackedLoaders[windowId] = () async {
       final sw = Stopwatch()..start();
       await loader();
       sw.stop();
