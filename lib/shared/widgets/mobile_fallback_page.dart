@@ -41,7 +41,11 @@ const _kMobileLanguages = [
 /// with live contents (Guestbook, Terminal, Snake, Experiences, Skills),
 /// and quick links to professional profiles.
 class MobileFallbackPage extends StatefulWidget {
-  const MobileFallbackPage({super.key});
+  const MobileFallbackPage({super.key, this.clock});
+
+  /// Time source for the status-bar clock, read once when the page opens and
+  /// again on every one-second tick. Defaults to [DateTime.now].
+  final DateTime Function()? clock;
 
   @override
   State<MobileFallbackPage> createState() => _MobileFallbackPageState();
@@ -50,16 +54,19 @@ class MobileFallbackPage extends StatefulWidget {
 class _MobileFallbackPageState extends State<MobileFallbackPage> {
   late Timer _clockTimer;
   late final ScrollController _scrollController;
-  DateTime _now = DateTime.now();
+  late DateTime _now;
   SoundService? _sound;
   bool _muted = false;
+
+  DateTime _readClock() => (widget.clock ?? DateTime.now)();
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+    _now = _readClock();
     _clockTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) setState(() => _now = DateTime.now());
+      if (mounted) setState(() => _now = _readClock());
     });
   }
 
