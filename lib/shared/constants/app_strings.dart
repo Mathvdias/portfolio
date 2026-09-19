@@ -267,23 +267,60 @@ abstract final class AppStrings {
   // Lava Studio
   static const String lavaStudioTitle = 'Lava 3D Micro-Animation Engine';
   static const String lavaStudioSubtitle =
-      'Native 32-bit Alpha • Tile Atlas Blitting • Interactive Tactile Physics';
+      'Airbnb-style 3D icons for Flutter: a key frame, an atlas of 32 px tiles and a recipe per frame.';
   static const String lavaStudioHint =
-      'Drag to rotate 360° • Hover to track • Tap for tactile bounce';
-  static const String lavaStudioAutoRotate = 'Auto-Rotate';
+      'Drag to scrub • hover to tilt • tap to bounce';
+  static const String lavaStudioAutoRotate = 'Play / pause';
+  static const String lavaStudioReplay = 'Restart';
   static const String lavaStudioArchitecture = 'Why Lava?';
   static const String lavaStudioArchitectureDesc =
-      'Standard Lottie cannot render photorealistic 3D lighting, while video players lack native cross-platform alpha channel support. Lava solves this by packing 3D raster frames into a GPU tile atlas, blitting at 60/120 FPS with zero heap allocations.';
-  static const String lavaStudioBadgeTile = 'Tile Atlas';
-  static const String lavaStudioBadgeAlpha = '32-bit RGBA';
-  static const String lavaStudioBadgePerspective = '3D Perspective';
-  static const String lavaStudioBadgeZeroAlloc = 'Zero Allocations';
-  static const String lavaStudioBadgeWasm = 'WASM Ready';
+      'Lottie is vector-only, so it cannot carry rendered 3D light. GIF has 256 colours and 1-bit alpha, so soft shadows and glows break. Video has no portable alpha channel and cannot be scrubbed frame by frame. Lava keeps full 8-bit alpha and random access: every frame is rebuilt from tiles that are stored once, composed 1:1 on the GPU and cached.';
+  static const String lavaStudioXray = 'X-ray';
+  static const String lavaStudioXrayOn = 'Hide the tile X-ray';
+  static const String lavaStudioXrayOff = 'Show which tiles build this frame';
+  static const String lavaStudioInspector = 'Under the hood';
+  static const String lavaStudioInspectorLead =
+      'Live: what the engine is doing for the frame on screen.';
+  static const String lavaStudioRecipe = 'Frame recipe';
+  static const String lavaStudioFromKey = 'from key frame';
+  static const String lavaStudioFromAtlas = 'from atlas';
+  static const String lavaStudioFree = 'transparent (free)';
+  static const String lavaStudioTiles = 'tiles';
+  static const String lavaStudioBlit = 'copy';
+  static const String lavaStudioBlits = 'copies';
+  static const String lavaStudioDrawCall = 'draw call';
+  static const String lavaStudioDrawCalls = 'draw calls';
+  static const String lavaStudioAtlas = 'Tile atlas';
+  static const String lavaStudioAtlasLead =
+      'Highlighted: the blocks this frame reads. Identical tiles are stored once for the whole loop.';
+  static const String lavaStudioKeyFrame = 'Key frame';
+  static const String lavaStudioFaceOff = 'Same animation, other containers';
+  static const String lavaStudioFaceOffNote =
+      'Measured on these exact frames. Video is left out: it has no portable alpha channel.';
+  static const String lavaStudioFormatLava = 'Lava (AVIF)';
+  static const String lavaStudioFormatWebp = 'Animated WebP';
+  static const String lavaStudioFormatGif = 'GIF';
+  static const String lavaStudioFormatApng = 'APNG';
+  static const String lavaStudioFormatPng = 'PNG sequence';
+  static const String lavaStudioRuntime = 'Runtime';
+  static const String lavaStudioDecoded = 'Decoded';
+  static const String lavaStudioVariant = 'Variant';
+  static const String lavaStudioTexture = 'Atlas texture';
+  static const String lavaStudioCache = 'Composed frames cached';
+  static const String lavaStudioDownload = 'Downloaded';
+  static const String lavaStudioVariantHd = 'Large preview · 360×324';
+  static const String lavaStudioVariantStd = 'Standard · 180×162';
+  static const String lavaStudioLoading = 'loading…';
+  static const String lavaStudioBadgeTile = 'OpenLava format';
+  static const String lavaStudioBadgeAlpha = '8-bit alpha';
+  static const String lavaStudioBadgePerspective = 'Tile dedup';
+  static const String lavaStudioBadgeZeroAlloc = 'AVIF 4:4:4 + WebP';
+  static const String lavaStudioBadgeWasm = 'Web · iOS · Android · Desktop';
   static const String lavaStudioBtnGithub = 'View on GitHub';
   static const String lavaStudioBtnPubDev = 'Pub.dev Publisher';
   static const String lavaStudioFrame = 'FRAME';
   static const String lavaStudioStatus = 'STATUS';
-  static const String lavaStudioFps = '30 FPS';
+  static const String lavaStudioFps = 'FPS';
   static const String lavaStudioAirbnbNav = 'Airbnb-Inspired Category Showcase';
   static const String lavaModelMacintosh = 'Macintosh 128K';
   static const String lavaModelTree = 'Sunflower';

@@ -337,6 +337,7 @@ void main() {
         AppStrings.lavaModelSenna,
         AppStrings.lavaModelChristmasTree,
       ]) {
+        await tester.ensureVisible(find.text(modelName).first);
         await tester.tap(find.text(modelName).first);
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 50));
@@ -344,6 +345,7 @@ void main() {
       }
 
       // Tap speed selector
+      await tester.ensureVisible(find.text('2.0x'));
       await tester.tap(find.text('2.0x'));
       await tester.pump();
 
@@ -359,7 +361,51 @@ void main() {
       // Tap reset
       await tester.tap(find.byIcon(Icons.replay));
       await tester.pump();
+
+      // The X-ray toggle flips on and brings its legend with it
+      await tester.ensureVisible(find.text(AppStrings.lavaStudioXray));
+      expect(find.text(AppStrings.lavaStudioFromAtlas), findsNothing);
+      await tester.tap(find.text(AppStrings.lavaStudioXray));
+      await tester.pump(const Duration(milliseconds: 250));
+      expect(find.text(AppStrings.lavaStudioFromAtlas), findsOneWidget);
+      expect(tester.takeException(), isNull);
     });
+
+    for (final size in const [
+      Size(1600, 1000),
+      Size(900, 700),
+      Size(360, 740),
+    ]) {
+      testWidgets(
+        'LavaStudioContent lays out without overflow at ${size.width.round()}x${size.height.round()}',
+        (tester) async {
+          tester.view.physicalSize = size;
+          tester.view.devicePixelRatio = 1.0;
+          addTearDown(tester.view.reset);
+
+          await tester.pumpWidget(
+            MaterialApp(
+              localizationsDelegates: [AppLocalizationsDelegate()],
+              home: Scaffold(body: LavaStudioContent()),
+            ),
+          );
+          await tester.pump(const Duration(milliseconds: 100));
+
+          expect(tester.takeException(), isNull);
+          expect(find.text(AppStrings.lavaStudioInspector), findsOneWidget);
+          expect(find.text(AppStrings.lavaStudioFaceOff), findsOneWidget);
+          expect(find.text(AppStrings.lavaStudioFormatLava), findsOneWidget);
+          // Reading text never drops under 12 logical pixels.
+          for (final text in tester.widgetList<Text>(find.byType(Text))) {
+            final fontSize = text.style?.fontSize;
+            if (fontSize != null &&
+                text.style?.fontFamily?.contains('SpaceMono') == true) {
+              expect(fontSize, greaterThanOrEqualTo(12.0), reason: text.data);
+            }
+          }
+        },
+      );
+    }
 
     testWidgets('LavaStudioContent preview plays the decoded OpenLava bundle', (
       tester,
