@@ -109,14 +109,14 @@ def key_backdrop(img, thr=34, matte=70.0, shadow_min=None, neutral_pockets=None,
     fixed[keep] = np.clip((fixed[keep] - (1.0 - a[keep, None]) * bgcol) / a[keep, None], 0, 255)
     rgb[ring] = fixed
     if bgcol[1] < 90 and bgcol[0] > 180 and bgcol[2] > 180:
-        # magenta chroma key: nothing in the subject is magenta, so enclosed pockets go too and
-        # the outline loses whatever red + blue it has in excess of green
-        pocket = dist < thr * 1.6
-        alpha[pocket] = 0.0
-        edge = grow(bg | pocket, 12)
-        spill = np.clip(np.minimum(rgb[..., 0], rgb[..., 2]) - rgb[..., 1], 0, None) * edge
-        rgb[..., 0] -= spill
-        rgb[..., 2] -= spill
+        # Magenta chroma key, by hue rather than by distance: nothing in the subject is magenta, a
+        # shadow cast on the backdrop is just darker magenta, and enclosed pockets need no path to
+        # the border. "Magenta-ness" is how far red and blue both rise above green.
+        magenta = np.clip(np.minimum(rgb[..., 0], rgb[..., 2]) - rgb[..., 1], 0, None)
+        alpha = 1.0 - smoothstep(18.0, 62.0, magenta)
+        # despill: what is left of the outline loses its red + blue excess over green
+        rgb[..., 0] -= magenta
+        rgb[..., 2] -= magenta
     alpha *= largest_component(alpha > 0.5) | (grow(largest_component(alpha > 0.5), 4) & (alpha > 0))
     return np.dstack([rgb, alpha * 255.0])
 
@@ -494,50 +494,74 @@ class F1Car(Relit):
 
 class F1Front(Relit):
     """Formula 1 car head-on with the driver in the cockpit; the only thing that moves is the
-    steering. `lit` is the still with the front wheels straight, `unlit` a pixel-aligned edit with
-    them "steered slightly to the left of the picture, about 12 degrees, nothing else changes".
+    steering, and it is geometry, not a second still (an image model asked to steer the wheels
+    invents rims, sidewall lines and new brake ducts, and gives a different angle each time).
 
-    The still is symmetric about x = 511.5, so the steer to the right is the same edit mirrored -
-    asking the image model for the other side gives a different angle and different brake ducts.
-    Only what the edit changed inside the two wheel boxes is swapped in, through a soft mask, so
-    the body, the helmet and the background never flicker.
+    The tyres are steered with light only (see `steered`): their outline stays where it is, the
+    highlight of the tread slides towards the steer and the far side darkens. Warping the
+    silhouette was tried and dropped - a front tyre is partly covered by the brake-duct fairing
+    and the wing endplate, and the warped edge never stays in register with them.
+
+    Ask for the still on a magenta backdrop (the helmet is white) with "plain smooth matte black
+    slicks: no rim visible, no lettering, no white lines" and a helmet "small compared with the
+    car, about one eighth of its width, sitting low behind the halo" - image models draw toy
+    drivers with huge heads otherwise.
 
     Five distinct frames in the whole loop (straight, half and full lock each way): the diff atlas
     holds a handful of wheel tiles and the bundle is tiny."""
 
     n_frames, fps = 72, 24                     # a slow three-second weave
-    fill, base_y, width_fill = 0.86, 0.93, 0.86
-    key = dict(thr=30, matte=70.0, shadow_min=150, neutral_pockets=132, pocket_min_width=5, pocket_chroma=90,
-               protect=(420, 225, 610, 440), shadow_floor=((0.62, 92, 80), (0.885, 58, 60)))
+    fill, base_y, width_fill = 0.86, 0.93, 0.88
+    key = dict(thr=60, matte=110.0)
 
-    AXIS_X = 511.5
-    WHEELS = ((55, 470, 340, 860), (684, 470, 969, 860))   # front wheel boxes: left, and its mirror image
+    TYRES = ((40, 500, 245, 850), (779, 500, 984, 850))    # front tyre boxes in source pixels
+    SLIDE = 0.13                               # how far the tread highlight travels, in tyre widths
+    SHADE = 0.30                               # how much the far side of the tread darkens
     #          start  straight->left   hold left   back       straight    ->right     hold right  back
     TIMELINE = ((0.00, 0), (0.12, 1), (0.16, 2), (0.38, 1), (0.42, 0), (0.62, 3), (0.66, 4), (0.88, 3), (0.92, 0))
 
     def prepare(self):
-        straight, left = self.lit, self.unlit
-        boxes = np.zeros((self.h, self.w), bool)
-        for x0, y0, x1, y1 in self.WHEELS:
+        car = self.lit
+        rgb, alpha = car[..., :3], car[..., 3]
+        rubber = (rgb.max(axis=2) < 105) & (rgb.max(axis=2) - rgb.min(axis=2) < 26) & (alpha > 200)
+        self.tyres = []
+        for x0, y0, x1, y1 in self.TYRES:
             (ax, ay), (bx, by) = self.at(x0, y0), self.at(x1, y1)
-            boxes[int(ay):int(by), int(ax):int(bx)] = True
-        differs = (np.abs(straight - left).max(axis=2) > 26) & boxes
-        mask = blur(fill_holes(grow(differs, max(2, int(4 * self.px)))).astype(np.float32) * 255.0, 2.0 * self.px)[..., None] / 255.0
+            box = np.zeros((self.h, self.w), bool)
+            box[int(ay):int(by), int(ax):int(bx)] = True
+            mask = fill_holes(largest_component(rubber & box)) & box
+            ys, xs = np.where(mask)
+            self.tyres.append((mask, xs.min(), xs.max() + 1, ys.min(), ys.max() + 1))
+        self.states = [car] + [self.steered(d * a) for d in (-1.0, 1.0) for a in (0.5, 1.0)]
 
-        # mirror about the car's centre line: x' = 2 * axis - x
-        axis = self.at(self.AXIS_X, 0)[0]
-        idx = np.clip(np.round(2.0 * axis - np.arange(self.w)).astype(int), 0, self.w - 1)
-        right, mask_r = left[:, idx], mask[:, idx]
+    def steered(self, amount):
+        """The car with both front tyres steered by `amount` of full lock (< 0: to the left).
 
-        def mix(other, m, amount):
-            k = m * amount
-            a0, a1 = straight[..., 3:4] / 255.0, other[..., 3:4] / 255.0
-            alpha = a0 * (1.0 - k) + a1 * k
-            rgb = (straight[..., :3] * a0 * (1.0 - k) + other[..., :3] * a1 * k) / np.maximum(alpha, 1e-4)
-            return np.dstack([rgb, alpha * 255.0])
-
-        self.states = [straight, mix(left, mask, 0.5), mix(left, mask, 1.0),
-                       mix(right, mask_r, 0.5), mix(right, mask_r, 1.0)]
+        The outline of the tyres does not move. A front tyre is partly covered by the brake-duct
+        fairing and the wing endplate, and any warp of its silhouette drifts out of register with
+        what covers it. What the eye reads as a wheel turning a few degrees is the light on the
+        tread: the soft highlight slides towards the steer and the far side falls into shade. So
+        only the colour inside the tyre mask changes - alpha is untouched, nothing can tear."""
+        car = self.lit
+        out = car.copy()
+        for mask, x0, x1, y0, y1 in self.tyres:
+            width = x1 - x0
+            slide = self.SLIDE * width * amount
+            cols = np.arange(width, dtype=np.float32)
+            span = cols / max(1.0, width - 1)
+            away = span if amount < 0 else 1.0 - span
+            shade = 1.0 - self.SHADE * abs(amount) * smoothstep(0.30, 1.0, away)
+            for row in range(y0, y1):
+                inside = np.where(mask[row, x0:x1])[0]
+                if len(inside) < 4:
+                    continue
+                lo, hi = inside[0], inside[-1]
+                src = np.clip(cols[lo:hi + 1] - slide, lo, hi)            # sample inside this row of rubber
+                for c in range(3):
+                    moved = np.interp(src, cols, car[row, x0:x1, c]) * shade[lo:hi + 1]
+                    keep = mask[row, x0 + lo:x0 + hi + 1]
+                    out[row, x0 + lo:x0 + hi + 1, c] = np.where(keep, moved, out[row, x0 + lo:x0 + hi + 1, c])
+        return out
 
     def frame(self, t):
         state = 0
