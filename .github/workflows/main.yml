@@ -23,7 +23,9 @@ jobs:
         run: flutter pub get
 
       - name: Verify formatting
-        run: dart format --set-exit-if-changed .
+        # On failure, show what the formatter of this SDK wants: the stable
+        # channel here can be newer than the SDK pinned on a developer machine.
+        run: dart format --set-exit-if-changed . || (git --no-pager diff; exit 1)
 
       - name: Analyze project
         run: flutter analyze
