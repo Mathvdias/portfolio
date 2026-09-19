@@ -220,32 +220,47 @@ class _LavaStudioContentState extends State<LavaStudioContent>
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           child: LayoutBuilder(
             builder: (context, box) {
-              // Seven equal tabs when they fit; a scrolling strip otherwise.
-              final count = LavaDemoType.values.length;
-              final fits = box.maxWidth / count >= 74;
-              final tabWidth = fits ? box.maxWidth / count : 104.0;
-              final tabs = Row(
+              // One row when every label fits unbroken; otherwise two rows
+              // (every icon stays visible, which a scrolling strip does not
+              // guarantee); a scrolling strip only on very narrow screens.
+              const minTab = 88.0;
+              final types = LavaDemoType.values;
+              final rows = box.maxWidth / types.length >= minTab ? 1 : 2;
+              final perRow = (types.length / rows).ceil();
+              final fits = box.maxWidth / perRow >= minTab;
+              final tabWidth = fits ? box.maxWidth / perRow : 104.0;
+
+              Widget tab(LavaDemoType type) => SizedBox(
+                width: tabWidth,
+                child: _CategoryTab(
+                  label: _names[type]!,
+                  demoType: type,
+                  isSelected: _selectedType == type,
+                  iconSize: math.min(m.tabIconSize, tabWidth - 28),
+                  metrics: m,
+                  onTap: () => _selectModel(type),
+                ),
+              );
+
+              if (!fits) {
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(children: [for (final type in types) tab(type)]),
+                );
+              }
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  for (final type in LavaDemoType.values)
-                    SizedBox(
-                      width: tabWidth,
-                      child: _CategoryTab(
-                        label: _names[type]!,
-                        demoType: type,
-                        isSelected: _selectedType == type,
-                        iconSize: math.min(m.tabIconSize, tabWidth - 28),
-                        metrics: m,
-                        onTap: () => _selectModel(type),
-                      ),
+                  for (var start = 0; start < types.length; start += perRow)
+                    Row(
+                      children: [
+                        for (final type in types.skip(start).take(perRow))
+                          tab(type),
+                      ],
                     ),
                 ],
               );
-              return fits
-                  ? tabs
-                  : SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: tabs,
-                  );
             },
           ),
         ),
