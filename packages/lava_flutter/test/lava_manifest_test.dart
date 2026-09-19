@@ -118,5 +118,50 @@ void main() {
       expect(manifest.images, ['image_1.avif', 'image_2.avif']);
       expect(manifest.rawFrames.length, 2);
     });
+
+    test('parses and round-trips fallbackUrl entries', () {
+      final manifest = LavaManifest.fromJson({
+        'width': 180,
+        'height': 162,
+        'images': [
+          {'url': 'image_1.avif', 'fallbackUrl': 'image_1.webp'},
+          {'url': 'image_2.png'},
+        ],
+        'frames': [
+          {'type': 'key', 'imageIndex': 0},
+        ],
+      });
+
+      expect(manifest.images, ['image_1.avif', 'image_2.png']);
+      expect(manifest.imageFallbacks, ['image_1.webp', null]);
+      expect(manifest.toJson()['images'], [
+        {'url': 'image_1.avif', 'fallbackUrl': 'image_1.webp'},
+        {'url': 'image_2.png'},
+      ]);
+    });
+
+    test('copyWith keeps the OpenLava fields it does not override', () {
+      final manifest = LavaManifest.fromJson({
+        'width': 180,
+        'height': 162,
+        'cellSize': 32,
+        'diffImageSize': 2048,
+        'alpha': false,
+        'images': [
+          {'url': 'image_1.avif', 'fallbackUrl': 'image_1.webp'},
+        ],
+        'frames': [
+          {'type': 'key', 'imageIndex': 0},
+        ],
+      }).copyWith(frameRate: 24);
+
+      expect(manifest.frameRate, 24);
+      expect(manifest.cellSize, 32);
+      expect(manifest.diffImageSize, 2048);
+      expect(manifest.alpha, isFalse);
+      expect(manifest.images, ['image_1.avif']);
+      expect(manifest.imageFallbacks, ['image_1.webp']);
+      expect(manifest.rawFrames, hasLength(1));
+    });
   });
 }

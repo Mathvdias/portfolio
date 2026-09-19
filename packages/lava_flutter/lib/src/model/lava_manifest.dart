@@ -15,6 +15,7 @@ class LavaManifest {
     this.diffImageSize,
     this.alpha = true,
     this.images = const [],
+    this.imageFallbacks = const [],
     this.rawFrames = const [],
   }) : loopEndFrame = loopEndFrame ?? (totalFrames - 1);
 
@@ -59,6 +60,11 @@ class LavaManifest {
 
   /// Relative URLs or identifiers of atlas images (OpenLava specification).
   final List<String> images;
+
+  /// Alternative file per entry of [images] (`fallbackUrl` in the manifest),
+  /// used when the platform cannot decode the primary one (an AVIF atlas on a
+  /// system without an AV1 decoder). Empty or `null` entries mean no fallback.
+  final List<String?> imageFallbacks;
 
   /// Raw frames metadata list (OpenLava specification).
   final List<dynamic> rawFrames;
@@ -105,12 +111,15 @@ class LavaManifest {
         (hasOpenLavaFrames ? rawFramesList.length : (columns * rows));
 
     final imagesList = <String>[];
+    final fallbackList = <String?>[];
     if (json['images'] is List) {
       for (final item in json['images'] as List) {
         if (item is Map && item['url'] is String) {
           imagesList.add(item['url'] as String);
+          fallbackList.add(item['fallbackUrl'] as String?);
         } else if (item is String) {
           imagesList.add(item);
+          fallbackList.add(null);
         }
       }
     }
@@ -131,6 +140,7 @@ class LavaManifest {
       diffImageSize: (json['diffImageSize'] as num?)?.toInt(),
       alpha: json['alpha'] as bool? ?? true,
       images: imagesList,
+      imageFallbacks: fallbackList,
       rawFrames: rawFramesList,
     );
   }
@@ -150,7 +160,15 @@ class LavaManifest {
     if (cellSize != null) 'cellSize': cellSize,
     if (diffImageSize != null) 'diffImageSize': diffImageSize,
     'alpha': alpha,
-    if (images.isNotEmpty) 'images': images.map((u) => {'url': u}).toList(),
+    if (images.isNotEmpty)
+      'images': [
+        for (var i = 0; i < images.length; i++)
+          {
+            'url': images[i],
+            if (i < imageFallbacks.length && imageFallbacks[i] != null)
+              'fallbackUrl': imageFallbacks[i],
+          },
+      ],
   };
 
   LavaManifest copyWith({
@@ -176,6 +194,12 @@ class LavaManifest {
       loop: loop ?? this.loop,
       loopStartFrame: loopStartFrame ?? this.loopStartFrame,
       loopEndFrame: loopEndFrame ?? this.loopEndFrame,
+      cellSize: cellSize,
+      diffImageSize: diffImageSize,
+      alpha: alpha,
+      images: images,
+      imageFallbacks: imageFallbacks,
+      rawFrames: rawFrames,
     );
   }
 
@@ -193,7 +217,23 @@ class LavaManifest {
           totalFrames == other.totalFrames &&
           loop == other.loop &&
           loopStartFrame == other.loopStartFrame &&
-          loopEndFrame == other.loopEndFrame;
+          loopEndFrame == other.loopEndFrame &&
+          cellSize == other.cellSize &&
+          diffImageSize == other.diffImageSize &&
+          alpha == other.alpha &&
+          _sameList(images, other.images) &&
+          _sameList(imageFallbacks, other.imageFallbacks) &&
+          // Frame lists are parsed JSON: two manifests share them or differ.
+          (identical(rawFrames, other.rawFrames) ||
+              (rawFrames.isEmpty && other.rawFrames.isEmpty));
+
+  static bool _sameList(List<Object?> a, List<Object?> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
 
   @override
   int get hashCode => Object.hash(
