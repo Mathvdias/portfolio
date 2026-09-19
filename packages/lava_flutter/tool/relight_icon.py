@@ -21,7 +21,7 @@ import sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
-from animate_icon import H, W, components, fill_holes, largest_component, yaw_rock
+from animate_icon import H, SCALE, W, components, fill_holes, largest_component, yaw_rock
 
 SS = 4
 TAU = 2.0 * math.pi
@@ -167,6 +167,7 @@ class Relit:
 class Campfire(Relit):
     key = dict(thr=34, matte=70.0, shadow_min=150)
     flame_scale = 1.30
+    LIGHT_LEVELS = 8
 
     def prepare(self):
         lit = self.lit
@@ -206,10 +207,12 @@ class Campfire(Relit):
 
     def frame(self, t):
         f = self.flicker(t)
-        # the flicker travels outwards: surfaces far from the flame react a touch later
-        wave = f + 0.10 * np.sin(TAU * (3 * t) - 9.0 * self.radius)
+        # Tile economy: the light pass only takes LIGHT_LEVELS distinct intensities, so every tile
+        # the flame does not touch repeats across the loop and is stored once per level instead of
+        # once per frame (the steps are ~4 % of brightness: invisible in motion).
+        level = round((f - 0.70) / 0.60 * (self.LIGHT_LEVELS - 1)) / (self.LIGHT_LEVELS - 1) * 0.60 + 0.70
         out = self.base.copy()
-        out[..., :3] = np.clip(out[..., :3] + self.light * wave[..., None] * 1.08, 0, 255)
+        out[..., :3] = np.clip(out[..., :3] + self.light * level * 1.08, 0, 255)
 
         # flame: rows bend more the higher they are, the whole tongue stretches and breathes
         rows = np.arange(self.h, dtype=np.float32)
@@ -229,6 +232,7 @@ class Campfire(Relit):
 
         energy = blur(layer[..., 3], 0.030 * self.w)[..., None] * np.array([1.0, 0.52, 0.12], np.float32)
         energy += blur(layer[..., 3], 0.085 * self.w)[..., None] * np.array([0.85, 0.36, 0.06], np.float32)
+        energy = np.where(energy.max(axis=2, keepdims=True) < 10.0, 0.0, energy)   # no invisible tails: they dirty far tiles
         out = add_glow(out, energy, 0.33 * f)
 
         dots = Image.new("L", (self.w, self.h), 0)
@@ -241,7 +245,7 @@ class Campfire(Relit):
             draw.ellipse([x - rad, y - rad, x + rad, y + rad], fill=255)
         d = np.array(dots).astype(np.float32)
         spark = (d + 1.6 * blur(d, 0.012 * self.w))[..., None] * np.array([1.0, 0.72, 0.30], np.float32)
-        return add_glow(out, spark, 1.0), 0.0, 0.85 + 0.15 * (2.0 - f)
+        return add_glow(out, spark, 1.0), 0.0, 0.85 + 0.15 * (2.0 - level)   # quantised like the light
 
 
 class ChristmasTree(Relit):
@@ -272,26 +276,35 @@ class ChristmasTree(Relit):
         self.rest = gain - (np.sum(self.pools, axis=0) if self.pools else 0.0)
         self.base = self.unlit.copy()
         rng = np.random.default_rng(11)
-        self.flakes = rng.uniform(0.0, 1.0, (10, 4))
+        self.flakes = rng.uniform(0.0, 1.0, (7, 4))
         print(f"christmastree: {len(self.pools)} light pools (star = #{self.star})")
+
+    # Tile economy (see Campfire.LIGHT_LEVELS): a bulb is off, half way or on - which is also how a
+    # real blinker behaves - and the ambient share of the light is constant. The pseudo-3D rock makes
+    # every tile of the tree unique per frame, but it is what makes the icon feel alive and it only
+    # costs ~77 KB (307 -> 384 KB as AVIF), so it stays.
+    BLINK_LEVELS = (0.04, 0.70, 1.30)
+    ROCK_DEGREES = 9.0
 
     def power(self, t):
         i = np.arange(len(self.pools))
-        p = 0.04 + 1.26 * smoothstep(-0.15, 0.65, np.sin(TAU * (2.0 * t + i * 0.29)))
+        ramp = smoothstep(-0.05, 0.35, np.sin(TAU * (2.0 * t + i * 0.29)))
+        p = np.array(self.BLINK_LEVELS)[np.round(ramp * (len(self.BLINK_LEVELS) - 1)).astype(int)]
         if len(p):
-            p[self.star] = 0.80 + 0.20 * math.sin(TAU * 2 * t)
+            p[self.star] = (0.75, 0.90, 1.05)[int(round(1.0 + math.sin(TAU * 2 * t)))]
         return p
 
     def frame(self, t):
         p = self.power(t)
-        light = self.rest * (float(p.mean()) if len(p) else 1.0)
+        light = self.rest * 0.65
         for pool, k in zip(self.pools, p):
             light = light + pool * k
         out = self.base.copy()
         out[..., :3] = np.clip(out[..., :3] + light, 0, 255)
         hot = np.clip(light - 70.0, 0, None)
-        out = add_glow(out, blur(hot, 0.012 * self.w) * 0.9 + blur(hot, 0.04 * self.w) * 0.9, 1.0)
-        return out, 9.0 * math.sin(TAU * t), 1.0
+        glow = blur(hot, 0.012 * self.w) * 0.9 + blur(hot, 0.04 * self.w) * 0.9
+        out = add_glow(out, np.where(glow.max(axis=2, keepdims=True) < 10.0, 0.0, glow), 1.0)
+        return out, self.ROCK_DEGREES * math.sin(TAU * t), 1.0
 
     def particles(self, canvas, t):
         cw, ch = canvas.size
@@ -303,7 +316,7 @@ class ChristmasTree(Relit):
             y = ch * (-0.02 + 0.98 * life)
             rad = ch * (0.008 + 0.006 * s2) * math.sin(math.pi * life) ** 0.5
             draw.ellipse([x - rad, y - rad, x + rad, y + rad], fill=235)
-        dots = dots.filter(ImageFilter.GaussianBlur(0.7 * SS))
+        dots = dots.filter(ImageFilter.GaussianBlur(0.7 * SS * SCALE))
         flakes = Image.new("RGBA", (cw, ch), (250, 252, 255, 0))
         flakes.putalpha(dots)
         canvas.alpha_composite(flakes)
@@ -327,7 +340,7 @@ def render(kind, lit, unlit, out_dir):
         body_w, body_h = subj.w - 2 * subj.margin, subj.h - 2 * subj.margin
         sw, shh = body_w * 0.44, body_h * 0.05
         ImageDraw.Draw(sh).ellipse([cx - sw, base - shh, cx + sw, base + shh], fill=int(95 * shadow_alpha))
-        canvas.paste(Image.new("RGBA", (cw, ch), (20, 16, 12, 255)), (0, 0), sh.filter(ImageFilter.GaussianBlur(9 * SS)))
+        canvas.paste(Image.new("RGBA", (cw, ch), (20, 16, 12, 255)), (0, 0), sh.filter(ImageFilter.GaussianBlur(9 * SS * SCALE)))
         big = Image.new("RGBA", (subj.w + 2 * pad, subj.h + 2 * pad), (0, 0, 0, 0))
         big.alpha_composite(Image.fromarray(np.clip(layer, 0, 255).astype(np.uint8)), (pad, pad))
         if yaw:

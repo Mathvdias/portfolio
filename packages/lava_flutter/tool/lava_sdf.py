@@ -9,9 +9,14 @@ flame or a fairy light actually lights the rest of the icon.
 Scenes live in sdf_scenes.py; this module only knows about distances, materials and light.
 """
 import math
+import os
+
 import numpy as np
 
-W, H = 180, 162  # OpenLava canvas (the Airbnb samples use the same size)
+# OpenLava canvas: 180x162 like the Airbnb samples; LAVA_SCALE=2 renders the 360x324 large-preview
+# variant (pixel-sized blurs scale with it).
+SCALE = int(os.environ.get("LAVA_SCALE", "1"))
+W, H = 180 * SCALE, 162 * SCALE
 
 F = np.float32
 
@@ -351,12 +356,12 @@ def render_frame(scene, t, ss=3):
     rgb = rgb.reshape(h, w, 3)
     alpha = alpha.reshape(h, w)
     if ground.any():
-        soft = np.clip(gaussian_blur(ground.reshape(h, w), 3.0 * ss), 0.0, 1.0)
+        soft = np.clip(gaussian_blur(ground.reshape(h, w), 3.0 * ss * SCALE), 0.0, 1.0)
         alpha = alpha + (1.0 - alpha) * soft * (alpha < 1.0)
     glow = glow.reshape(h, w, 3)
 
     if glow.any():
-        bloom = 0.55 * gaussian_blur(glow, 1.6 * ss) + 0.50 * gaussian_blur(glow, 5.5 * ss)
+        bloom = 0.55 * gaussian_blur(glow, 1.6 * ss * SCALE) + 0.50 * gaussian_blur(glow, 5.5 * ss * SCALE)
         bloom = np.maximum(bloom, 0.0)
         rgb += bloom
         alpha = np.maximum(alpha, np.clip(bloom.max(-1) * 1.25, 0.0, 1.0))

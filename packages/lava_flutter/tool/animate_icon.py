@@ -15,7 +15,10 @@ import sys, os, math
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
-W, H = 180, 162          # OpenLava canvas (density 2)
+# OpenLava canvas: 180x162 is the Airbnb size (density 2). LAVA_SCALE=2 renders the same icon at
+# 360x324 (density 4) for the large previews; every pixel-sized constant below scales with it.
+SCALE = int(os.environ.get("LAVA_SCALE", "1"))
+W, H = 180 * SCALE, 162 * SCALE
 SS = 4                   # supersample factor
 
 
@@ -566,16 +569,16 @@ def render(kind, cut, out_dir, n_frames=None):
         sh = Image.new("L", (cw, ch), 0)
         d = ImageDraw.Draw(sh)
         sw, shh = ow * 0.42 * sh_scale, oh * 0.06 * sh_scale
-        d.ellipse([cx - sw, base - shh + 6 * SS, cx + sw, base + shh + 6 * SS], fill=int(110 * sh_alpha))
-        sh = sh.filter(ImageFilter.GaussianBlur(10 * SS * sh_scale))
+        d.ellipse([cx - sw, base - shh + 6 * SS * SCALE, cx + sw, base + shh + 6 * SS * SCALE], fill=int(110 * sh_alpha))
+        sh = sh.filter(ImageFilter.GaussianBlur(10 * SS * SCALE * sh_scale))
         canvas.paste(Image.new("RGBA", (cw, ch), (20, 16, 12, 255)), (0, 0), sh)
         # object layer -> padded -> pseudo-3D yaw -> composite
         lay = subj.layer(t)
         big = Image.new("RGBA", (ow + 2 * pad, oh + 2 * pad), (0, 0, 0, 0))
         big.alpha_composite(lay, (pad, pad))
         big = yaw_rock(big, yaw)
-        px = cx + dx * SS - big.width / 2
-        py = base + dy * SS - (pad + oh)
+        px = cx + dx * SS * SCALE - big.width / 2
+        py = base + dy * SS * SCALE - (pad + oh)
         canvas.alpha_composite(big, (int(round(px)), int(round(py))))
         frame = canvas.resize((W, H), Image.LANCZOS)
         p = os.path.join(out_dir, f"frame_{i:03d}.png")
