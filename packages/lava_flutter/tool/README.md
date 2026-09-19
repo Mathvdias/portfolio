@@ -143,17 +143,20 @@ python3 tool/openlava_encode.py assets/lava/christmastree --avif 65 --fallback-w
   the string and the star breathes. Snow falls in front; the tree itself stands still so its tiles
   repeat (`ROCK_DEGREES` brings the pseudo-3D rock back at the cost of a much larger atlas).
 
-- `F1Car`: the pair is DRS closed / DRS open (an edit of the same still: "the upper flap lifted
-  like an open letterbox lid, a big gap with the background visible through it" - a realistic slot
-  is a dark hairline on a dark wing and does not read at icon size). The loop tells one story: the
-  flap snaps open in two frames, titanium sparks pour out from under the diffuser and trail behind
-  the car (drawn under it, so the rear wheel hides where they are born), the flap closes and they
-  die down. The body has two states (a one-pixel engine vibration), the wheel glints four phases
-  (anticlockwise: the car drives to the lower left) and the flap four positions, so the car's
-  tiles repeat - 414 atlas tiles instead of 1442. Its contact shadow is the car's own silhouette,
-  squashed and blurred; `neutral_pockets` keys out the pale backdrop seen through the wings;
-  `offset` / `width_fill` leave room behind the car for the sparks. No logos or sponsor decals were
-  asked for in the still.
+- `F1Car`: the pair is DRS closed / DRS open. **Pick the camera for the part that moves**: from
+  the front or from above the flap is a thin strip and an open DRS is a hairline (and an image
+  model asked to exaggerate it lifts a whole second wing, endplates and all). From the TV chase
+  camera, at wing height, the flap is a tall band and when it lies flat the livery shows through
+  the gap - readable at 44 px. Ask for the closed still with "the rear wing clearly built from two
+  stacked elements, a thin slot line between them", then for the edit "the upper flap has rotated
+  flat, pivoting about its top edge: a thin blade at the top, and through the gap you see the
+  engine cover ahead of the wing". The in-between positions squash the closed flap against its top
+  edge (the pivot), column by column, over the open still. One story per loop: the flap opens, the
+  car gains speed, sparks pour out from under the diffuser towards the camera, the flap closes and
+  they die down; the rain light blinks and streaks rush along rays from the vanishing point. Two
+  body states, four flap positions and two lamp states keep the car's tiles repeating: 429 atlas
+  tiles instead of 1230. `shadow_floor` keys out the baked shadow trapped between the wheels. No
+  logos or sponsor decals were asked for in the still.
 
 Backdrop: white is fine for the campfire (the smooth baked drop shadow is flood-filled away, the
 textured stones stop the fill). Anything white at the silhouette (snow) needs a chroma backdrop:
