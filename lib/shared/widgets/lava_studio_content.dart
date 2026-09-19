@@ -20,7 +20,8 @@ class LavaStudioContent extends StatefulWidget {
   State<LavaStudioContent> createState() => _LavaStudioContentState();
 }
 
-class _LavaStudioContentState extends State<LavaStudioContent> {
+class _LavaStudioContentState extends State<LavaStudioContent>
+    with SingleTickerProviderStateMixin {
   late final LavaController _controller;
   LavaDemoType _selectedType = LavaDemoType.macintosh;
   double _speed = 1.0;
@@ -33,6 +34,7 @@ class _LavaStudioContentState extends State<LavaStudioContent> {
       fps: 30,
       autoPlay: false,
       loop: true,
+      vsync: this,
     );
   }
 
@@ -47,6 +49,16 @@ class _LavaStudioContentState extends State<LavaStudioContent> {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     }
+  }
+
+  void _selectModel(LavaDemoType type) {
+    if (_selectedType == type) return;
+    setState(() {
+      _selectedType = type;
+      // Frame count / fps come from the bundle manifest: LavaIcon reconfigures
+      // the shared controller as soon as the new bundle is decoded.
+      _controller.reset();
+    });
   }
 
   @override
@@ -108,47 +120,72 @@ class _LavaStudioContentState extends State<LavaStudioContent> {
 
           // Airbnb-Style Category Navigation Bar
           Center(
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSizes.spacingLg,
-                vertical: AppSizes.spacingSm,
-              ),
-              decoration: BoxDecoration(
-                color: AppTheme.surface.withValues(alpha: 0.6),
-                borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-                border: Border.all(color: AppTheme.surface0, width: 1.0),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _AirbnbCategoryTab(
-                    label: AppStrings.lavaModelMacintosh,
-                    demoType: LavaDemoType.macintosh,
-                    isSelected: _selectedType == LavaDemoType.macintosh,
-                    onTap: () {
-                      if (_selectedType != LavaDemoType.macintosh) {
-                        setState(() {
-                          _selectedType = LavaDemoType.macintosh;
-                          _controller.reset();
-                        });
-                      }
-                    },
-                  ),
-                  const SizedBox(width: AppSizes.spacingXl),
-                  _AirbnbCategoryTab(
-                    label: AppStrings.lavaModelTree,
-                    demoType: LavaDemoType.tree,
-                    isSelected: _selectedType == LavaDemoType.tree,
-                    onTap: () {
-                      if (_selectedType != LavaDemoType.tree) {
-                        setState(() {
-                          _selectedType = LavaDemoType.tree;
-                          _controller.reset();
-                        });
-                      }
-                    },
-                  ),
-                ],
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSizes.spacingLg,
+                  vertical: AppSizes.spacingSm,
+                ),
+                decoration: BoxDecoration(
+                  color: AppTheme.surface.withValues(alpha: 0.6),
+                  borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+                  border: Border.all(color: AppTheme.surface0, width: 1.0),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _AirbnbCategoryTab(
+                      label: AppStrings.lavaModelMacintosh,
+                      demoType: LavaDemoType.macintosh,
+                      isSelected: _selectedType == LavaDemoType.macintosh,
+                      onTap: () => _selectModel(LavaDemoType.macintosh),
+                    ),
+                    const SizedBox(width: AppSizes.spacingLg),
+                    _AirbnbCategoryTab(
+                      label: AppStrings.lavaModelTree,
+                      demoType: LavaDemoType.sunflower,
+                      isSelected: _selectedType == LavaDemoType.sunflower,
+                      onTap: () => _selectModel(LavaDemoType.sunflower),
+                    ),
+                    const SizedBox(width: AppSizes.spacingLg),
+                    _AirbnbCategoryTab(
+                      label: AppStrings.lavaModelLavaLamp,
+                      demoType: LavaDemoType.lavaLamp,
+                      isSelected:
+                          _selectedType == LavaDemoType.lavaLamp,
+                      onTap: () => _selectModel(LavaDemoType.lavaLamp),
+                    ),
+                    const SizedBox(width: AppSizes.spacingLg),
+                    _AirbnbCategoryTab(
+                      label: AppStrings.lavaModelCampfire,
+                      demoType: LavaDemoType.campfire,
+                      isSelected: _selectedType == LavaDemoType.campfire,
+                      onTap: () => _selectModel(LavaDemoType.campfire),
+                    ),
+                    const SizedBox(width: AppSizes.spacingLg),
+                    _AirbnbCategoryTab(
+                      label: AppStrings.lavaModelRocket,
+                      demoType: LavaDemoType.rocket,
+                      isSelected: _selectedType == LavaDemoType.rocket,
+                      onTap: () => _selectModel(LavaDemoType.rocket),
+                    ),
+                    const SizedBox(width: AppSizes.spacingLg),
+                    _AirbnbCategoryTab(
+                      label: AppStrings.lavaModelSenna,
+                      demoType: LavaDemoType.senna,
+                      isSelected: _selectedType == LavaDemoType.senna,
+                      onTap: () => _selectModel(LavaDemoType.senna),
+                    ),
+                    const SizedBox(width: AppSizes.spacingLg),
+                    _AirbnbCategoryTab(
+                      label: AppStrings.lavaModelChristmasTree,
+                      demoType: LavaDemoType.christmasTree,
+                      isSelected: _selectedType == LavaDemoType.christmasTree,
+                      onTap: () => _selectModel(LavaDemoType.christmasTree),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -179,7 +216,6 @@ class _LavaStudioContentState extends State<LavaStudioContent> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   LavaIcon.demo(
-                    key: ValueKey(_selectedType),
                     demoType: _selectedType,
                     controller: _controller,
                     size: 140,
@@ -187,9 +223,16 @@ class _LavaStudioContentState extends State<LavaStudioContent> {
                   ),
                   const SizedBox(height: AppSizes.spacingMd),
                   Text(
-                    _selectedType == LavaDemoType.macintosh
-                        ? AppStrings.lavaModelMacintosh
-                        : AppStrings.lavaModelTree,
+                    switch (_selectedType) {
+                      LavaDemoType.macintosh => AppStrings.lavaModelMacintosh,
+                      LavaDemoType.sunflower => AppStrings.lavaModelTree,
+                      LavaDemoType.lavaLamp => AppStrings.lavaModelLavaLamp,
+                      LavaDemoType.campfire => AppStrings.lavaModelCampfire,
+                      LavaDemoType.rocket => AppStrings.lavaModelRocket,
+                      LavaDemoType.senna => AppStrings.lavaModelSenna,
+                      LavaDemoType.christmasTree =>
+                        AppStrings.lavaModelChristmasTree,
+                    },
                     style: GoogleFonts.spaceMono(
                       fontSize: AppSizes.fontSm,
                       fontWeight: FontWeight.bold,
@@ -198,9 +241,17 @@ class _LavaStudioContentState extends State<LavaStudioContent> {
                   ),
                   const SizedBox(height: AppSizes.spacingXxs),
                   Text(
-                    _selectedType == LavaDemoType.macintosh
-                        ? AppStrings.lavaModelMacintoshDesc
-                        : AppStrings.lavaModelTreeDesc,
+                    switch (_selectedType) {
+                      LavaDemoType.macintosh =>
+                        AppStrings.lavaModelMacintoshDesc,
+                      LavaDemoType.sunflower => AppStrings.lavaModelTreeDesc,
+                      LavaDemoType.lavaLamp => AppStrings.lavaModelLavaLampDesc,
+                      LavaDemoType.campfire => AppStrings.lavaModelCampfireDesc,
+                      LavaDemoType.rocket => AppStrings.lavaModelRocketDesc,
+                      LavaDemoType.senna => AppStrings.lavaModelSennaDesc,
+                      LavaDemoType.christmasTree =>
+                        AppStrings.lavaModelChristmasTreeDesc,
+                    },
                     textAlign: TextAlign.center,
                     style: GoogleFonts.spaceMono(
                       fontSize: AppSizes.fontXs,

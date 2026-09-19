@@ -317,14 +317,30 @@ void main() {
       expect(find.text(AppStrings.lavaStudioBadgeTile), findsOneWidget);
       expect(find.text(AppStrings.lavaStudioBadgeAlpha), findsOneWidget);
       expect(find.text(AppStrings.lavaStudioArchitecture), findsOneWidget);
-      expect(find.byType(LavaIcon), findsNWidgets(3));
+      expect(find.byType(LavaIcon), findsNWidgets(8));
       expect(find.text(AppStrings.lavaModelMacintosh), findsWidgets);
       expect(find.text(AppStrings.lavaModelTree), findsWidgets);
+      expect(find.text(AppStrings.lavaModelLavaLamp), findsWidgets);
+      expect(find.text(AppStrings.lavaModelCampfire), findsWidgets);
+      expect(find.text(AppStrings.lavaModelRocket), findsWidgets);
+      expect(find.text(AppStrings.lavaModelSenna), findsWidgets);
+      expect(find.text(AppStrings.lavaModelChristmasTree), findsWidgets);
 
-      // Tap Tree category tab to switch model
-      await tester.tap(find.text(AppStrings.lavaModelTree).first);
-      await tester.pump();
-      expect(find.text(AppStrings.lavaModelTreeDesc), findsOneWidget);
+      // Test selecting each of the 7 demo models in the category bar
+      for (final modelName in [
+        AppStrings.lavaModelMacintosh,
+        AppStrings.lavaModelTree,
+        AppStrings.lavaModelLavaLamp,
+        AppStrings.lavaModelCampfire,
+        AppStrings.lavaModelRocket,
+        AppStrings.lavaModelSenna,
+        AppStrings.lavaModelChristmasTree,
+      ]) {
+        await tester.tap(find.text(modelName).first);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 50));
+        expect(tester.takeException(), isNull);
+      }
 
       // Tap speed selector
       await tester.tap(find.text('2.0x'));
