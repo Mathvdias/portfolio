@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -63,6 +64,17 @@ class _LavaStudioContentState extends State<LavaStudioContent>
 
   @override
   Widget build(BuildContext context) {
+    // The stage scales with the window: a fixed 140 px icon gets lost on a
+    // wide desktop and crowds a phone. Height caps it so the timeline below
+    // stays on screen.
+    final viewport = MediaQuery.sizeOf(context);
+    final previewSize = math.min(
+      (viewport.width * 0.17).clamp(150.0, 340.0),
+      math.max(150.0, viewport.height * 0.34),
+    );
+    final tabIconSize = (viewport.width / 26).clamp(44.0, 76.0).toDouble();
+    final stageWidth = (previewSize * 2.4).clamp(440.0, 820.0).toDouble();
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSizes.spacing3xl),
       child: Column(
@@ -139,6 +151,7 @@ class _LavaStudioContentState extends State<LavaStudioContent>
                       label: AppStrings.lavaModelMacintosh,
                       demoType: LavaDemoType.macintosh,
                       isSelected: _selectedType == LavaDemoType.macintosh,
+                      iconSize: tabIconSize,
                       onTap: () => _selectModel(LavaDemoType.macintosh),
                     ),
                     const SizedBox(width: AppSizes.spacingLg),
@@ -146,14 +159,15 @@ class _LavaStudioContentState extends State<LavaStudioContent>
                       label: AppStrings.lavaModelTree,
                       demoType: LavaDemoType.sunflower,
                       isSelected: _selectedType == LavaDemoType.sunflower,
+                      iconSize: tabIconSize,
                       onTap: () => _selectModel(LavaDemoType.sunflower),
                     ),
                     const SizedBox(width: AppSizes.spacingLg),
                     _AirbnbCategoryTab(
                       label: AppStrings.lavaModelLavaLamp,
                       demoType: LavaDemoType.lavaLamp,
-                      isSelected:
-                          _selectedType == LavaDemoType.lavaLamp,
+                      isSelected: _selectedType == LavaDemoType.lavaLamp,
+                      iconSize: tabIconSize,
                       onTap: () => _selectModel(LavaDemoType.lavaLamp),
                     ),
                     const SizedBox(width: AppSizes.spacingLg),
@@ -161,6 +175,7 @@ class _LavaStudioContentState extends State<LavaStudioContent>
                       label: AppStrings.lavaModelCampfire,
                       demoType: LavaDemoType.campfire,
                       isSelected: _selectedType == LavaDemoType.campfire,
+                      iconSize: tabIconSize,
                       onTap: () => _selectModel(LavaDemoType.campfire),
                     ),
                     const SizedBox(width: AppSizes.spacingLg),
@@ -168,6 +183,7 @@ class _LavaStudioContentState extends State<LavaStudioContent>
                       label: AppStrings.lavaModelRocket,
                       demoType: LavaDemoType.rocket,
                       isSelected: _selectedType == LavaDemoType.rocket,
+                      iconSize: tabIconSize,
                       onTap: () => _selectModel(LavaDemoType.rocket),
                     ),
                     const SizedBox(width: AppSizes.spacingLg),
@@ -175,6 +191,7 @@ class _LavaStudioContentState extends State<LavaStudioContent>
                       label: AppStrings.lavaModelSenna,
                       demoType: LavaDemoType.senna,
                       isSelected: _selectedType == LavaDemoType.senna,
+                      iconSize: tabIconSize,
                       onTap: () => _selectModel(LavaDemoType.senna),
                     ),
                     const SizedBox(width: AppSizes.spacingLg),
@@ -182,6 +199,7 @@ class _LavaStudioContentState extends State<LavaStudioContent>
                       label: AppStrings.lavaModelChristmasTree,
                       demoType: LavaDemoType.christmasTree,
                       isSelected: _selectedType == LavaDemoType.christmasTree,
+                      iconSize: tabIconSize,
                       onTap: () => _selectModel(LavaDemoType.christmasTree),
                     ),
                   ],
@@ -195,7 +213,7 @@ class _LavaStudioContentState extends State<LavaStudioContent>
           Center(
             child: Container(
               width: double.infinity,
-              constraints: const BoxConstraints(maxWidth: 440),
+              constraints: BoxConstraints(maxWidth: stageWidth),
               padding: const EdgeInsets.symmetric(
                 vertical: AppSizes.spacing3xl,
                 horizontal: AppSizes.spacingLg,
@@ -218,7 +236,7 @@ class _LavaStudioContentState extends State<LavaStudioContent>
                   LavaIcon.demo(
                     demoType: _selectedType,
                     controller: _controller,
-                    size: 140,
+                    size: previewSize,
                     interactive: true,
                   ),
                   const SizedBox(height: AppSizes.spacingMd),
@@ -276,7 +294,7 @@ class _LavaStudioContentState extends State<LavaStudioContent>
           // Timeline & Scrubbing Panel
           Center(
             child: Container(
-              constraints: const BoxConstraints(maxWidth: 420),
+              constraints: BoxConstraints(maxWidth: stageWidth - 20),
               padding: const EdgeInsets.all(AppSizes.spacingMd),
               decoration: BoxDecoration(
                 color: AppTheme.surface.withValues(alpha: 0.5),
@@ -492,12 +510,14 @@ class _AirbnbCategoryTab extends StatefulWidget {
     required this.demoType,
     required this.isSelected,
     required this.onTap,
+    required this.iconSize,
   });
 
   final String label;
   final LavaDemoType demoType;
   final bool isSelected;
   final VoidCallback onTap;
+  final double iconSize;
 
   @override
   State<_AirbnbCategoryTab> createState() => _AirbnbCategoryTabState();
@@ -534,7 +554,7 @@ class _AirbnbCategoryTabState extends State<_AirbnbCategoryTab> {
             children: [
               LavaIcon.demo(
                 demoType: widget.demoType,
-                size: 44,
+                size: widget.iconSize,
                 // Airbnb tabs: the icon comes alive when picked (or hovered).
                 autoPlay: widget.isSelected || _isHovered,
                 interactive: false,
