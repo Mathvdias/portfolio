@@ -48,9 +48,10 @@
   1.5 MB (WebP), with smaller decoded atlases.
 * Fixed: `LavaManifest.copyWith` dropped the OpenLava fields; `LavaBundle.fromAsset` /
   `fromMemory` leaked the codec when decoding failed.
-* New `LavaDemoType.f1Car`: a Formula 1 car at speed built for tile reuse (two body states, four
-  wheel phases, sparks and streaks as the only per-frame tiles): 340 tiles instead of 1540 and a
-  121 KB bundle, against 464 KB for the same frames as a GIF.
+* New `LavaDemoType.f1Car`: a Formula 1 car whose DRS flap opens, sparks trail from under the
+  diffuser while it is open, and closes again. Built for tile reuse (two body states, four wheel
+  phases, four flap positions): 414 atlas tiles instead of 1442 and a 171 KB bundle, against
+  356 KB for the same frames as a GIF.
 * New campfire, Christmas tree and helmet bundles: the flame and the fairy lights really relight
   the icon (lit / unlit light pass), the helmet is rendered in 3D and turns on its own axis.
 * `tool/` ships the Python pipeline used to key, animate, relight, render and encode new OpenLava

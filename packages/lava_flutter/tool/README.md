@@ -6,7 +6,7 @@ Airbnb samples. There are three ways to get frames, all ending in `openlava_enco
 | Route | Script | Use it when | Built with it |
 | --- | --- | --- | --- |
 | Still + motion | `animate_icon.py` | one rendered still, secondary motion is enough | Macintosh, sunflower |
-| Lit / unlit pair | `relight_icon.py` | the icon has a light source that must light the rest of it (or, with one still passed twice, particles and glints over a still: `f1car`) | campfire, Christmas tree, F1 car |
+| Lit / unlit pair | `relight_icon.py` | the icon has a light source that must light the rest of it (or a part that has two states: the F1 car's DRS flap) | campfire, Christmas tree, F1 car |
 | Procedural 3D | `sdf_scenes.py` (+ `lava_sdf.py`) | the object has to turn on its own axis | racing helmet |
 
 Sections 1-3 cover the first route; 4 and 5 the other two.
@@ -143,12 +143,17 @@ python3 tool/openlava_encode.py assets/lava/christmastree --avif 65 --fallback-w
   the string and the star breathes. Snow falls in front; the tree itself stands still so its tiles
   repeat (`ROCK_DEGREES` brings the pseudo-3D rock back at the cost of a much larger atlas).
 
-- `F1Car`: one still (passed as both images). The body has two states (a one-pixel engine
-  vibration) and the wheel glints four phases, so the car's tiles repeat every four frames; only the
-  titanium sparks from under the floor and the ground streaks are new per frame - 340 atlas tiles
-  instead of 1540. Its contact shadow is the car's own silhouette, squashed and blurred, and
-  `neutral_pockets` keys out the pale backdrop seen through the wings. No logos or sponsor decals
-  were asked for in the still.
+- `F1Car`: the pair is DRS closed / DRS open (an edit of the same still: "the upper flap lifted
+  like an open letterbox lid, a big gap with the background visible through it" - a realistic slot
+  is a dark hairline on a dark wing and does not read at icon size). The loop tells one story: the
+  flap snaps open in two frames, titanium sparks pour out from under the diffuser and trail behind
+  the car (drawn under it, so the rear wheel hides where they are born), the flap closes and they
+  die down. The body has two states (a one-pixel engine vibration), the wheel glints four phases
+  (anticlockwise: the car drives to the lower left) and the flap four positions, so the car's
+  tiles repeat - 414 atlas tiles instead of 1442. Its contact shadow is the car's own silhouette,
+  squashed and blurred; `neutral_pockets` keys out the pale backdrop seen through the wings;
+  `offset` / `width_fill` leave room behind the car for the sparks. No logos or sponsor decals were
+  asked for in the still.
 
 Backdrop: white is fine for the campfire (the smooth baked drop shadow is flood-filled away, the
 textured stones stop the fill). Anything white at the silhouette (snow) needs a chroma backdrop:
