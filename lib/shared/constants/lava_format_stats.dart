@@ -96,5 +96,15 @@ class LavaFormatStats {
       lavaWebp: 386796,
       lavaHdAvif: 745846,
     ),
+    LavaDemoType.f1Car: LavaFormatStats(
+      frames: 48,
+      pngSequence: 1745397,
+      apng: 1534138,
+      gif: 463612,
+      animatedWebp: 503044,
+      lavaAvif: 121146,
+      lavaWebp: 153188,
+      lavaHdAvif: 177959,
+    ),
   };
 }

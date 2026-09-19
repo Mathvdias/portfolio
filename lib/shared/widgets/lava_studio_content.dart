@@ -92,6 +92,7 @@ class _LavaStudioContentState extends State<LavaStudioContent>
     LavaDemoType.rocket: AppStrings.lavaModelRocket,
     LavaDemoType.senna: AppStrings.lavaModelSenna,
     LavaDemoType.christmasTree: AppStrings.lavaModelChristmasTree,
+    LavaDemoType.f1Car: AppStrings.lavaModelF1Car,
   };
 
   static const _descriptions = {
@@ -102,6 +103,7 @@ class _LavaStudioContentState extends State<LavaStudioContent>
     LavaDemoType.rocket: AppStrings.lavaModelRocketDesc,
     LavaDemoType.senna: AppStrings.lavaModelSennaDesc,
     LavaDemoType.christmasTree: AppStrings.lavaModelChristmasTreeDesc,
+    LavaDemoType.f1Car: AppStrings.lavaModelF1CarDesc,
   };
 
   @override
@@ -216,7 +218,7 @@ class _LavaStudioContentState extends State<LavaStudioContent>
             builder: (context, box) {
               // Seven equal tabs when they fit; a scrolling strip otherwise.
               final count = LavaDemoType.values.length;
-              final fits = box.maxWidth / count >= 92;
+              final fits = box.maxWidth / count >= 88;
               final tabWidth = fits ? box.maxWidth / count : 104.0;
               final tabs = Row(
                 children: [
@@ -1237,7 +1239,10 @@ class _CategoryTabState extends State<_CategoryTab> {
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
+                  // Fixed at the 12 px floor: eight tabs share the bar, and a
+                  // scaled label would break words in the middle.
                   style: widget.metrics.caption.copyWith(
+                    fontSize: 12,
                     height: 1.25,
                     color: colour,
                     fontWeight:
