@@ -116,5 +116,15 @@ class LavaFormatStats {
       lavaWebp: 36195,
       lavaHdAvif: 50432,
     ),
+    LavaDemoType.sennaMp4: LavaFormatStats(
+      frames: 36,
+      pngSequence: 1107127,
+      apng: 261752,
+      gif: 286108,
+      animatedWebp: 176598,
+      lavaAvif: 98358,
+      lavaWebp: 99531,
+      lavaHdAvif: 170443,
+    ),
   };
 }
