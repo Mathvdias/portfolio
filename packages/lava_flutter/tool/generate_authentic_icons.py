@@ -2,10 +2,14 @@ import os, sys, math
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
-W, H = 180, 162       # OpenLava canvas size
-SS = 4                # 4x supersampling -> 720x648
-CANVAS_W = W * SS
-CANVAS_H = H * SS
+# Everything is composed on a fixed 720x648 canvas (4x the 180x162 OpenLava size) and only the
+# final resize depends on the output size, so LAVA_SCALE=2 yields the 360x324 large-preview variant
+# of exactly the same animation.
+SCALE = int(os.environ.get("LAVA_SCALE", "1"))
+W, H = 180 * SCALE, 162 * SCALE
+SS = 4
+CANVAS_W = 180 * SS
+CANVAS_H = 162 * SS
 N_FRAMES = 48
 
 def clean_cutout(img_path, is_flower=False):
@@ -655,8 +659,6 @@ def animate_campfire(src_path, out_dir):
     frames[0].save("/tmp/campfire_alive.gif", save_all=True, append_images=frames[1:], duration=33, loop=0)
     print("Campfire alive animation complete! Saved /tmp/campfire_alive.gif")
 
-generate_campfire_alive()
-
 def animate_rocket(src_path, out_dir):
     os.makedirs(out_dir, exist_ok=True)
     cutout = Image.open(src_path).convert('RGBA')
@@ -959,8 +961,6 @@ def animate_senna(src_path, out_dir):
                    save_all=True, append_images=frames[1:], duration=33, loop=0)
     print("Senna perfect animation complete!")
 
-generate_senna_perfect()
-
 def animate_christmastree(src_path, out_dir):
     tree = Image.open(src_path)
     tw, th = tree.size
@@ -1193,23 +1193,15 @@ def animate_christmastree(src_path, out_dir):
                    save_all=True, append_images=frames[1:], duration=33, loop=0)
     print("Christmas tree perfect animation complete!")
 
-generate_tree_perfect()
+ANIMATIONS = {
+    "macintosh": animate_macintosh,
+    "sunflower": animate_sunflower,
+    "lavalamp": animate_lavalamp,
+    "rocket": animate_rocket,
+}
 
 if __name__ == '__main__':
-    mac_in = '/Users/matheusdias/.gemini/antigravity-cli/brain/8a22d24e-19f0-4cc2-9411-d668d22ba149/macintosh_retro_3d_1789752883609.jpg'
-    flower_in = '/Users/matheusdias/.gemini/antigravity-cli/brain/8a22d24e-19f0-4cc2-9411-d668d22ba149/sunflower_flower_3d_1789752959950.jpg'
-    lamp_in = '/tmp/lamp_clean2.png'
-    campfire_in = '/tmp/campfire_base_clean.png'
-    rocket_in = '/tmp/rocket_final.png'
-    senna_in = '/tmp/senna_quarter_perfect.png'
-    tree_in = '/tmp/christmas_tree_base_clean.png'
-    
-    animate_macintosh(mac_in, '/tmp/mac_frames_refined')
-    animate_sunflower(flower_in, '/tmp/sunflower_frames_refined')
-    animate_lavalamp(lamp_in, '/tmp/lavalamp_frames_refined')
-    animate_campfire(campfire_in, '/tmp/campfire_frames_clean')
-    animate_rocket(rocket_in, '/tmp/rocket_frames_clean')
-    animate_senna(senna_in, '/tmp/senna_frames_clean')
-    animate_christmastree(tree_in, '/tmp/tree_frames_clean')
-
-
+    # generate_authentic_icons.py <macintosh|sunflower|lavalamp|rocket> <still> <frames_dir>
+    # (stills are kept in tool/stills/; the campfire, helmet and Christmas tree moved to
+    # relight_icon.py and sdf_scenes.py)
+    ANIMATIONS[sys.argv[1]](sys.argv[2], sys.argv[3])
