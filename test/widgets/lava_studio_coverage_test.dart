@@ -851,11 +851,13 @@ void main() {
       await _scrubTo(tester, 1);
       expect(find.text('FRAME 24 / 24'), findsOneWidget);
       expect(tester.widget<Slider>(find.byType(Slider)).value, 23);
-      expect(tester.getSemantics(find.byType(Slider)).value, 'FRAME 24');
+      // Which node of the slider carries the value differs between SDKs.
+      expect(find.semantics.byValue('FRAME 24'), findsOne);
 
       await _scrubTo(tester, 0);
       expect(find.text('FRAME 1 / 24'), findsOneWidget);
-      expect(tester.getSemantics(find.byType(Slider)).value, 'FRAME 1');
+      expect(find.semantics.byValue('FRAME 1'), findsOne);
+      expect(find.semantics.byValue('FRAME 24'), findsNothing);
       semantics.dispose();
     });
   });
