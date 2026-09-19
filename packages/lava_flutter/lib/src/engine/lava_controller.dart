@@ -7,15 +7,19 @@ import '../model/lava_types.dart';
 /// for Lava animations.
 class LavaController implements Listenable {
   LavaController({
-    required this.totalFrames,
-    this.fps = 30,
-    this.loop = true,
-    this.loopStartFrame = 0,
+    required int totalFrames,
+    int fps = 30,
+    bool loop = true,
+    int loopStartFrame = 0,
     int? loopEndFrame,
     bool autoPlay = true,
     double speed = 1.0,
     TickerProvider? vsync,
-  }) : loopEndFrame = loopEndFrame ?? (totalFrames - 1),
+  }) : _totalFrames = totalFrames,
+       _fps = fps,
+       _loop = loop,
+       _loopStartFrame = loopStartFrame,
+       _loopEndFrame = loopEndFrame ?? (totalFrames - 1),
        _speed = speed,
        _statusNotifier = ValueNotifier<LavaPlaybackStatus>(
          autoPlay ? LavaPlaybackStatus.playing : LavaPlaybackStatus.stopped,
@@ -29,20 +33,44 @@ class LavaController implements Listenable {
     }
   }
 
+  int _totalFrames;
+  int _fps;
+  bool _loop;
+  int _loopStartFrame;
+  int _loopEndFrame;
+
   /// Total number of animation frames.
-  final int totalFrames;
+  int get totalFrames => _totalFrames;
 
   /// Playback rate in frames per second.
-  final int fps;
+  int get fps => _fps;
 
   /// Whether the animation loops continuously.
-  final bool loop;
+  bool get loop => _loop;
 
   /// Index of the first frame in the loop section.
-  final int loopStartFrame;
+  int get loopStartFrame => _loopStartFrame;
 
   /// Index of the last frame in the loop section (inclusive).
-  final int loopEndFrame;
+  int get loopEndFrame => _loopEndFrame;
+
+  /// Updates playback bounds and metadata when switching bundles dynamically.
+  void configure({
+    required int totalFrames,
+    int? fps,
+    bool? loop,
+    int? loopStartFrame,
+    int? loopEndFrame,
+  }) {
+    _totalFrames = totalFrames;
+    if (fps != null) _fps = fps;
+    if (loop != null) _loop = loop;
+    _loopStartFrame = loopStartFrame ?? 0;
+    _loopEndFrame = loopEndFrame ?? (totalFrames - 1);
+    if (_currentFrameNotifier.value >= totalFrames) {
+      _currentFrameNotifier.value = 0;
+    }
+  }
 
   double _speed;
   Ticker? _ticker;
@@ -70,6 +98,9 @@ class LavaController implements Listenable {
   /// Whether the animation is actively ticking.
   bool get isPlaying => _statusNotifier.value == LavaPlaybackStatus.playing;
 
+  /// Whether a [TickerProvider] is currently attached.
+  bool get isAttached => _ticker != null;
+
   /// Attaches a [TickerProvider] to drive playback.
   void attach(TickerProvider vsync) {
     _ticker?.dispose();
@@ -77,6 +108,12 @@ class LavaController implements Listenable {
     if (_statusNotifier.value == LavaPlaybackStatus.playing) {
       _ticker?.start();
     }
+  }
+
+  /// Detaches and disposes the active ticker if attached.
+  void detach() {
+    _ticker?.dispose();
+    _ticker = null;
   }
 
   void _onTick(Duration elapsed) {

@@ -34,7 +34,7 @@ class LavaIcon extends StatefulWidget {
        _manifestAsset = null,
        _assetBundle = null;
 
-  /// Creates a [LavaIcon] rendering the built-in 3D procedural demo animation.
+  /// Creates a [LavaIcon] rendering one of the built-in demo bundles (see [LavaDemoType]).
   const LavaIcon.demo({
     super.key,
     this.demoType = LavaDemoType.macintosh,
@@ -53,11 +53,38 @@ class LavaIcon extends StatefulWidget {
     this.scrubOnHover = false,
     this.onTap,
     this.onStateChanged,
+    AssetBundle? assetBundle,
   }) : bundle = null,
        _isDemo = true,
        _imageAsset = null,
        _manifestAsset = null,
-       _assetBundle = null;
+       _assetBundle = assetBundle;
+
+  /// Creates a [LavaIcon] rendering the built-in sunflower demo bundle.
+  const LavaIcon.demoSunflower({
+    super.key,
+    this.controller,
+    this.size,
+    this.width,
+    this.height,
+    this.fit = BoxFit.contain,
+    this.alignment = Alignment.center,
+    this.color,
+    this.blendMode = BlendMode.srcIn,
+    this.filterQuality = FilterQuality.medium,
+    this.interactive = false,
+    this.autoPlay,
+    this.dragToRotate = true,
+    this.scrubOnHover = false,
+    this.onTap,
+    this.onStateChanged,
+    AssetBundle? assetBundle,
+  }) : bundle = null,
+       demoType = LavaDemoType.sunflower,
+       _isDemo = true,
+       _imageAsset = null,
+       _manifestAsset = null,
+       _assetBundle = assetBundle;
 
   /// Creates a [LavaIcon] rendering the built-in 3D procedural nature tree animation.
   const LavaIcon.demoTree({
@@ -77,12 +104,13 @@ class LavaIcon extends StatefulWidget {
     this.scrubOnHover = false,
     this.onTap,
     this.onStateChanged,
+    AssetBundle? assetBundle,
   }) : bundle = null,
-       demoType = LavaDemoType.tree,
+       demoType = LavaDemoType.sunflower,
        _isDemo = true,
        _imageAsset = null,
        _manifestAsset = null,
-       _assetBundle = null;
+       _assetBundle = assetBundle;
 
   /// Creates a [LavaIcon] by loading assets asynchronously.
   const LavaIcon.asset({
@@ -175,7 +203,7 @@ class LavaIcon extends StatefulWidget {
 }
 
 class _LavaIconState extends State<LavaIcon>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   LavaBundle? _bundle;
   LavaController? _internalController;
   bool _isLoading = false;
@@ -209,6 +237,10 @@ class _LavaIconState extends State<LavaIcon>
       _initControllerIfNeeded();
     } else if (widget._isDemo && widget.demoType != oldWidget.demoType) {
       _loadBundleAsync();
+    } else if (widget.controller != oldWidget.controller &&
+        widget.controller != null &&
+        _bundle != null) {
+      _initControllerIfNeeded();
     } else if (_effectiveAutoPlay !=
         (oldWidget.autoPlay ?? !oldWidget.interactive)) {
       if (widget.controller != null) {
@@ -236,7 +268,10 @@ class _LavaIconState extends State<LavaIcon>
     try {
       final loadedBundle =
           widget._isDemo
-              ? await LavaBundle.demo(type: widget.demoType)
+              ? await LavaBundle.demo(
+                type: widget.demoType,
+                bundle: widget._assetBundle,
+              )
               : await LavaBundle.fromAsset(
                 imageAsset: widget._imageAsset!,
                 manifestAsset: widget._manifestAsset!,
@@ -271,8 +306,17 @@ class _LavaIconState extends State<LavaIcon>
         autoPlay: _effectiveAutoPlay,
         vsync: this,
       );
-    } else if (widget.controller != null) {
-      widget.controller!.attach(this);
+    } else if (widget.controller != null && _bundle != null) {
+      if (!widget.controller!.isAttached) {
+        widget.controller!.attach(this);
+      }
+      widget.controller!.configure(
+        totalFrames: _bundle!.manifest.totalFrames,
+        fps: _bundle!.manifest.frameRate,
+        loop: _bundle!.manifest.loop,
+        loopStartFrame: _bundle!.manifest.loopStartFrame,
+        loopEndFrame: _bundle!.manifest.loopEndFrame,
+      );
     }
   }
 
@@ -296,6 +340,7 @@ class _LavaIconState extends State<LavaIcon>
         size: Size(effectiveWidth, effectiveHeight),
         painter: LavaPainter(
           atlas: _bundle!.atlas,
+          images: _bundle!.images,
           manifest: _bundle!.manifest,
           controller: _effectiveController,
           fit: widget.fit,
