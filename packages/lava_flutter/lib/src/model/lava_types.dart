@@ -55,4 +55,9 @@ enum LavaDemoType {
   /// Snow-dusted Christmas tree whose fairy lights blink one by one, each
   /// casting its own pool of light, under falling snow (`assets/lava/christmastree`).
   christmasTree,
+
+  /// Formula 1 car at speed in a navy, red and yellow livery: engine vibration,
+  /// spinning wheel glints, titanium sparks skidding out from under the floor and
+  /// speed streaks on the ground (`assets/lava/f1car`).
+  f1Car,
 }

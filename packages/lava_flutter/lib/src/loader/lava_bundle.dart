@@ -57,6 +57,7 @@ class LavaBundle {
     LavaDemoType.rocket: 'assets/lava/rocket',
     LavaDemoType.senna: 'assets/lava/senna',
     LavaDemoType.christmasTree: 'assets/lava/christmastree',
+    LavaDemoType.f1Car: 'assets/lava/f1car',
   };
 
   /// Canvas width of the standard demo bundles (the Airbnb size, density 2).
@@ -107,6 +108,7 @@ class LavaBundle {
         case LavaDemoType.rocket:
         case LavaDemoType.senna:
         case LavaDemoType.christmasTree:
+        case LavaDemoType.f1Car:
           rethrow;
       }
     }
