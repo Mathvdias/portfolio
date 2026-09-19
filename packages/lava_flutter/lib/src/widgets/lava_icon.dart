@@ -205,8 +205,13 @@ class LavaIcon extends StatefulWidget {
 class _LavaIconState extends State<LavaIcon>
     with TickerProviderStateMixin {
   LavaBundle? _bundle;
+  // Only bundles decoded by LavaIcon.asset belong to this widget; demo
+  // bundles are shared through the loader caches and injected ones belong to
+  // the caller.
+  bool _ownsBundle = false;
   LavaController? _internalController;
   bool _isLoading = false;
+  int _loadGeneration = 0;
 
   LavaController get _effectiveController {
     if (widget.controller != null) return widget.controller!;
@@ -222,18 +227,25 @@ class _LavaIconState extends State<LavaIcon>
   void initState() {
     super.initState();
     if (widget.bundle != null) {
-      _bundle = widget.bundle;
+      _setBundle(widget.bundle!);
       _initControllerIfNeeded();
     } else {
       _loadBundleAsync();
     }
   }
 
+  void _setBundle(LavaBundle bundle, {bool owned = false}) {
+    if (_ownsBundle && !identical(_bundle, bundle)) _bundle?.dispose();
+    _bundle = bundle;
+    _ownsBundle = owned;
+  }
+
   @override
   void didUpdateWidget(covariant LavaIcon oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.bundle != oldWidget.bundle && widget.bundle != null) {
-      _bundle = widget.bundle;
+      _loadGeneration++;
+      _setBundle(widget.bundle!);
       _initControllerIfNeeded();
     } else if (widget._isDemo && widget.demoType != oldWidget.demoType) {
       _loadBundleAsync();
@@ -261,8 +273,11 @@ class _LavaIconState extends State<LavaIcon>
   }
 
   Future<void> _loadBundleAsync() async {
+    // A slower load started for a previous demo type must not overwrite this one.
+    final generation = ++_loadGeneration;
+    // The current bundle stays on screen until the next one is decoded.
     setState(() {
-      _isLoading = true;
+      _isLoading = _bundle == null;
     });
 
     try {
@@ -278,15 +293,27 @@ class _LavaIconState extends State<LavaIcon>
                 bundle: widget._assetBundle,
               );
 
-      if (mounted) {
-        setState(() {
-          _bundle = loadedBundle;
-          _isLoading = false;
-        });
-        _initControllerIfNeeded();
+      if (!mounted || generation != _loadGeneration) {
+        if (!widget._isDemo) loadedBundle.dispose();
+        return;
       }
-    } catch (_) {
-      if (mounted) {
+      setState(() {
+        _setBundle(loadedBundle, owned: !widget._isDemo);
+        _isLoading = false;
+      });
+      _initControllerIfNeeded();
+    } catch (error, stackTrace) {
+      // A missing or corrupt bundle leaves the placeholder box; report it
+      // instead of failing silently.
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: error,
+          stack: stackTrace,
+          library: 'lava_flutter',
+          context: ErrorDescription('while loading a LavaIcon bundle'),
+        ),
+      );
+      if (mounted && generation == _loadGeneration) {
         setState(() {
           _isLoading = false;
         });
@@ -317,12 +344,16 @@ class _LavaIconState extends State<LavaIcon>
         loopStartFrame: _bundle!.manifest.loopStartFrame,
         loopEndFrame: _bundle!.manifest.loopEndFrame,
       );
+      if (widget.autoPlay == true && !widget.controller!.isPlaying) {
+        widget.controller!.play();
+      }
     }
   }
 
   @override
   void dispose() {
     _internalController?.dispose();
+    if (_ownsBundle) _bundle?.dispose();
     super.dispose();
   }
 
@@ -341,6 +372,7 @@ class _LavaIconState extends State<LavaIcon>
         painter: LavaPainter(
           atlas: _bundle!.atlas,
           images: _bundle!.images,
+          compositor: _bundle!.compositor,
           manifest: _bundle!.manifest,
           controller: _effectiveController,
           fit: widget.fit,

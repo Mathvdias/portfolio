@@ -107,6 +107,57 @@ void main() {
       controller.dispose();
     });
 
+    testWidgets('LavaInteractive resumes playback after a drag scrub', (
+      tester,
+    ) async {
+      final controller = LavaController(totalFrames: 24, vsync: tester);
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: Center(
+            child: LavaInteractive(
+              controller: controller,
+              dragToRotate: true,
+              child: const SizedBox(width: 100, height: 100),
+            ),
+          ),
+        ),
+      );
+      expect(controller.isPlaying, isTrue);
+
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.byType(LavaInteractive)),
+      );
+      await gesture.moveBy(const Offset(30, 0));
+      await gesture.moveBy(const Offset(30, 0));
+      await tester.pump();
+      expect(controller.isPlaying, isFalse);
+
+      await gesture.up();
+      await tester.pump();
+      expect(controller.isPlaying, isTrue);
+
+      final resumedFrom = controller.currentFrame;
+      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(controller.currentFrame, isNot(resumedFrom));
+
+      controller.dispose();
+    });
+
+    test('LavaController.configure notifies listeners of new bounds', () {
+      final controller = LavaController(totalFrames: 24, autoPlay: false);
+      var notifications = 0;
+      controller.addListener(() => notifications++);
+
+      controller.configure(totalFrames: 48, fps: 30);
+
+      expect(controller.totalFrames, 48);
+      expect(notifications, 1);
+      controller.dispose();
+    });
+
     test('LavaPainter shouldRepaint reflects property changes', () async {
       final bundle = await LavaBundle.procedural();
       final controller1 = LavaController(totalFrames: 24, autoPlay: false);
