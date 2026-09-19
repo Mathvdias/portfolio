@@ -9,7 +9,11 @@ import 'package:flutter/scheduler.dart';
 import '../../core/services/wasm_engine_service.dart';
 
 class FractalExplorerContent extends StatefulWidget {
-  const FractalExplorerContent({super.key});
+  const FractalExplorerContent({super.key, this.engine});
+
+  /// Engine to render with; defaults to the platform engine. Read once, when
+  /// the window opens.
+  final WasmEngineService? engine;
 
   @override
   State<FractalExplorerContent> createState() => _FractalExplorerContentState();
@@ -85,6 +89,10 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
   Duration _lastRenderAt = Duration.zero;
   bool _refined = false;
 
+  /// A full-quality still was asked for while a frame was decoding. No tick
+  /// follows a still, so nothing else would ever draw it.
+  bool _stillOwed = false;
+
   double _zoom = 1.0;
   double _offsetX = -0.5;
   double _offsetY = 0.0;
@@ -143,7 +151,7 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
   @override
   void initState() {
     super.initState();
-    _engineService = WasmEngineService();
+    _engineService = widget.engine ?? WasmEngineService();
     _ticker = createTicker(_onTick);
     _initEngine();
   }
@@ -171,7 +179,12 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
     _zoom = 1.0;
     _offsetX = _currentScenario.targetX;
     _offsetY = _currentScenario.targetY;
+    // The motion is back: a still would be stale before it was decoded.
+    _stillOwed = false;
     if (!_ticker.isActive) {
+      // A restarted ticker counts from zero again. Pacing against the previous
+      // run's clock would hold every frame back for as long as that run lasted.
+      _lastRenderAt = Duration.zero;
       _ticker.start();
     }
   }
@@ -199,10 +212,13 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
 
       // Cap zoom to avoid precision loss
       if (newZoom > 1e12) {
-        _stopAutoAnimation();
-      } else {
-        _zoom = newZoom;
+        // Rebuild: the labels say whether the view is still moving.
+        setState(_stopAutoAnimation);
+        // The frame that stays on screen gets the full-quality pass.
+        _renderFractal(fullQuality: true);
+        return;
       }
+      _zoom = newZoom;
     }
 
     _renderFractal();
@@ -215,7 +231,13 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
   );
 
   Future<void> _renderFractal({bool fullQuality = false}) async {
-    if (!_engineService.isReady || _isRendering) return;
+    if (!_engineService.isReady) return;
+    if (_isRendering) {
+      // A moving frame can be dropped, the next tick draws a newer one. Nothing
+      // comes after a still: it waits for the frame in flight to land.
+      if (fullQuality) _stillOwed = true;
+      return;
+    }
 
     _isRendering = true;
 
@@ -279,6 +301,11 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
       debugPrint('Fractal render failed: $e');
     } finally {
       _isRendering = false;
+    }
+
+    if (_stillOwed && mounted) {
+      _stillOwed = false;
+      _renderFractal(fullQuality: true);
     }
   }
 
