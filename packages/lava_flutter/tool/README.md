@@ -158,14 +158,19 @@ python3 tool/openlava_encode.py assets/lava/christmastree --avif 65 --fallback-w
   tiles instead of 1230. `shadow_floor` keys out the baked shadow trapped between the wheels. No
   logos or sponsor decals were asked for in the still.
 
-- `F1Front`: the pair is wheels straight / "front wheels steered slightly to the left, about 12
-  degrees, nothing else changes". The still is symmetric, so the steer to the right is the same
-  edit mirrored about the car's centre line (asked for directly, the other side came back with a
-  different angle and different brake ducts). Only what the edit changed inside the wheel boxes is
-  swapped in, through a soft mask. Five distinct frames in a 72-frame loop: 63 atlas tiles, 36 KB.
-  The helmet is white, so the keyer gets a `protect` box; `pocket_chroma` accepts the bluish tint
-  of this render's backdrop and `shadow_floor` takes several rules as the baked shadow darkens
-  towards the car. The helmet follows a real driver's colours and lion, without sponsor logos.
+- `F1Front`: a single still (pass it twice); the only motion is the steering, and it is done
+  with light alone: the tread highlight slides towards the steer and the far side of the tyre
+  darkens, while the outline stays where it is. Two other routes were tried and dropped. An image
+  model asked to steer the wheels invents rims, sidewall lines and new brake ducts, at a different
+  angle each time. Warping the tyre silhouette geometrically (it should widen by
+  `W cos t + D sin t`) tears against the brake-duct fairing and the wing endplate that partly
+  cover it. Five distinct frames in a 72-frame loop keep the bundle tiny. Ask for the still on a
+  magenta backdrop (the helmet is white) with "plain smooth matte black slicks: no rim, no
+  lettering, no white lines" and a helmet "small compared with the car, about one eighth of its
+  width, sitting low behind the halo" - image models give toy drivers huge heads otherwise. The
+  magenta key works by hue (`min(R, B) - G`), so shadows cast on the backdrop and enclosed pockets
+  go with it and the tyre edges stay intact. The helmet follows a real driver's colours and lion,
+  without sponsor logos.
 
 Backdrop: white is fine for the campfire (the smooth baked drop shadow is flood-filled away, the
 textured stones stop the fill). Anything white at the silhouette (snow) needs a chroma backdrop:

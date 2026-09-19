@@ -54,9 +54,9 @@
   reuse (two body states, four flap positions, two lamp states): 429 atlas tiles instead of
   1230 and a 117 KB bundle, against 430 KB for the same frames as a GIF.
 * New `LavaDemoType.f1Front`: the car head-on with the driver's helmet in the cockpit; only the
-  front wheels move (straight, half and full lock each way, the right-hand steer being the
-  left-hand edit mirrored). Five distinct frames: 63 atlas tiles instead of 1100, a 36 KB bundle
-  against 823 KB for the same loop as a GIF.
+  front wheels move. They are steered with light alone - the tread highlight slides towards the
+  steer and the far side darkens while the outline stays put - so nothing tears against the
+  bodywork that covers the tyres. Five distinct frames in a 72-frame loop.
 * New campfire, Christmas tree and helmet bundles: the flame and the fairy lights really relight
   the icon (lit / unlit light pass), the helmet is rendered in 3D and turns on its own axis.
 * `tool/` ships the Python pipeline used to key, animate, relight, render and encode new OpenLava
