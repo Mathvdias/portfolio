@@ -78,7 +78,7 @@ void main() {
         findsOneWidget,
       );
       expect(
-        find.textContaining('GLSL GPU Shader', skipOffstage: false),
+        find.textContaining('CustomPainter · 30 fps', skipOffstage: false),
         findsOneWidget,
       );
       expect(
@@ -127,7 +127,7 @@ void main() {
     );
 
     testWidgets(
-      'ProjectStatsWindowContent expands GPU shader Q&A card and shows answer points',
+      'ProjectStatsWindowContent expands the wallpaper Q&A card and shows answer points',
       (tester) async {
         await tester.pumpWidget(
           MaterialApp(
@@ -145,7 +145,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.textContaining('FragmentShader'), findsWidgets);
+        expect(find.textContaining('drawRect'), findsWidgets);
         expect(find.textContaining('smoothstep'), findsWidgets);
         expect(find.textContaining('vsync'), findsWidgets);
       },
