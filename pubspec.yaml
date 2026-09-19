@@ -110,6 +110,8 @@ flutter:
     - assets/lava/f1car_hd/
     - assets/lava/f1front/
     - assets/lava/f1front_hd/
+    - assets/lava/sennamp4/
+    - assets/lava/sennamp4_hd/
 
   fonts:
     - family: Noto Sans
