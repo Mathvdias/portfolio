@@ -106,5 +106,15 @@ class LavaFormatStats {
       lavaWebp: 179018,
       lavaHdAvif: 180524,
     ),
+    LavaDemoType.f1Front: LavaFormatStats(
+      frames: 72,
+      pngSequence: 2624010,
+      apng: 253574,
+      gif: 823169,
+      animatedWebp: 64964,
+      lavaAvif: 35876,
+      lavaWebp: 48525,
+      lavaHdAvif: 70091,
+    ),
   };
 }

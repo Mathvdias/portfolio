@@ -318,7 +318,7 @@ void main() {
       expect(find.text(AppStrings.lavaStudioBadgeTile), findsOneWidget);
       expect(find.text(AppStrings.lavaStudioBadgeAlpha), findsOneWidget);
       expect(find.text(AppStrings.lavaStudioArchitecture), findsOneWidget);
-      expect(find.byType(LavaIcon), findsNWidgets(9));
+      expect(find.byType(LavaIcon), findsNWidgets(10));
       expect(find.text(AppStrings.lavaModelMacintosh), findsWidgets);
       expect(find.text(AppStrings.lavaModelTree), findsWidgets);
       expect(find.text(AppStrings.lavaModelLavaLamp), findsWidgets);
@@ -338,6 +338,7 @@ void main() {
         AppStrings.lavaModelSenna,
         AppStrings.lavaModelChristmasTree,
         AppStrings.lavaModelF1Car,
+        AppStrings.lavaModelF1Front,
       ]) {
         await tester.ensureVisible(find.text(modelName).first);
         await tester.tap(find.text(modelName).first);
@@ -429,12 +430,12 @@ void main() {
             home: Scaffold(body: LavaStudioContent()),
           ),
         );
-        for (var i = 0; i < 100 && paintedIcons.evaluate().length < 9; i++) {
+        for (var i = 0; i < 100 && paintedIcons.evaluate().length < 10; i++) {
           await Future<void>.delayed(const Duration(milliseconds: 50));
           await tester.pump();
         }
       });
-      expect(paintedIcons, findsNWidgets(9));
+      expect(paintedIcons, findsNWidgets(10));
 
       // Bounds come from the manifest (48 frames), not the controller default.
       expect(find.textContaining('/ 48'), findsOneWidget);

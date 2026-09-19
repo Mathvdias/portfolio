@@ -93,6 +93,7 @@ class _LavaStudioContentState extends State<LavaStudioContent>
     LavaDemoType.senna: AppStrings.lavaModelSenna,
     LavaDemoType.christmasTree: AppStrings.lavaModelChristmasTree,
     LavaDemoType.f1Car: AppStrings.lavaModelF1Car,
+    LavaDemoType.f1Front: AppStrings.lavaModelF1Front,
   };
 
   static const _descriptions = {
@@ -104,6 +105,7 @@ class _LavaStudioContentState extends State<LavaStudioContent>
     LavaDemoType.senna: AppStrings.lavaModelSennaDesc,
     LavaDemoType.christmasTree: AppStrings.lavaModelChristmasTreeDesc,
     LavaDemoType.f1Car: AppStrings.lavaModelF1CarDesc,
+    LavaDemoType.f1Front: AppStrings.lavaModelF1FrontDesc,
   };
 
   @override
@@ -218,7 +220,7 @@ class _LavaStudioContentState extends State<LavaStudioContent>
             builder: (context, box) {
               // Seven equal tabs when they fit; a scrolling strip otherwise.
               final count = LavaDemoType.values.length;
-              final fits = box.maxWidth / count >= 88;
+              final fits = box.maxWidth / count >= 80;
               final tabWidth = fits ? box.maxWidth / count : 104.0;
               final tabs = Row(
                 children: [
