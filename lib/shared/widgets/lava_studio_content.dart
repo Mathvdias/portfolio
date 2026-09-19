@@ -32,7 +32,7 @@ class _LavaStudioContentState extends State<LavaStudioContent>
     _controller = LavaController(
       totalFrames: 24,
       fps: 30,
-      autoPlay: false,
+      autoPlay: true,
       loop: true,
       vsync: this,
     );
@@ -535,7 +535,8 @@ class _AirbnbCategoryTabState extends State<_AirbnbCategoryTab> {
               LavaIcon.demo(
                 demoType: widget.demoType,
                 size: 44,
-                autoPlay: _isHovered,
+                // Airbnb tabs: the icon comes alive when picked (or hovered).
+                autoPlay: widget.isSelected || _isHovered,
                 interactive: false,
               ),
               const SizedBox(height: AppSizes.spacingXs),

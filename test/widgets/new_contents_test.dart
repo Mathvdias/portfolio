@@ -2,6 +2,7 @@
 // Const constructors are intentionally omitted in this file so that widget
 // constructors execute at runtime and are tracked by the coverage tool.
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lava_flutter/lava_flutter.dart';
 import 'package:portifolio/l10n/app_localizations.dart';
@@ -346,18 +347,57 @@ void main() {
       await tester.tap(find.text('2.0x'));
       await tester.pump();
 
-      // Tap Play button to start auto-rotate, then pause to stop
-      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
-      await tester.tap(find.byIcon(Icons.play_arrow));
-      await tester.pump();
+      // The preview plays on its own: pause it, then resume
       expect(find.byIcon(Icons.pause), findsOneWidget);
       await tester.tap(find.byIcon(Icons.pause));
       await tester.pump();
       expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+      await tester.tap(find.byIcon(Icons.play_arrow));
+      await tester.pump();
+      expect(find.byIcon(Icons.pause), findsOneWidget);
 
       // Tap reset
       await tester.tap(find.byIcon(Icons.replay));
       await tester.pump();
+    });
+
+    testWidgets('LavaStudioContent preview plays the decoded OpenLava bundle', (
+      tester,
+    ) async {
+      // Asset loads started under the previous tests' fake clock never finish
+      // and stay cached, so start from clean caches.
+      rootBundle.clear();
+      LavaBundle.evictOpenLavaCache();
+      final paintedIcons = find.descendant(
+        of: find.byType(LavaIcon),
+        matching: find.byType(CustomPaint),
+      );
+
+      // PNG decoding only progresses on the real event loop.
+      await tester.runAsync(() async {
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: [AppLocalizationsDelegate()],
+            home: Scaffold(body: LavaStudioContent()),
+          ),
+        );
+        for (var i = 0; i < 100 && paintedIcons.evaluate().length < 8; i++) {
+          await Future<void>.delayed(const Duration(milliseconds: 50));
+          await tester.pump();
+        }
+      });
+      expect(paintedIcons, findsNWidgets(8));
+
+      // Bounds come from the manifest (48 frames), not the controller default.
+      expect(find.textContaining('/ 48'), findsOneWidget);
+      expect(find.textContaining('PLAYING'), findsOneWidget);
+
+      final before = tester.widget<Slider>(find.byType(Slider)).value;
+      await tester.pump(const Duration(milliseconds: 200));
+      await tester.pump(const Duration(milliseconds: 200));
+      final after = tester.widget<Slider>(find.byType(Slider)).value;
+      expect(after, isNot(before));
+      expect(tester.takeException(), isNull);
     });
   });
 }
