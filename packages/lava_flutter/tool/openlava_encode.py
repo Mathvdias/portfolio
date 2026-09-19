@@ -64,7 +64,11 @@ class Atlas:
         return img
 
 
-def encode(frame_paths, out_dir, fps=30, cell=32, diff_w=2048, density=2, gutter=1):
+def encode(frame_paths, out_dir, fps=30, cell=32, diff_w=2048, density=2, gutter=1, webp_quality=None):
+    """`webp_quality` (e.g. 92) stores the key frame as lossless WebP and the diff atlas as lossy
+    WebP with a lossless alpha plane - the same trade the Airbnb assets make with AVIF. Use it for
+    photographic icons whose light changes every pixel of every frame; leave it off (lossless PNG)
+    for flat icons, which already pack small."""
     frames = load_frames(frame_paths)
     h, w = frames[0].shape[:2]
     cols, rows = math.ceil(w / cell), math.ceil(h / cell)
@@ -103,12 +107,26 @@ def encode(frame_paths, out_dir, fps=30, cell=32, diff_w=2048, density=2, gutter
 
     atlas_img = atlas.image()
     os.makedirs(out_dir, exist_ok=True)
-    Image.fromarray(key).save(os.path.join(out_dir, "image_1.png"), optimize=True)
-    Image.fromarray(atlas_img).save(os.path.join(out_dir, "image_2.png"), optimize=True)
+    ext = "webp" if webp_quality else "png"
+    for stale in ("png", "webp"):
+        for name in ("image_1", "image_2"):
+            if stale != ext and os.path.exists(os.path.join(out_dir, f"{name}.{stale}")):
+                os.remove(os.path.join(out_dir, f"{name}.{stale}"))
+    if webp_quality:
+        Image.fromarray(key).save(os.path.join(out_dir, "image_1.webp"), lossless=True, method=6)
+        if webp_quality >= 100:                    # flat, hard-edged art: lossless WebP still beats PNG
+            Image.fromarray(atlas_img).save(os.path.join(out_dir, "image_2.webp"), lossless=True, method=6)
+        else:
+            # 4:2:0 chroma washes out thin saturated lines (the helmet stripes): such art needs 100
+            Image.fromarray(atlas_img).save(os.path.join(out_dir, "image_2.webp"), quality=webp_quality,
+                                            method=6, alpha_quality=100)
+    else:
+        Image.fromarray(key).save(os.path.join(out_dir, "image_1.png"), optimize=True)
+        Image.fromarray(atlas_img).save(os.path.join(out_dir, "image_2.png"), optimize=True)
     manifest = {
         "version": 1, "fps": fps, "cellSize": cell, "diffImageSize": diff_w,
         "width": w, "height": h, "density": density, "alpha": True,
-        "images": [{"url": "image_1.png"}, {"url": "image_2.png"}],
+        "images": [{"url": f"image_1.{ext}"}, {"url": f"image_2.{ext}"}],
         "frames": manifest_frames,
     }
     with open(os.path.join(out_dir, "manifest.json"), "w") as fh:
@@ -124,7 +142,11 @@ def decode_check(out_dir, frame_paths, cell=32):
     cols = math.ceil(w / cell)
     tpr = [math.ceil(im.shape[1] / cell) for im in imgs]
     src = load_frames(frame_paths)
-    worst = 0
+    def premultiplied(a):                          # colour under transparent pixels is not visible
+        a = a.astype(np.float32)
+        return np.dstack([a[..., :3] * a[..., 3:4] / 255.0, a[..., 3:4]])
+
+    worst, total = 0, 0.0
     for fi, fr in enumerate(m["frames"]):
         canvas = np.zeros((math.ceil(h / cell) * cell, cols * cell, 4), np.uint8)
         if fr["type"] == "key":
@@ -137,12 +159,22 @@ def decode_check(out_dir, frame_paths, cell=32):
                 dx, dy = (d % cols) * cell, (d // cols) * cell
                 blk = im[sy:sy + cy * cell, sx:sx + cx * cell]
                 canvas[dy:dy + blk.shape[0], dx:dx + blk.shape[1]] = blk
-        worst = max(worst, int(np.abs(canvas[:h, :w].astype(int) - src[fi].astype(int)).max()))
-    print(f"decode check {out_dir}: max abs pixel error = {worst}")
+        err = np.abs(premultiplied(canvas[:h, :w]) - premultiplied(src[fi]))
+        worst, total = max(worst, int(err.max())), total + float(err.mean())
+    print(f"decode check {out_dir}: max abs pixel error = {worst}, mean = {total / len(m['frames']):.3f} "
+          f"(lossless bundles must report 0)")
     return worst
 
 
 if __name__ == "__main__":
-    out = sys.argv[1]; frames = sys.argv[2:]
-    encode(frames, out)
+    # openlava_encode.py <out_dir> [--fps N] [--webp Q] frame_000.png frame_001.png ...
+    args = sys.argv[1:]
+    opts = {}
+    for flag, name in (("--fps", "fps"), ("--webp", "webp_quality")):
+        if flag in args:
+            at = args.index(flag)
+            opts[name] = int(args[at + 1])
+            del args[at:at + 2]
+    out, frames = args[0], args[1:]
+    encode(frames, out, **opts)
     decode_check(out, frames)
