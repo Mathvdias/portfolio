@@ -32,7 +32,11 @@ dependencies:
 
 ### 1. Instant 3D Demo Icon
 
-Use the built-in procedural demo icon directly without loading external assets:
+Use one of the built-in demo bundles (`LavaDemoType.macintosh`, `LavaDemoType.sunflower`,
+`LavaDemoType.lavaLamp`, `LavaDemoType.campfire`, `LavaDemoType.rocket`,
+`LavaDemoType.senna`, `LavaDemoType.christmasTree`). They are OpenLava diff
+tilesets that the host app ships under `assets/lava/<name>/` (see `LavaBundle.demoAssetPaths`);
+the Macintosh and sunflower fall back to a procedural Canvas atlas when the directory is missing:
 
 ```dart
 import 'package:flutter/material.dart';
@@ -56,6 +60,14 @@ class MyScreen extends StatelessWidget {
 ```
 
 ### 2. Loading a Custom Lava Bundle
+
+OpenLava directories (`manifest.json` + `image_1.png` key frame + `image_2.png` diff atlas):
+
+```dart
+final bundle = await LavaBundle.openLavaAsset(assetPath: 'assets/lava/sunflower');
+```
+
+Single grid atlases:
 
 ```dart
 final bundle = await LavaBundle.fromAsset(
@@ -94,6 +106,12 @@ LavaIcon.demo(
 ```
 
 ---
+
+## Producing OpenLava assets
+
+`tool/README.md` documents the pipeline used for the bundled demos: render a still 3D icon on
+white, key it and animate it with `tool/animate_icon.py`, then pack the frames into a
+key-frame + deduplicated diff atlas with `tool/openlava_encode.py`.
 
 ## Architecture Overview
 
