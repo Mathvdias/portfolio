@@ -3,17 +3,14 @@ import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
 
 import '../demo/lava_demo_baker.dart';
+import '../engine/lava_frame_compositor.dart';
 import '../model/lava_manifest.dart';
 import '../model/lava_types.dart';
 
 /// Container encapsulating a decoded texture atlas [ui.Image] and its
 /// associated [LavaManifest] layout parameters.
 class LavaBundle {
-  const LavaBundle({
-    this.atlas,
-    this.images = const [],
-    required this.manifest,
-  });
+  LavaBundle({this.atlas, this.images = const [], required this.manifest});
 
   /// Hardware texture holding animation frames for single-atlas grid mode.
   final ui.Image? atlas;
@@ -23,6 +20,20 @@ class LavaBundle {
 
   /// Structural layout and timing metadata.
   final LavaManifest manifest;
+
+  LavaFrameCompositor? _compositor;
+
+  /// Frame assembler for OpenLava key/diff bundles (`null` for grid atlases).
+  ///
+  /// It lives with the bundle so every widget showing it shares one cache of
+  /// composed frames.
+  LavaFrameCompositor? get compositor {
+    if (manifest.rawFrames.isEmpty || images.isEmpty) return null;
+    return _compositor ??= LavaFrameCompositor(
+      images: images,
+      manifest: manifest,
+    );
+  }
 
   /// Asset directory (inside the host application) holding the OpenLava bundle
   /// for each built-in [LavaDemoType].
@@ -90,13 +101,42 @@ class LavaBundle {
   static Future<LavaBundle> demoSunflower({bool forceRegenerate = false}) =>
       demo(type: LavaDemoType.sunflower, forceRegenerate: forceRegenerate);
 
+  static final Map<String, Future<LavaBundle>> _openLavaCache = {};
+
   /// Loads an OpenLava format animation directory containing `manifest.json` and image tilesets.
+  ///
+  /// Decoded bundles are shared: every icon pointing at the same [assetPath]
+  /// reuses one set of textures, so they must not be disposed individually
+  /// (use [evictOpenLavaCache] to release them).
   static Future<LavaBundle> openLavaAsset({
     required String assetPath,
     AssetBundle? bundle,
-  }) async {
+  }) {
     final effectiveBundle = bundle ?? rootBundle;
+    final cacheKey = '${identityHashCode(effectiveBundle)}:$assetPath';
+    return _openLavaCache[cacheKey] ??= _decodeOpenLava(
+      assetPath,
+      effectiveBundle,
+    ).onError((Object error, StackTrace stackTrace) {
+      _openLavaCache.remove(cacheKey);
+      Error.throwWithStackTrace(error, stackTrace);
+    });
+  }
 
+  /// Empties the [openLavaAsset] cache and disposes its bundles (loads still
+  /// in flight are disposed as soon as they finish).
+  static void evictOpenLavaCache() {
+    final pending = _openLavaCache.values.toList();
+    _openLavaCache.clear();
+    for (final future in pending) {
+      future.then((bundle) => bundle.dispose(), onError: (Object _) {});
+    }
+  }
+
+  static Future<LavaBundle> _decodeOpenLava(
+    String assetPath,
+    AssetBundle effectiveBundle,
+  ) async {
     final jsonStr = await effectiveBundle.loadString(
       '$assetPath/manifest.json',
     );
@@ -162,6 +202,8 @@ class LavaBundle {
 
   /// Releases the GPU texture resources.
   void dispose() {
+    _compositor?.dispose();
+    _compositor = null;
     atlas?.dispose();
     for (final img in images) {
       if (img != atlas) {
