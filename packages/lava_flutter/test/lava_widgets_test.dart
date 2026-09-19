@@ -7,16 +7,16 @@ void main() {
 
   group('LavaIcon & LavaInteractive Widgets', () {
     testWidgets('LavaIcon.demo renders without errors', (tester) async {
-      await tester.pumpWidget(
-        const Directionality(
-          textDirection: TextDirection.ltr,
-          child: Center(child: LavaIcon.demo(size: 64, interactive: true)),
-        ),
-      );
-
-      // Await async bundle loading and advance a few frames
+      await tester.runAsync(() async {
+        await tester.pumpWidget(
+          const Directionality(
+            textDirection: TextDirection.ltr,
+            child: Center(child: LavaIcon.demo(size: 64, interactive: true)),
+          ),
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 300));
+      });
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.byType(LavaIcon), findsOneWidget);
       expect(find.byType(CustomPaint), findsOneWidget);
@@ -25,16 +25,17 @@ void main() {
       LavaDemoBaker.clearCache();
     });
 
-    testWidgets('LavaIcon.demoTree renders without errors', (tester) async {
-      await tester.pumpWidget(
-        const Directionality(
-          textDirection: TextDirection.ltr,
-          child: Center(child: LavaIcon.demoTree(size: 64, interactive: true)),
-        ),
-      );
-
+    testWidgets('LavaIcon.demoSunflower renders without errors', (tester) async {
+      await tester.runAsync(() async {
+        await tester.pumpWidget(
+          const Directionality(
+            textDirection: TextDirection.ltr,
+            child: Center(child: LavaIcon.demoSunflower(size: 64, interactive: true)),
+          ),
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 300));
+      });
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.byType(LavaIcon), findsOneWidget);
       expect(find.byType(CustomPaint), findsOneWidget);
@@ -107,7 +108,7 @@ void main() {
     });
 
     test('LavaPainter shouldRepaint reflects property changes', () async {
-      final bundle = await LavaBundle.demo();
+      final bundle = await LavaBundle.procedural();
       final controller1 = LavaController(totalFrames: 24, autoPlay: false);
       final controller2 = LavaController(totalFrames: 24, autoPlay: false);
 
@@ -142,6 +143,65 @@ void main() {
 
       controller1.dispose();
       controller2.dispose();
+      LavaDemoBaker.clearCache();
+    });
+
+    testWidgets('LavaPainter OpenLava diff mode blits with boundary clamping without error', (
+      tester,
+    ) async {
+      final img1 = await LavaDemoBaker.bakeAtlas(type: LavaDemoType.macintosh);
+      final img2 = await LavaDemoBaker.bakeAtlas(type: LavaDemoType.sunflower);
+
+      final manifest = const LavaManifest(
+        tileWidth: 180,
+        tileHeight: 162,
+        columns: 6,
+        rows: 4,
+        totalFrames: 2,
+        cellSize: 32,
+        rawFrames: [
+          {'type': 'key', 'imageIndex': 0},
+          {
+            'type': 'diff',
+            'diffs': [
+              // Intentionally specify blocks that exceed 180x162 bounds
+              [0, 0, 6, 1, 0],
+              [0, 30, 6, 1, 30],
+              [1, 0, 4, 4, 1],
+            ],
+          },
+        ],
+      );
+
+      final controller = LavaController(totalFrames: 2, autoPlay: false);
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: Center(
+            child: CustomPaint(
+              size: const Size(180, 162),
+              painter: LavaPainter(
+                images: [img1, img2],
+                manifest: manifest,
+                controller: controller,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Frame 0 (key)
+      expect(controller.currentFrame, 0);
+      expect(tester.takeException(), isNull);
+
+      // Frame 1 (diff with out-of-bounds tile blits)
+      controller.seekToFrame(1);
+      await tester.pump();
+      expect(controller.currentFrame, 1);
+      expect(tester.takeException(), isNull);
+
+      controller.dispose();
       LavaDemoBaker.clearCache();
     });
   });
