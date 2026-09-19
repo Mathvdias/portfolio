@@ -29,6 +29,23 @@ void main() {
       expect(vm.windows.first.id, 'w1');
     });
 
+    test('openWindow can open a window maximized', () {
+      vm.openWindow(
+        'studio',
+        'Studio',
+        const Text('c'),
+        Colors.blue,
+        width: 760,
+        height: 680,
+        maximized: true,
+      );
+      expect(vm.windows.single.maximized, isTrue);
+      expect(vm.windows.single.width, 760);
+
+      vm.openWindow('plain', 'Plain', const Text('c'), Colors.blue);
+      expect(vm.windows.last.maximized, isFalse);
+    });
+
     test('openWindow replaces existing window with same id', () {
       vm.openWindow('w1', 'v1', const Text('a'), Colors.blue);
       vm.openWindow('w1', 'v2', const Text('b'), Colors.red);

@@ -42,6 +42,7 @@ class DesktopViewModel extends ChangeNotifier {
     Color accent, {
     double width = 480.0,
     double height = 360.0,
+    bool maximized = false,
   }) {
     _windows.removeWhere((w) => w.id == id);
     final offset = Offset(
@@ -62,6 +63,7 @@ class DesktopViewModel extends ChangeNotifier {
         position: offset,
         width: width,
         height: height,
+        maximized: maximized,
       ),
     );
     windowsNotifier.value = List.unmodifiable(_windows);

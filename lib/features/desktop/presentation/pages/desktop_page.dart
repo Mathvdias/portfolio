@@ -407,6 +407,7 @@ class _DesktopPageState extends State<DesktopPage> {
           AppTheme.peach,
           width: 760,
           height: 680,
+          maximized: true,
         );
     }
   }
@@ -491,7 +492,18 @@ class _DesktopPageState extends State<DesktopPage> {
                     experiences: experiences,
                     onOpenWindow: (id, title, content, accent) {
                       _trackWindowOpen(id);
-                      _desktopVM.openWindow(id, title, content, accent);
+                      // The Lava Studio is a two-column tool: it needs the
+                      // whole desktop, not the default 480x360 window.
+                      final isLava = id == AppStrings.winLava;
+                      _desktopVM.openWindow(
+                        id,
+                        title,
+                        content,
+                        accent,
+                        width: isLava ? 760 : 480,
+                        height: isLava ? 680 : 360,
+                        maximized: isLava,
+                      );
                     },
                   ),
                 ),
@@ -518,6 +530,7 @@ class _DesktopPageState extends State<DesktopPage> {
                                   maximizeColor: AppTheme.green,
                                   width: w.width,
                                   height: w.height,
+                                  startMaximized: w.maximized,
                                   titleBarHeight: AppSizes.windowTitleBarHeight,
                                   trafficLightSize:
                                       AppSizes.windowTrafficLightSize,
