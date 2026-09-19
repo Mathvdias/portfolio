@@ -13,7 +13,12 @@ import 'browser_image_decoder_stub.dart'
 /// Container encapsulating a decoded texture atlas [ui.Image] and its
 /// associated [LavaManifest] layout parameters.
 class LavaBundle {
-  LavaBundle({this.atlas, this.images = const [], required this.manifest});
+  LavaBundle({
+    this.atlas,
+    this.images = const [],
+    required this.manifest,
+    this.imageFiles = const [],
+  });
 
   /// Hardware texture holding animation frames for single-atlas grid mode.
   final ui.Image? atlas;
@@ -23,6 +28,10 @@ class LavaBundle {
 
   /// Structural layout and timing metadata.
   final LavaManifest manifest;
+
+  /// File actually decoded for each entry of [images] (`image_2.avif`, or
+  /// `image_2.webp` when the fallback was used). Empty for in-memory bundles.
+  final List<String> imageFiles;
 
   LavaFrameCompositor? _compositor;
 
@@ -184,16 +193,20 @@ class LavaBundle {
           ? name.substring(name.lastIndexOf('.') + 1).toLowerCase()
           : '';
 
-  static Future<ui.Image> _decodeWithFallback(
+  /// Decodes `name`, or its `fallback`, and reports which file it was.
+  static Future<(ui.Image, String)> _decodeWithFallback(
     AssetBundle bundle,
     String assetPath,
     String name,
     String? fallback, {
     int? expectedWidth,
   }) async {
-    Future<ui.Image> decode(String file) async => _decodeImage(
-      await _loadBytes(bundle, '$assetPath/$file'),
-      mimeType: _mimeTypes[_extensionOf(file)],
+    Future<(ui.Image, String)> decode(String file) async => (
+      await _decodeImage(
+        await _loadBytes(bundle, '$assetPath/$file'),
+        mimeType: _mimeTypes[_extensionOf(file)],
+      ),
+      file,
     );
 
     if (fallback == null) return decode(name);
@@ -234,7 +247,7 @@ class LavaBundle {
       image.dispose();
       image = null;
     }
-    return image ?? decode(fallback);
+    return image == null ? decode(fallback) : (image, name);
   }
 
   /// Container signature -> extension (`null` when the bytes are none of the
@@ -316,25 +329,26 @@ class LavaBundle {
     };
 
     final loadedImages = <ui.Image>[];
+    final loadedFiles = <String>[];
     for (var i = 0; i < manifest.images.length; i++) {
       final fallback =
           i < manifest.imageFallbacks.length
               ? manifest.imageFallbacks[i]
               : null;
       try {
-        loadedImages.add(
-          await _decodeWithFallback(
-            effectiveBundle,
-            assetPath,
-            manifest.images[i],
-            fallback,
-            // A key image is the canvas itself; any other image is a diff atlas.
-            expectedWidth:
-                keyImages.contains(i)
-                    ? manifest.tileWidth
-                    : manifest.diffImageSize,
-          ),
+        final (image, file) = await _decodeWithFallback(
+          effectiveBundle,
+          assetPath,
+          manifest.images[i],
+          fallback,
+          // A key image is the canvas itself; any other image is a diff atlas.
+          expectedWidth:
+              keyImages.contains(i)
+                  ? manifest.tileWidth
+                  : manifest.diffImageSize,
         );
+        loadedImages.add(image);
+        loadedFiles.add(file);
       } catch (_) {
         for (final image in loadedImages) {
           image.dispose();
@@ -347,6 +361,7 @@ class LavaBundle {
       images: loadedImages,
       atlas: loadedImages.isNotEmpty ? loadedImages.first : null,
       manifest: manifest,
+      imageFiles: loadedFiles,
     );
   }
 
