@@ -49,7 +49,7 @@ def shrink(mask, px):
     return np.array(Image.fromarray(mask.astype(np.uint8) * 255).filter(ImageFilter.MinFilter(2 * px + 1))) > 0
 
 
-def key_backdrop(img, thr=34, matte=70.0, shadow_min=None):
+def key_backdrop(img, thr=34, matte=70.0, shadow_min=None, neutral_pockets=None):
     """Flat-backdrop keyer (white or chroma): flood fill from the border on colour distance, soft
     matte on the outline, colours unpremultiplied against the backdrop. Returns float RGBA."""
     rgb = np.array(img.convert("RGB")).astype(np.float32)
@@ -74,6 +74,11 @@ def key_backdrop(img, thr=34, matte=70.0, shadow_min=None):
         ys, xs = np.where(bg)
         ImageDraw.floodfill(fill, (int(xs[0]), int(ys[0])), 128)
         bg = np.array(fill) == 128
+    if neutral_pockets is not None:
+        # a subject with no light neutral surfaces (a dark car): whatever is pale and colourless is
+        # backdrop or baked shadow showing through a gap, even where no path leads to the border
+        mn = rgb.min(axis=2)
+        bg = bg | ((rgb.max(axis=2) - mn < 26) & (mn > neutral_pockets))
     alpha = np.where(bg, 0.0, 1.0).astype(np.float32)
     ring = grow(bg, 3) & ~bg
     a = np.clip(dist[ring] / matte, 0.0, 1.0)
@@ -152,6 +157,8 @@ class Relit:
 
         # transparent margin so glow and bloom can spill past the silhouette
         self.margin = m = int(0.14 * max(size))
+        self.at = lambda x, y: ((x - x0) * scale + m, (y - y0) * scale + m)   # source px -> layer px
+        self.px = scale                                                      # source px -> layer px (lengths)
         self.unlit, self.lit = (np.pad(fit(a), ((m, m), (m, m), (0, 0))) for a in (keyed, keyed_lit))
         self.h, self.w = self.unlit.shape[:2]
         self.prepare()
@@ -322,7 +329,100 @@ class ChristmasTree(Relit):
         canvas.alpha_composite(flakes)
 
 
-SUBJECTS = {"campfire": Campfire, "christmastree": ChristmasTree}
+class F1Car(Relit):
+    """Formula 1 car at speed, from a single still (pass it as both `lit` and `unlit`).
+
+    Tile economy first: the body only has two states (a one-pixel engine vibration) and the wheel
+    glints four phases, so the car's tiles repeat every four frames; what is unique per frame is
+    small - titanium sparks skidding out from under the floor and speed streaks on the ground.
+    Coordinates below are in source-still pixels (1024x1024, car pointing to the lower left)."""
+
+    n_frames, fps = 48, 30
+    fill, base_y = 0.80, 0.90
+    key = dict(thr=34, matte=70.0, shadow_min=150, neutral_pockets=150)
+
+    AXIS = np.array([0.727, -0.687])          # image direction from the nose to the rear wing
+    SIDE = np.array([0.74, 0.67])             # ground direction towards the viewer's side
+    WHEELS = [((572, 682), (58, 92), -8.0), ((932, 428), (42, 70), -8.0)]   # centre, radii, tilt of the visible faces
+    FLOOR = ((650, 655), (840, 520))          # floor edge the sparks come out from
+
+    def prepare(self):
+        self.car = self.lit.copy()
+        rng = np.random.default_rng(19)
+        self.sparks = rng.uniform(0.0, 1.0, (34, 5))
+        self.streaks = rng.uniform(0.0, 1.0, (7, 3))
+
+    def wheel_glints(self, phase):
+        """Three soft arcs per wheel face, rotated by `phase` turns: reads as a spinning rim."""
+        layer = Image.new("L", (self.w, self.h), 0)
+        draw = ImageDraw.Draw(layer)
+        for (cx, cy), (rx, ry), tilt in self.WHEELS:
+            x, y = self.at(cx, cy)
+            rx, ry = rx * self.px, ry * self.px
+            for k in range(3):
+                a0 = 360.0 * (phase + k / 3.0)
+                for r, width in ((0.80, 0.10), (0.50, 0.08)):
+                    box = [x - rx * r, y - ry * r, x + rx * r, y + ry * r]
+                    draw.arc(box, a0 + tilt, a0 + tilt + 38, fill=150, width=max(2, int(rx * width)))
+        return np.array(layer.filter(ImageFilter.GaussianBlur(0.012 * self.w))).astype(np.float32)
+
+    def frame(self, t):
+        i = int(round(t * self.n_frames))
+        car = self.car
+        if (i // 2) % 2:                                   # engine vibration: two body states
+            car = np.roll(car, int(round(0.8 * SS * SCALE)), axis=0)
+        glint = self.wheel_glints((i % 4) / 12.0) * (car[..., 3] / 255.0)
+        car = car.copy()
+        car[..., :3] = np.clip(car[..., :3] + glint[..., None] * 0.55, 0, 255)
+
+        # speed streaks on the ground, under the car
+        under = Image.new("L", (self.w, self.h), 0)
+        draw = ImageDraw.Draw(under)
+        for s0, s1, s2 in self.streaks:
+            life = (t * 2.0 + s0) % 1.0                    # two passes per loop
+            start = np.array(self.at(130 + 300 * s1, 905 - 60 * s1)) + self.SIDE * self.px * (s2 - 0.35) * 260
+            head = start + self.AXIS * self.px * (life * 1150 - 120)
+            tail = head - self.AXIS * self.px * (90 + 120 * s2)
+            fade = math.sin(math.pi * life) ** 0.8
+            draw.line([tuple(tail), tuple(head)], fill=int(150 * fade), width=max(2, int(0.006 * self.w)))
+        streaks = np.array(under.filter(ImageFilter.GaussianBlur(0.004 * self.w))).astype(np.float32)
+        out = np.dstack([np.full((self.h, self.w, 3), 235.0, np.float32), streaks * 0.55])
+        out = over(out, car)
+
+        # titanium sparks: shot backwards and outwards from the floor edge, hopping as they cool
+        hot = Image.new("RGB", (self.w, self.h), (0, 0, 0))
+        draw = ImageDraw.Draw(hot)
+        (fx0, fy0), (fx1, fy1) = self.FLOOR
+        for s0, s1, s2, s3, s4 in self.sparks:
+            life = (t * 3.0 + s0) % 1.0                    # three bursts per loop
+            ox, oy = self.at(fx0 + (fx1 - fx0) * (0.55 + 0.45 * s1), fy0 + (fy1 - fy0) * (0.55 + 0.45 * s1))
+            reach = self.px * (150 + 330 * s2)
+            pos = (np.array([ox, oy]) + self.AXIS * reach * life * 0.55 + self.SIDE * reach * life * (0.35 + 0.9 * s3))
+            pos[1] -= self.px * 70 * abs(math.sin(math.pi * life * (1.5 + s4))) * (1.0 - life)
+            vel = self.AXIS * 0.55 + self.SIDE * (0.35 + 0.9 * s3)
+            tail = pos - vel / np.linalg.norm(vel) * self.px * (34 * (1.0 - life) + 6)
+            heat = (1.0 - life) ** 1.4 * min(1.0, life * 9.0)      # born under the floor, not on its edge
+            colour = (255, int(120 + 135 * heat), int(30 + 190 * heat ** 2))
+            draw.line([tuple(tail), tuple(pos)], fill=tuple(int(c * (0.35 + 0.65 * heat)) for c in colour),
+                      width=max(2, int(0.0032 * self.w * (0.6 + 0.8 * heat))))
+        hot = np.array(hot).astype(np.float32)
+        sparks = hot + 1.4 * blur(hot, 0.008 * self.w) + 0.8 * blur(hot, 0.03 * self.w)
+        sparks = np.where(sparks.max(axis=2, keepdims=True) < 10.0, 0.0, sparks)
+        return add_glow(out, sparks, 1.0), 0.0, 1.0
+
+    def shadow(self, size, position):
+        """Contact shadow cast by the silhouette itself: squashed, dropped a little and blurred, so it
+        follows the diagonal of the car instead of sitting in an ellipse under its middle."""
+        alpha = Image.fromarray(self.car[..., 3].astype(np.uint8))
+        squashed = alpha.resize((alpha.width, int(alpha.height * 0.55)))
+        sh = Image.new("L", size, 0)
+        x, y = position
+        sh.paste(squashed.point(lambda v: int(v * 0.42)),
+                 (int(x), int(y + alpha.height * 0.45 + self.h * 0.035)))
+        return sh.filter(ImageFilter.GaussianBlur(6 * SS * SCALE))
+
+
+SUBJECTS = {"campfire": Campfire, "christmastree": ChristmasTree, "f1car": F1Car}
 
 
 def render(kind, lit, unlit, out_dir):
@@ -336,11 +436,15 @@ def render(kind, lit, unlit, out_dir):
         t = i / subj.n_frames
         layer, yaw, shadow_alpha = subj.frame(t)
         canvas = Image.new("RGBA", (cw, ch), (0, 0, 0, 0))
-        sh = Image.new("L", (cw, ch), 0)
-        body_w, body_h = subj.w - 2 * subj.margin, subj.h - 2 * subj.margin
-        sw, shh = body_w * 0.44, body_h * 0.05
-        ImageDraw.Draw(sh).ellipse([cx - sw, base - shh, cx + sw, base + shh], fill=int(95 * shadow_alpha))
-        canvas.paste(Image.new("RGBA", (cw, ch), (20, 16, 12, 255)), (0, 0), sh.filter(ImageFilter.GaussianBlur(9 * SS * SCALE)))
+        if hasattr(subj, "shadow"):
+            soft = subj.shadow((cw, ch), (cx - subj.w / 2, base - subj.h + subj.margin))
+        else:
+            sh = Image.new("L", (cw, ch), 0)
+            body_w, body_h = subj.w - 2 * subj.margin, subj.h - 2 * subj.margin
+            sw, shh = body_w * 0.44, body_h * 0.05
+            ImageDraw.Draw(sh).ellipse([cx - sw, base - shh, cx + sw, base + shh], fill=int(95 * shadow_alpha))
+            soft = sh.filter(ImageFilter.GaussianBlur(9 * SS * SCALE))
+        canvas.paste(Image.new("RGBA", (cw, ch), (20, 16, 12, 255)), (0, 0), soft)
         big = Image.new("RGBA", (subj.w + 2 * pad, subj.h + 2 * pad), (0, 0, 0, 0))
         big.alpha_composite(Image.fromarray(np.clip(layer, 0, 255).astype(np.uint8)), (pad, pad))
         if yaw:
