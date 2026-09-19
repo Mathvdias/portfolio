@@ -30,6 +30,9 @@ const _prompt = 'matheus@portfolio:~\$ ';
 const _urlLauncherChannel = MethodChannel('plugins.flutter.io/url_launcher');
 const _outsideKey = Key('outside-terminal');
 
+TestDefaultBinaryMessenger get _messenger =>
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+
 /// Pumps the terminal inside the dependencies it reads (`admin_login` needs the
 /// guestbook view model) next to a plain area that is *not* part of it.
 Widget _buildTerminal(GuestbookViewModel guestbook) {
@@ -65,11 +68,10 @@ FocusNode _inputFocus(WidgetTester tester) =>
 ScrollPosition _outputScroll(WidgetTester tester) =>
     tester.widget<ListView>(find.byType(ListView)).controller!.position;
 
-int _outputLineCount(WidgetTester tester) =>
-    tester
-        .widget<ListView>(find.byType(ListView))
-        .childrenDelegate
-        .estimatedChildCount!;
+int _outputLineCount(WidgetTester tester) {
+  final list = tester.widget<ListView>(find.byType(ListView));
+  return list.childrenDelegate.estimatedChildCount!;
+}
 
 /// Lets the command finish, its output paint and the 100 ms scroll-to-bottom
 /// animation (started from a post-frame callback) run to its end.
@@ -117,16 +119,14 @@ void main() {
 
     launcherCalls = [];
     canLaunch = true;
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(_urlLauncherChannel, (call) async {
-          launcherCalls.add(call);
-          return call.method == 'canLaunch' ? canLaunch : true;
-        });
+    _messenger.setMockMethodCallHandler(_urlLauncherChannel, (call) async {
+      launcherCalls.add(call);
+      return call.method == 'canLaunch' ? canLaunch : true;
+    });
   });
 
   tearDown(() {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(_urlLauncherChannel, null);
+    _messenger.setMockMethodCallHandler(_urlLauncherChannel, null);
     guestbook.dispose();
   });
 
@@ -475,13 +475,10 @@ void main() {
       tester,
     ) async {
       final gate = Completer<bool>();
-      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-        _urlLauncherChannel,
-        (call) {
-          launcherCalls.add(call);
-          return call.method == 'canLaunch' ? gate.future : Future.value(true);
-        },
-      );
+      _messenger.setMockMethodCallHandler(_urlLauncherChannel, (call) {
+        launcherCalls.add(call);
+        return call.method == 'canLaunch' ? gate.future : Future.value(true);
+      });
       await tester.pumpWidget(_buildTerminal(guestbook));
       await tester.enterText(
         find.byType(TextField),
