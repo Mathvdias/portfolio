@@ -4,6 +4,7 @@ library;
 
 export 'src/demo/lava_demo_baker.dart';
 export 'src/engine/lava_controller.dart';
+export 'src/engine/lava_frame_compositor.dart';
 export 'src/engine/lava_painter.dart';
 export 'src/engine/tile_math.dart';
 export 'src/loader/lava_bundle.dart';
