@@ -57,6 +57,10 @@
   front wheels move. They are steered with light alone - the tread highlight slides towards the
   steer and the far side darkens while the outline stays put - so nothing tears against the
   bodywork that covers the tyres. Five distinct frames in a 72-frame loop.
+* New `LavaDemoType.sennaMp4`: a 1988-style car on its victory lap with the driver holding the
+  Brazilian flag. The still only has a bare pole; the flag is a simulated cloth mesh (travelling
+  wave pinned at the hoist, a faster ripple, droop, foreshortening, folds shaded by slope) drawn
+  under the car layer, so it loops perfectly and needed no second image.
 * New campfire, Christmas tree and helmet bundles: the flame and the fairy lights really relight
   the icon (lit / unlit light pass), the helmet is rendered in 3D and turns on its own axis.
 * `tool/` ships the Python pipeline used to key, animate, relight, render and encode new OpenLava

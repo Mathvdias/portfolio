@@ -6,7 +6,7 @@ Airbnb samples. There are three ways to get frames, all ending in `openlava_enco
 | Route | Script | Use it when | Built with it |
 | --- | --- | --- | --- |
 | Still + motion | `animate_icon.py` | one rendered still, secondary motion is enough | Macintosh, sunflower |
-| Lit / unlit pair | `relight_icon.py` | the icon has a light source that must light the rest of it (or a part that has two states: the F1 car's DRS flap) | campfire, Christmas tree, F1 car |
+| Lit / unlit pair | `relight_icon.py` | the icon has a light source that must light the rest of it, a part with two states (the DRS flap), or something simulated over one still (steering light, a cloth flag) | campfire, Christmas tree, F1 cars, victory lap |
 | Procedural 3D | `sdf_scenes.py` (+ `lava_sdf.py`) | the object has to turn on its own axis | racing helmet |
 
 Sections 1-3 cover the first route; 4 and 5 the other two.
@@ -171,6 +171,17 @@ python3 tool/openlava_encode.py assets/lava/christmastree --avif 65 --fallback-w
   magenta key works by hue (`min(R, B) - G`), so shadows cast on the backdrop and enclosed pockets
   go with it and the tyre edges stay intact. The helmet follows a real driver's colours and lion,
   without sponsor logos.
+
+- `SennaFlag`: one still of the car with the driver holding a BARE flagpole ("the pole is
+  completely bare: no flag, no cloth, no banner"); the flag is cloth simulated in `flag_layer` and
+  drawn under the car layer, so the pole and the glove stay in front. A wave travels from the
+  hoist to the fly with growing amplitude (pinned at the pole), a faster ripple rides on it, the
+  fly end droops, each strip advances by the cosine of its slope (foreshortening) and folds are
+  shaded by their slope against the top-left light - that shading is what makes it read as fabric.
+  `brazil_flag()` builds the texture (the motto is left out: not legible at icon size) and it is
+  mirrored because we see the reverse of a flag whose hoist is on the right. Anything that can be
+  simulated needs no second image - useful whenever image editing is unavailable. Red and white
+  livery and yellow helmet with green and blue stripes, no sponsor logos.
 
 Backdrop: white is fine for the campfire (the smooth baked drop shadow is flood-filled away, the
 textured stones stop the fill). Anything white at the silhouette (snow) needs a chroma backdrop:
