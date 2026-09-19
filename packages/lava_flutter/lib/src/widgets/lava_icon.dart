@@ -202,8 +202,7 @@ class LavaIcon extends StatefulWidget {
   State<LavaIcon> createState() => _LavaIconState();
 }
 
-class _LavaIconState extends State<LavaIcon>
-    with TickerProviderStateMixin {
+class _LavaIconState extends State<LavaIcon> with TickerProviderStateMixin {
   LavaBundle? _bundle;
   // Only bundles decoded by LavaIcon.asset belong to this widget; demo
   // bundles are shared through the loader caches and injected ones belong to
@@ -212,6 +211,8 @@ class _LavaIconState extends State<LavaIcon>
   LavaController? _internalController;
   bool _isLoading = false;
   int _loadGeneration = 0;
+  bool _didStart = false;
+  bool _useHd = false;
 
   LavaController get _effectiveController {
     if (widget.controller != null) return widget.controller!;
@@ -229,8 +230,44 @@ class _LavaIconState extends State<LavaIcon>
     if (widget.bundle != null) {
       _setBundle(widget.bundle!);
       _initControllerIfNeeded();
-    } else {
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final upgraded = _upgradeToHdIfNeeded();
+    if (!_didStart) {
+      _didStart = true;
+      if (widget.bundle == null) _loadBundleAsync();
+    } else if (upgraded && widget.bundle == null) {
       _loadBundleAsync();
+    }
+  }
+
+  /// A demo icon painted well above the standard bundle's resolution switches
+  /// to the large-preview bundle. It never switches back: resizing a window
+  /// around the threshold must not reload the icon over and over.
+  bool _upgradeToHdIfNeeded() {
+    if (_useHd || !widget._isDemo) return false;
+    final logicalWidth = widget.width ?? widget.size ?? 64.0;
+    final pixelRatio = MediaQuery.maybeDevicePixelRatioOf(context) ?? 1.0;
+    _useHd = logicalWidth * pixelRatio > LavaBundle.demoBaseWidth * 1.35;
+    return _useHd;
+  }
+
+  void _showBundle(LavaBundle bundle, {required bool owned}) {
+    if (identical(bundle, _bundle)) return;
+    final frame = _internalController?.currentFrame ?? 0;
+    setState(() {
+      _setBundle(bundle, owned: owned);
+      _isLoading = false;
+    });
+    _initControllerIfNeeded();
+    // Both variants are the same animation: carry the playhead over so the
+    // swap to the large one is not a visible restart.
+    if (frame > 0 && frame < bundle.manifest.totalFrames) {
+      _internalController?.seekToFrame(frame);
     }
   }
 
@@ -247,7 +284,8 @@ class _LavaIconState extends State<LavaIcon>
       _loadGeneration++;
       _setBundle(widget.bundle!);
       _initControllerIfNeeded();
-    } else if (widget._isDemo && widget.demoType != oldWidget.demoType) {
+    } else if (widget._isDemo &&
+        (widget.demoType != oldWidget.demoType || _upgradeToHdIfNeeded())) {
       _loadBundleAsync();
     } else if (widget.controller != oldWidget.controller &&
         widget.controller != null &&
@@ -281,10 +319,23 @@ class _LavaIconState extends State<LavaIcon>
     });
 
     try {
+      if (widget._isDemo && _useHd) {
+        // Progressive: the standard bundle is small (and usually already
+        // decoded for a thumbnail), so it goes on screen at once; the large
+        // variant replaces it when its atlas is ready.
+        final standard = await LavaBundle.demo(
+          type: widget.demoType,
+          bundle: widget._assetBundle,
+        );
+        if (!mounted || generation != _loadGeneration) return;
+        _showBundle(standard, owned: false);
+      }
+
       final loadedBundle =
           widget._isDemo
               ? await LavaBundle.demo(
                 type: widget.demoType,
+                hd: _useHd,
                 bundle: widget._assetBundle,
               )
               : await LavaBundle.fromAsset(
@@ -297,11 +348,7 @@ class _LavaIconState extends State<LavaIcon>
         if (!widget._isDemo) loadedBundle.dispose();
         return;
       }
-      setState(() {
-        _setBundle(loadedBundle, owned: !widget._isDemo);
-        _isLoading = false;
-      });
-      _initControllerIfNeeded();
+      _showBundle(loadedBundle, owned: !widget._isDemo);
     } catch (error, stackTrace) {
       // A missing or corrupt bundle leaves the placeholder box; report it
       // instead of failing silently.
