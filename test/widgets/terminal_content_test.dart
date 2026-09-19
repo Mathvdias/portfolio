@@ -486,22 +486,16 @@ void main() {
       );
       await tester.testTextInput.receiveAction(TextInputAction.done);
       await tester.pump();
-      expect(
-        launcherCalls.map((c) => c.method),
-        ['canLaunch'],
-        reason: 'the first command is still waiting on the platform',
-      );
+      // The first command is still waiting on the platform.
+      expect(launcherCalls.map((c) => c.method), ['canLaunch']);
 
       await tester.pumpWidget(const SizedBox());
       gate.complete(false);
       await _settleOutput(tester);
 
       expect(tester.takeException(), isNull);
-      expect(
-        launcherCalls.map((c) => c.method),
-        ['canLaunch'],
-        reason: 'nothing is launched and the rest of the line is dropped',
-      );
+      // Nothing is launched and the rest of the line is dropped.
+      expect(launcherCalls.map((c) => c.method), ['canLaunch']);
     });
   });
 
