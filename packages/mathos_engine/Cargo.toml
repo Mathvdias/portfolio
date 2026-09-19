@@ -9,5 +9,5 @@ crate-type = ["cdylib"]
 
 [profile.release]
 lto = true
-opt-level = "s" # Optimize for size
+opt-level = 3 # the module is one hot loop and a few KB: speed is what matters here
 strip = true
