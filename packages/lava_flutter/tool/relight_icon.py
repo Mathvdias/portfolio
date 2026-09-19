@@ -571,7 +571,112 @@ class F1Front(Relit):
         return self.states[state], 0.0, 1.0
 
 
-SUBJECTS = {"campfire": Campfire, "christmastree": ChristmasTree, "f1car": F1Car, "f1front": F1Front}
+def brazil_flag(width=840, mirrored=False):
+    """The Brazilian flag as a texture (20:14): green field, yellow rhombus, blue disc, white band
+    and a scatter of stars. The motto is left out - it is not legible at icon size."""
+    w, h = width, int(width * 0.7)
+    img = Image.new("RGB", (w, h), (0, 146, 62))            # a touch deeper than the spec green: it renders neon otherwise
+    draw = ImageDraw.Draw(img)
+    m = 0.085 * w                                           # rhombus margin (1.7 of 20 modules)
+    draw.polygon([(m, h / 2), (w / 2, m), (w - m, h / 2), (w / 2, h - m)], fill=(255, 223, 0))
+    r = 0.175 * w                                           # disc radius (3.5 modules)
+    cx, cy = w / 2, h / 2
+    draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(0, 39, 118))
+    # the white band: part of a big circle centred below and to the left, clipped to the disc
+    band = Image.new("L", (w, h), 0)
+    bd = ImageDraw.Draw(band)
+    bx, by, br = cx - 0.10 * w, cy + 0.42 * w, 0.47 * w
+    bd.ellipse([bx - br, by - br, bx + br, by + br], fill=255)
+    inner = br - 0.030 * w
+    bd.ellipse([bx - inner, by - inner, bx + inner, by + inner], fill=0)
+    disc = Image.new("L", (w, h), 0)
+    ImageDraw.Draw(disc).ellipse([cx - r, cy - r, cx + r, cy + r], fill=255)
+    img.paste((255, 255, 255), (0, 0), Image.fromarray(np.minimum(np.array(band), np.array(disc))))
+    rng = np.random.default_rng(1889)
+    for _ in range(14):                                     # stars, below the band
+        ang, rad = rng.uniform(0.15, 2.95), r * math.sqrt(rng.uniform(0.05, 0.80))
+        sx, sy = cx + rad * math.cos(ang), cy + abs(rad * math.sin(ang)) * 0.9 + 0.01 * w
+        if (sx - cx) ** 2 + (sy - cy) ** 2 < (0.9 * r) ** 2:
+            q = 0.006 * w
+            draw.ellipse([sx - q, sy - q, sx + q, sy + q], fill=(255, 255, 255))
+    return np.array(img.transpose(Image.FLIP_LEFT_RIGHT) if mirrored else img).astype(np.float32)
+
+
+class SennaFlag(Relit):
+    """A 1988-style red and white Formula 1 car on its victory lap, the driver holding a flagpole
+    out of the cockpit. One still (pass it twice) of the car with a BARE pole - "the pole is
+    completely bare: no flag, no cloth, no banner" - and the flag is cloth simulated here, so it
+    loops perfectly and needs no second image.
+
+    The flag is a mesh hanging from the top of the pole and streaming behind the car. A wave
+    travels from the hoist to the fly with growing amplitude (it is pinned at the pole), a second,
+    faster ripple rides on it, the fly end droops a little, and the cloth is foreshortened where
+    it turns away (each strip advances by the cosine of its slope). Folds are shaded by their
+    slope against a top-left light, which is what makes it read as fabric rather than a sticker.
+    It is drawn UNDER the car layer: the pole and the glove stay in front.
+
+    Coordinates are in source-still pixels (1024x1024, car pointing to the lower right)."""
+
+    n_frames, fps = 36, 24                     # one majestic wave cycle every 1.5 s
+    fill, base_y, width_fill = 0.78, 0.93, 0.92
+    key = dict(thr=60, matte=110.0)
+
+    POLE_TIP, FLAG_FOOT = (509, 176), (580, 356)            # the stretch of pole the hoist is tied to
+    STREAM = (-0.965, -0.262)                               # where the fly end points (behind the car)
+    LENGTH = 395.0
+    GRID = (168, 100)                          # fine enough for the rhombus and disc edges to stay smooth
+
+    def prepare(self):
+        self.car = self.lit
+        self.cloth = brazil_flag(mirrored=True)             # we see the reverse: the hoist is on the right
+
+    def flag_layer(self, t):
+        nu, nv = self.GRID
+        u = np.linspace(0.0, 1.0, nu + 1)
+        v = np.linspace(0.0, 1.0, nv + 1)
+        p0, p1 = np.array(self.at(*self.POLE_TIP)), np.array(self.at(*self.FLAG_FOOT))
+        d = np.array(self.STREAM) / np.linalg.norm(self.STREAM)
+        up = np.array([-d[1], d[0]])
+        if up[1] > 0:
+            up = -up                                        # screen-up is negative y
+        length = self.LENGTH * self.px
+
+        uu, vv = np.meshgrid(u, v)                          # (nv+1, nu+1)
+        amp = 52.0 * self.px * uu ** 1.15
+        phase = TAU * (1.55 * uu - t) + 0.85 * vv
+        wave = amp * np.sin(phase) + 0.30 * amp * np.sin(TAU * (3.2 * uu - 2.0 * t) + 1.9 * vv + 1.0)
+        slope = np.gradient(wave, axis=1) / (length / nu)
+        along = np.cumsum(np.cos(np.arctan(slope)) * (length / nu), axis=1)
+        along = along - along[:, :1]
+        droop = 34.0 * self.px * uu ** 2.0
+
+        hoist = p0[None, None, :] + vv[..., None] * (p1 - p0)[None, None, :]
+        pts = hoist + along[..., None] * d + wave[..., None] * up
+        pts[..., 1] += droop
+
+        # light from the top left: folds facing it brighten, folds turned away darken
+        lit = np.clip(0.96 - 0.95 * slope, 0.48, 1.34)
+        sheen = np.clip(-slope - 0.25, 0.0, 1.0) ** 2 * 60.0
+
+        th, tw = self.cloth.shape[:2]
+        layer = Image.new("RGBA", (self.w, self.h), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(layer)
+        for j in range(nv):
+            ty = min(th - 1, int((j + 0.5) / nv * th))
+            for i in range(nu):
+                tx = min(tw - 1, int((i + 0.5) / nu * tw))
+                k = 0.25 * (lit[j, i] + lit[j, i + 1] + lit[j + 1, i] + lit[j + 1, i + 1])
+                g = 0.25 * (sheen[j, i] + sheen[j, i + 1] + sheen[j + 1, i] + sheen[j + 1, i + 1])
+                colour = tuple(int(min(255.0, c * k + g)) for c in self.cloth[ty, tx])
+                quad = [tuple(pts[j, i]), tuple(pts[j, i + 1]), tuple(pts[j + 1, i + 1]), tuple(pts[j + 1, i])]
+                draw.polygon(quad, fill=colour + (255,))
+        return np.array(layer).astype(np.float32)
+
+    def frame(self, t):
+        return over(self.flag_layer(t), self.car), 0.0, 1.0
+
+
+SUBJECTS = {"campfire": Campfire, "christmastree": ChristmasTree, "f1car": F1Car, "f1front": F1Front, "sennamp4": SennaFlag}
 
 
 def render(kind, lit, unlit, out_dir):
