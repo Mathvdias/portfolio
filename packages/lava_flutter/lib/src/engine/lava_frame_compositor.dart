@@ -16,13 +16,17 @@ import '../model/lava_manifest.dart';
 ///
 /// The manifest is compiled once into typed-data blit plans (one
 /// [ui.Canvas.drawRawAtlas] call per source image, no per-frame parsing or
-/// allocation) and composed frames are kept in an LRU cache bounded by
-/// [maxCacheBytes], so a looping icon stops compositing after its first pass.
+/// allocation). Composed frames are cached all-or-nothing: when the whole loop
+/// fits in [maxCacheBytes] every frame is kept and a looping icon stops
+/// compositing after its first pass; when it does not fit, nothing but the
+/// frame on screen is kept. A partial cache is the worst of both: playback
+/// walks the frames in order, so an LRU smaller than the loop evicts exactly
+/// the frame needed next - a 100 % miss rate that still pins its whole budget.
 class LavaFrameCompositor {
   LavaFrameCompositor({
     required this.images,
     required this.manifest,
-    this.maxCacheBytes = 16 * 1024 * 1024,
+    this.maxCacheBytes = 40 * 1024 * 1024,
   }) : _plans = _compile(images, manifest);
 
   /// Decoded images referenced by the manifest (`images[0]` is the key frame).
@@ -46,10 +50,15 @@ class LavaFrameCompositor {
         // Later blocks replace whatever an earlier block left underneath.
         ..blendMode = ui.BlendMode.src;
 
-  int get _maxCachedFrames {
+  /// The whole loop, or only the frame on screen (see the class comment).
+  late final int _maxCachedFrames = () {
     final frameBytes = manifest.tileWidth * manifest.tileHeight * 4;
-    return math.max(1, maxCacheBytes ~/ math.max(1, frameBytes));
-  }
+    final diffFrames =
+        _plans.where((p) => p != null && p.keyImageIndex < 0).length;
+    return diffFrames * frameBytes <= maxCacheBytes
+        ? math.max(1, diffFrames)
+        : 1;
+  }();
 
   /// Number of composed frames currently held.
   int get cachedFrameCount => _cache.length;
@@ -239,6 +248,14 @@ class LavaFrameCompositor {
 
     return _FramePlan.diff(batches);
   }
+
+  /// Bytes of RGBA currently held by composed frames.
+  int get cachedBytes =>
+      _cache.length * manifest.tileWidth * manifest.tileHeight * 4;
+
+  /// Drops the composed frames (they are rebuilt on demand). Call it when the
+  /// bundle leaves the screen: a finished loop holds up to [maxCacheBytes].
+  void clearCache() => dispose();
 
   /// Releases the composed frames. The source [images] belong to the bundle.
   void dispose() {

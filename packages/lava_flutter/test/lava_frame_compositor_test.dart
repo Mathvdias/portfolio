@@ -164,5 +164,36 @@ void main() {
       expect(diff.last.destination, const ui.Rect.fromLTWH(64, 32, 16, 16));
       expect(compositor.frameCount, 3);
     });
+
+    test(
+      'a loop that does not fit the budget keeps only the frame on screen',
+      () {
+        // Two diff frames of 80x48: a budget for one and a half of them is a
+        // partial cache, which would miss on every frame of a loop.
+        final partial = LavaFrameCompositor(
+          images: [key, atlas],
+          manifest: compositor.manifest,
+          maxCacheBytes: 80 * 48 * 4 * 3 ~/ 2,
+        );
+        partial.frame(1);
+        partial.frame(2);
+        expect(partial.cachedFrameCount, 1);
+        expect(partial.cachedBytes, 80 * 48 * 4);
+
+        partial.clearCache();
+        expect(partial.cachedFrameCount, 0);
+        partial.dispose();
+      },
+    );
+
+    test('a loop that fits is cached whole and stops compositing', () {
+      final first = compositor.frame(1);
+      final second = compositor.frame(2);
+      for (var lap = 0; lap < 3; lap++) {
+        expect(compositor.frame(1), same(first));
+        expect(compositor.frame(2), same(second));
+      }
+      expect(compositor.cachedFrameCount, 2);
+    });
   });
 }
