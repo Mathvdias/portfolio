@@ -85,6 +85,7 @@ class _LavaInteractiveState extends State<LavaInteractive>
   Offset _currentTilt = Offset.zero;
   bool _isHovered = false;
   bool _isDragging = false;
+  bool _resumeAfterDrag = false;
   double _dragAccumulator = 0.0;
   int _dragStartFrame = 0;
   LavaInteractiveState _state = LavaInteractiveState.idle;
@@ -233,7 +234,8 @@ class _LavaInteractiveState extends State<LavaInteractive>
     _dragStartFrame = widget.controller!.currentFrame;
     _tiltReturnController.stop();
     _frameReturnController.stop();
-    if (widget.controller!.isPlaying) {
+    _resumeAfterDrag = widget.controller!.isPlaying;
+    if (_resumeAfterDrag) {
       widget.controller!.pause();
     }
     _updateState(LavaInteractiveState.pressed);
@@ -254,8 +256,16 @@ class _LavaInteractiveState extends State<LavaInteractive>
     }
   }
 
-  void _onPanEnd(DragEndDetails details) {
+  void _onPanEnd(DragEndDetails details) => _endDrag();
+
+  void _endDrag() {
     _isDragging = false;
+    // Playback was only suspended for the scrub: carry on from the frame the
+    // user left the model at.
+    if (_resumeAfterDrag) {
+      _resumeAfterDrag = false;
+      widget.controller?.play();
+    }
     _updateState(
       _isHovered ? LavaInteractiveState.hover : LavaInteractiveState.idle,
     );
@@ -322,6 +332,7 @@ class _LavaInteractiveState extends State<LavaInteractive>
             onPanStart: widget.dragToRotate ? _onPanStart : null,
             onPanUpdate: widget.dragToRotate ? _onPanUpdate : null,
             onPanEnd: widget.dragToRotate ? _onPanEnd : null,
+            onPanCancel: widget.dragToRotate ? _endDrag : null,
             onTapDown: _onTapDown,
             onTapUp: _onTapUp,
             onTapCancel: _onTapCancel,
