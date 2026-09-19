@@ -60,4 +60,10 @@ enum LavaDemoType {
   /// the DRS flap opens and closes, titanium sparks fly from under the diffuser
   /// while it is open, and the rain light blinks (`assets/lava/f1car`).
   f1Car,
+
+  /// The same car head-on, the driver's white, red and navy helmet with a gold
+  /// lion in the cockpit; only the front wheels move, weaving slightly left and
+  /// right - five distinct frames, the smallest bundle of the set
+  /// (`assets/lava/f1front`).
+  f1Front,
 }
