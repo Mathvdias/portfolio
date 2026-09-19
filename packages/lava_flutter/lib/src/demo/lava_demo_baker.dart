@@ -39,7 +39,8 @@ abstract final class LavaDemoBaker {
   }) async {
     final cached = switch (type) {
       LavaDemoType.macintosh => _cachedMacImage,
-      LavaDemoType.tree => _cachedTreeImage,
+      LavaDemoType.sunflower => _cachedTreeImage,
+      _ => _cachedMacImage,
     };
 
     if (cached != null && !forceRegenerate) {
@@ -69,8 +70,16 @@ abstract final class LavaDemoBaker {
             width: tileWidth.toDouble(),
             height: tileHeight.toDouble(),
           );
-        case LavaDemoType.tree:
+        case LavaDemoType.sunflower:
           _renderTreeFrame(
+            canvas: canvas,
+            frameIndex: i,
+            totalFrames: totalFrames,
+            width: tileWidth.toDouble(),
+            height: tileHeight.toDouble(),
+          );
+        default:
+          _renderFrame(
             canvas: canvas,
             frameIndex: i,
             totalFrames: totalFrames,
@@ -88,8 +97,10 @@ abstract final class LavaDemoBaker {
     switch (type) {
       case LavaDemoType.macintosh:
         _cachedMacImage = image;
-      case LavaDemoType.tree:
+      case LavaDemoType.sunflower:
         _cachedTreeImage = image;
+      default:
+        break;
     }
     return image;
   }
@@ -103,7 +114,7 @@ abstract final class LavaDemoBaker {
     int totalFrames = 24,
     bool forceRegenerate = false,
   }) => bakeAtlas(
-    type: LavaDemoType.tree,
+    type: LavaDemoType.sunflower,
     tileWidth: tileWidth,
     tileHeight: tileHeight,
     columns: columns,

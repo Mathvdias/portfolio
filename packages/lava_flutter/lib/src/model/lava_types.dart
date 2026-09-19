@@ -25,11 +25,36 @@ enum LavaInteractiveState {
   pressed,
 }
 
-/// Built-in procedural 3D demo icon types.
+/// Built-in demo icon bundles (OpenLava diff tilesets shipped with the host app).
 enum LavaDemoType {
-  /// Classic 1984 Macintosh 128K with glowing phosphor CRT screen, scanlines, and retro badge.
+  /// Classic 1984 Macintosh 128K rendered in 3D, hovering with a soft contact shadow
+  /// (`assets/lava/macintosh`; falls back to the procedural baker when absent).
   macintosh,
 
-  /// Stylized procedural 3D nature tree with foliage canopy puffs, wind sway physics, and ruby apples.
-  tree,
+  /// 3D sunflower in a terracotta pot: stem bends in the wind, the head turns
+  /// and pollen drifts up (`assets/lava/sunflower`; falls back to the procedural
+  /// tree baker when absent).
+  sunflower,
+
+  /// Retro 1970s Lava Lamp with glowing internal bulb, molten wax blobs, and
+  /// brushed aluminum cone base (`assets/lava/lavalamp`).
+  lavaLamp,
+
+  /// Cozy outdoor campfire with glowing embers, organic flame flickers,
+  /// volumetric warm light bloom, and rising incandescent sparks (`assets/lava/campfire`).
+  campfire,
+
+  /// Classic 1950s atomic sci-fi retro space rocket with fire thruster plume,
+  /// mach diamonds, and incandescent glowing sparks (`assets/lava/rocket`).
+  rocket,
+
+  /// Ayrton Senna's legendary Formula 1 helmet with iconic yellow lacquer,
+  /// green and blue stripes, moving 3D perspective, visor reflections, and
+  /// dynamic lacquer specular gleam (`assets/lava/senna`).
+  senna,
+
+  /// Magical Christmas tree dusted with snow, wrapped in colorful blinking
+  /// fairy lights (pisca-piscas), gently falling snowflakes, and radiant golden
+  /// star topper (`assets/lava/christmastree`).
+  christmasTree,
 }
