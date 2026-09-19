@@ -343,7 +343,7 @@ abstract final class AppStrings {
   static const String lavaModelChristmasTree = 'Árvore de Natal';
   static const String lavaModelF1Car = 'RB19';
   static const String lavaModelF1CarDesc =
-      'OpenLava Diff Tileset • 48-Frame Speed Loop • DRS Opens, Sparks Fly';
+      'OpenLava Diff Tileset • 48-Frame Chase Cam • DRS Opens, Sparks Fly, Rain Light Blinks';
   static const String lavaModelChristmasTreeDesc =
       'OpenLava Diff Tileset • 60-Frame Winter Loop • Blinking Fairy Lights & Snow';
 }

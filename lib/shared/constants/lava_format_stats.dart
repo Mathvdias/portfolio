@@ -98,13 +98,13 @@ class LavaFormatStats {
     ),
     LavaDemoType.f1Car: LavaFormatStats(
       frames: 48,
-      pngSequence: 1432061,
-      apng: 1369574,
-      gif: 356044,
-      animatedWebp: 493950,
-      lavaAvif: 171100,
-      lavaWebp: 193186,
-      lavaHdAvif: 265509,
+      pngSequence: 1478368,
+      apng: 1027664,
+      gif: 429886,
+      animatedWebp: 372502,
+      lavaAvif: 116500,
+      lavaWebp: 179018,
+      lavaHdAvif: 180524,
     ),
   };
 }

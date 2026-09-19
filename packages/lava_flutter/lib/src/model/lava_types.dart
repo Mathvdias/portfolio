@@ -56,8 +56,8 @@ enum LavaDemoType {
   /// casting its own pool of light, under falling snow (`assets/lava/christmastree`).
   christmasTree,
 
-  /// Formula 1 car at speed in a navy, red and yellow livery: engine vibration,
-  /// spinning wheel glints, titanium sparks skidding out from under the floor and
-  /// speed streaks on the ground (`assets/lava/f1car`).
+  /// Formula 1 car from the TV chase camera in a navy, red and yellow livery:
+  /// the DRS flap opens and closes, titanium sparks fly from under the diffuser
+  /// while it is open, and the rain light blinks (`assets/lava/f1car`).
   f1Car,
 }
