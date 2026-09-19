@@ -108,6 +108,8 @@ flutter:
     - assets/lava/christmastree_hd/
     - assets/lava/f1car/
     - assets/lava/f1car_hd/
+    - assets/lava/f1front/
+    - assets/lava/f1front_hd/
 
   fonts:
     - family: Noto Sans
