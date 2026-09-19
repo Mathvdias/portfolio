@@ -49,7 +49,8 @@ def shrink(mask, px):
     return np.array(Image.fromarray(mask.astype(np.uint8) * 255).filter(ImageFilter.MinFilter(2 * px + 1))) > 0
 
 
-def key_backdrop(img, thr=34, matte=70.0, shadow_min=None, neutral_pockets=None, shadow_floor=None):
+def key_backdrop(img, thr=34, matte=70.0, shadow_min=None, neutral_pockets=None, shadow_floor=None,
+                 pocket_min_width=0, pocket_chroma=26, protect=None):
     """Flat-backdrop keyer (white or chroma): flood fill from the border on colour distance, soft
     matte on the outline, colours unpremultiplied against the backdrop. Returns float RGBA."""
     rgb = np.array(img.convert("RGB")).astype(np.float32)
@@ -78,14 +79,27 @@ def key_backdrop(img, thr=34, matte=70.0, shadow_min=None, neutral_pockets=None,
         # a subject with no light neutral surfaces (a dark car): whatever is pale and colourless is
         # backdrop or baked shadow showing through a gap, even where no path leads to the border
         mn = rgb.min(axis=2)
-        bg = bg | ((rgb.max(axis=2) - mn < 26) & (mn > neutral_pockets))
+        # `pocket_chroma`: some renders tint their white backdrop and shadows (bluish here)
+        pale = (rgb.max(axis=2) - mn < pocket_chroma) & (mn > neutral_pockets)
+        if pocket_min_width:
+            # only blobs at least this wide: thin white pinstripes on the bodywork are paint
+            pale = grow(shrink(pale, pocket_min_width), pocket_min_width + 1) & pale
+        if protect is not None:
+            # a subject part that really is white (a helmet): box in source pixels, left alone
+            px0, py0, px1, py1 = protect
+            pale[py0:py1, px0:px1] = False
+        bg = bg | pale
     if shadow_floor is not None:
         # baked contact shadow trapped between the wheels: below `row` (a share of the height),
         # anything colourless and lighter than the black tyres and floor is shadow on the backdrop
-        row, lightest = shadow_floor
+        # one (row, lightest[, tint]) rule, or several: the shadow gets darker towards the car
+        rules = shadow_floor if isinstance(shadow_floor[0], (tuple, list)) else (shadow_floor,)
         mn = rgb.min(axis=2)
-        below = (np.arange(h) > row * h)[:, None]
-        bg = bg | ((rgb.max(axis=2) - mn < 22) & (mn > lightest) & below)
+        for rule in rules:
+            row, lightest = rule[:2]
+            tint = rule[2] if len(rule) > 2 else 22
+            below = (np.arange(h) > row * h)[:, None]
+            bg = bg | ((rgb.max(axis=2) - mn < tint) & (mn > lightest) & below)
     alpha = np.where(bg, 0.0, 1.0).astype(np.float32)
     ring = grow(bg, 3) & ~bg
     a = np.clip(dist[ring] / matte, 0.0, 1.0)
@@ -478,7 +492,62 @@ class F1Car(Relit):
         return add_glow(out, glow, 1.0), 0.0, 1.0
 
 
-SUBJECTS = {"campfire": Campfire, "christmastree": ChristmasTree, "f1car": F1Car}
+class F1Front(Relit):
+    """Formula 1 car head-on with the driver in the cockpit; the only thing that moves is the
+    steering. `lit` is the still with the front wheels straight, `unlit` a pixel-aligned edit with
+    them "steered slightly to the left of the picture, about 12 degrees, nothing else changes".
+
+    The still is symmetric about x = 511.5, so the steer to the right is the same edit mirrored -
+    asking the image model for the other side gives a different angle and different brake ducts.
+    Only what the edit changed inside the two wheel boxes is swapped in, through a soft mask, so
+    the body, the helmet and the background never flicker.
+
+    Five distinct frames in the whole loop (straight, half and full lock each way): the diff atlas
+    holds a handful of wheel tiles and the bundle is tiny."""
+
+    n_frames, fps = 72, 24                     # a slow three-second weave
+    fill, base_y, width_fill = 0.86, 0.93, 0.86
+    key = dict(thr=30, matte=70.0, shadow_min=150, neutral_pockets=132, pocket_min_width=5, pocket_chroma=90,
+               protect=(420, 225, 610, 440), shadow_floor=((0.62, 92, 80), (0.885, 58, 60)))
+
+    AXIS_X = 511.5
+    WHEELS = ((55, 470, 340, 860), (684, 470, 969, 860))   # front wheel boxes: left, and its mirror image
+    #          start  straight->left   hold left   back       straight    ->right     hold right  back
+    TIMELINE = ((0.00, 0), (0.12, 1), (0.16, 2), (0.38, 1), (0.42, 0), (0.62, 3), (0.66, 4), (0.88, 3), (0.92, 0))
+
+    def prepare(self):
+        straight, left = self.lit, self.unlit
+        boxes = np.zeros((self.h, self.w), bool)
+        for x0, y0, x1, y1 in self.WHEELS:
+            (ax, ay), (bx, by) = self.at(x0, y0), self.at(x1, y1)
+            boxes[int(ay):int(by), int(ax):int(bx)] = True
+        differs = (np.abs(straight - left).max(axis=2) > 26) & boxes
+        mask = blur(fill_holes(grow(differs, max(2, int(4 * self.px)))).astype(np.float32) * 255.0, 2.0 * self.px)[..., None] / 255.0
+
+        # mirror about the car's centre line: x' = 2 * axis - x
+        axis = self.at(self.AXIS_X, 0)[0]
+        idx = np.clip(np.round(2.0 * axis - np.arange(self.w)).astype(int), 0, self.w - 1)
+        right, mask_r = left[:, idx], mask[:, idx]
+
+        def mix(other, m, amount):
+            k = m * amount
+            a0, a1 = straight[..., 3:4] / 255.0, other[..., 3:4] / 255.0
+            alpha = a0 * (1.0 - k) + a1 * k
+            rgb = (straight[..., :3] * a0 * (1.0 - k) + other[..., :3] * a1 * k) / np.maximum(alpha, 1e-4)
+            return np.dstack([rgb, alpha * 255.0])
+
+        self.states = [straight, mix(left, mask, 0.5), mix(left, mask, 1.0),
+                       mix(right, mask_r, 0.5), mix(right, mask_r, 1.0)]
+
+    def frame(self, t):
+        state = 0
+        for start, index in self.TIMELINE:
+            if t >= start:
+                state = index
+        return self.states[state], 0.0, 1.0
+
+
+SUBJECTS = {"campfire": Campfire, "christmastree": ChristmasTree, "f1car": F1Car, "f1front": F1Front}
 
 
 def render(kind, lit, unlit, out_dir):
