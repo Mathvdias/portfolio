@@ -66,4 +66,9 @@ enum LavaDemoType {
   /// right - five distinct frames, the smallest bundle of the set
   /// (`assets/lava/f1front`).
   f1Front,
+
+  /// A 1988-style red and white Formula 1 car on its victory lap, the driver in
+  /// a yellow helmet holding the Brazilian flag out of the cockpit; the flag is
+  /// simulated cloth waving behind the car (`assets/lava/sennamp4`).
+  sennaMp4,
 }
