@@ -47,12 +47,13 @@
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="manifest" href="manifest.json">
 
-  <!-- Preconnect (fonts loaded by Flutter at runtime) -->
+  <!-- Preconnect (fonts loaded by Flutter at runtime; www.gstatic.com serves
+       the renderer and the Firebase SDKs the app waits for before its first
+       frame). No preload of main.dart.wasm: browsers without WasmGC run
+       main.dart.js and would download the module for nothing. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <!-- High-Performance WASM Preloading -->
-  <link rel="preload" href="main.dart.wasm" as="fetch" type="application/wasm" crossorigin>
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 
   <!-- Structured data -->
   <script type="application/ld+json">
@@ -464,10 +465,14 @@
         }, 650);
       }
 
-      steps.forEach(function (s, i) {
-        setTimeout(function () {
-          if (lines[i]) lines[i].style.opacity = '1';
-          fill.style.transform = 'scaleX(' + s.pct + ')';
+      function show(i) {
+        if (lines[i]) lines[i].style.opacity = '1';
+        fill.style.transform = 'scaleX(' + steps[i].pct + ')';
+      }
+
+      var timers = steps.map(function (s, i) {
+        return setTimeout(function () {
+          show(i);
           if (i === steps.length - 1) {
             seqDone = true;
             tryDismiss();
@@ -477,6 +482,15 @@
 
       window.addEventListener('flutter-first-frame', function () {
         ready = true;
+        if (!seqDone) {
+          // The app is on screen behind the splash: finish the boot log at
+          // once instead of holding a ready app for the rest of the sequence.
+          timers.forEach(clearTimeout);
+          for (var i = 0; i < steps.length; i++) show(i);
+          seqDone = true;
+          setTimeout(dismiss, 220);
+          return;
+        }
         tryDismiss();
       });
     })();
