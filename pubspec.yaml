@@ -43,6 +43,8 @@ dependencies:
   # Internal packages
   app_window:
     path: packages/app_window
+  lava_flutter:
+    path: packages/lava_flutter
   flutter_lazy_load_web: ^0.1.2
   flutter_svg: ^2.3.0
 
@@ -67,9 +69,6 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
-  shaders:
-    - shaders/wallpaper.frag
-
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
@@ -90,6 +89,26 @@ flutter:
     - assets/fonts/
     - assets/icons/
     - assets/wasm/
+    - assets/lava/macintosh/
+    - assets/lava/macintosh_hd/
+    - assets/lava/sunflower/
+    - assets/lava/sunflower_hd/
+    - assets/lava/lavalamp/
+    - assets/lava/lavalamp_hd/
+    - assets/lava/campfire/
+    - assets/lava/campfire_hd/
+    - assets/lava/rocket/
+    - assets/lava/rocket_hd/
+    - assets/lava/senna/
+    - assets/lava/senna_hd/
+    - assets/lava/christmastree/
+    - assets/lava/christmastree_hd/
+    - assets/lava/f1car/
+    - assets/lava/f1car_hd/
+    - assets/lava/f1front/
+    - assets/lava/f1front_hd/
+    - assets/lava/sennamp4/
+    - assets/lava/sennamp4_hd/
 
   fonts:
     - family: Noto Sans

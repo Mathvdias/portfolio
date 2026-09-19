@@ -124,7 +124,7 @@ class _TechStackSection extends StatelessWidget {
             ('Architecture', 'MVVM 2.0'),
             ('State', 'InheritedWidget'),
             ('DI', 'InheritedWidget · Pure Dart'),
-            ('Wallpaper', 'GLSL GPU Shader'),
+            ('Wallpaper', 'CustomPainter · 30 fps'),
             ('Web Render', 'CanvasKit / WebGL'),
             ('CI', 'GitHub Actions'),
           ],

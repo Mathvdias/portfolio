@@ -225,7 +225,7 @@ class _TerminalContentState extends State<TerminalContent> {
       case 'clear':
         return null;
       case 'history':
-        if (_cmdHistory.isEmpty) return '(empty history)';
+        // Never empty here: _submit records the line before running it.
         final sb = StringBuffer();
         for (int i = _cmdHistory.length - 1; i >= 0; i--) {
           sb.writeln('  ${_cmdHistory.length - i}  ${_cmdHistory[i]}');
@@ -403,6 +403,12 @@ class _TerminalContentState extends State<TerminalContent> {
                       cursorWidth: 8.0,
                       cursorHeight: AppSizes.terminalFontSize + 2,
                       cursorRadius: Radius.zero,
+                      // Enter would otherwise blur the field (the default for
+                      // TextInputAction.done), leaving ↑ / ↓ / Tab dead until
+                      // the next click. Never letting go of the focus, rather
+                      // than taking it back in _submit, also keeps the soft
+                      // keyboard up between commands instead of bouncing it.
+                      onEditingComplete: () {},
                       onSubmitted: _submit,
                       onTapOutside: (_) => _focus.requestFocus(),
                     ),

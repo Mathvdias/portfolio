@@ -64,15 +64,15 @@ class AppLocalizations {
       "techQAA1p3Body":
           "If a browser lacks WasmGC or has strict privacy settings, Flutter Web silently falls back to CanvasKit (JS) or HTML (DOM) — 100% uptime on any device.",
       "techQAQ2": "How are the wallpaper particles and mouse effect rendered?",
-      "techQAA2p1Title": "dart:ui FragmentShader — pure GPU",
+      "techQAA2p1Title": "70 rectangles, not a full-screen shader",
       "techQAA2p1Body":
-          "The wallpaper is a GLSL fragment shader loaded with ui.FragmentProgram.fromAsset. On Impeller (native) it compiles to Metal/Vulkan; on the web it runs via CanvasKit/WebGL. ~140M operations per frame execute in parallel on the GPU — near-zero CPU cost.",
-      "techQAA2p2Title": "Mouse repulsion as a shader uniform",
+          "The wallpaper started as a GLSL fragment shader. Profiling showed it looping over all 70 particles for every pixel of the screen on every vsync: ~140M operations per frame to light a few hundred pixels. It is now 70 drawRect calls in a CustomPainter — the same picture for a tiny fraction of the GPU time.",
+      "techQAA2p2Title": "Mouse repulsion with a smoothstep curve",
       "techQAA2p2Body":
-          "The cursor position is sent to the shader every frame as uMouseX/uMouseY uniforms. The repulsion force uses a smoothstep curve (force² × (3 − 2 × force)) computed per-pixel on the GPU — no CPU physics loop at all.",
-      "techQAA2p3Title": "Native vsync Ticker + zero-allocation hot path",
+          "The cursor position lives in a ValueNotifier read by the painter. Particles within 100 px are pushed radially by a smoothstep curve (force² × (3 − 2 × force)) — 70 evaluations per frame instead of one per pixel.",
+      "techQAA2p3Title": "30 fps timer instead of a vsync Ticker",
       "techQAA2p3Body":
-          "A Ticker tied to the engine's vsync runs at the screen's native refresh rate (120 fps on ProMotion, 60 fps otherwise). One Paint is reused every frame, RepaintBoundary isolates repaints, and a ValueNotifier avoids setState — zero garbage per frame. A Dart CustomPainter activates automatically as a CPU fallback.",
+          "A vsync Ticker made the engine composite the whole desktop at the display rate (120 fps on ProMotion) for particles that move about one pixel per frame. A 33 ms timer drives the clock now. One Paint is reused every frame, RepaintBoundary isolates repaints, and a ValueNotifier avoids setState — zero garbage per frame.",
       "expertise": "Expertise",
       "core": "Core",
       "tools": "Tools",
@@ -221,15 +221,15 @@ class AppLocalizations {
           "Si un navegador no admite WasmGC o tiene privacidad estricta, Flutter Web hace fallback automático a CanvasKit (JS) o HTML (DOM) — disponibilidad del 100%.",
       "techQAQ2":
           "¿Cómo se renderizan las partículas del fondo y el efecto del mouse?",
-      "techQAA2p1Title": "dart:ui FragmentShader — GPU pura",
+      "techQAA2p1Title": "70 rectángulos, no un shader a pantalla completa",
       "techQAA2p1Body":
-          "El fondo es un shader GLSL cargado con ui.FragmentProgram.fromAsset. En Impeller (nativo) compila a Metal/Vulkan; en web corre via CanvasKit/WebGL. ~140M operaciones por frame se ejecutan en paralelo en la GPU — costo de CPU casi nulo.",
-      "techQAA2p2Title": "Repulsión del mouse como uniform del shader",
+          "El fondo nació como un fragment shader GLSL. El profiling mostró que recorría las 70 partículas por cada píxel de la pantalla en cada vsync: ~140M de operaciones por frame para encender unos cientos de píxeles. Ahora son 70 llamadas drawRect en un CustomPainter — la misma imagen con una fracción mínima del tiempo de GPU.",
+      "techQAA2p2Title": "Repulsión del mouse con curva smoothstep",
       "techQAA2p2Body":
-          "La posición del cursor se envía al shader cada frame como uniforms uMouseX/uMouseY. La fuerza de repulsión usa una curva smoothstep (fuerza² × (3 − 2 × fuerza)) calculada por píxel en la GPU — sin bucle de física en la CPU.",
-      "techQAA2p3Title": "Ticker de vsync nativo + hot path sin asignaciones",
+          "La posición del cursor vive en un ValueNotifier que lee el painter. Las partículas a menos de 100 px se empujan radialmente con una curva smoothstep (fuerza² × (3 − 2 × fuerza)) — 70 evaluaciones por frame en lugar de una por píxel.",
+      "techQAA2p3Title": "Timer de 30 fps en lugar del Ticker de vsync",
       "techQAA2p3Body":
-          "Un Ticker vinculado al vsync del motor corre a la tasa nativa de la pantalla (120 fps en ProMotion, 60 fps en el resto). Un Paint se reutiliza cada frame, RepaintBoundary aísla los repaints y un ValueNotifier evita setState — cero basura por frame. Un Dart CustomPainter se activa automáticamente como fallback de CPU.",
+          "Un Ticker de vsync hacía que el motor compusiera todo el escritorio a la tasa de la pantalla (120 fps en ProMotion) para partículas que avanzan cerca de un píxel por frame. Ahora un timer de 33 ms mueve el reloj. Un único Paint se reutiliza en cada frame, RepaintBoundary aísla los repaints y un ValueNotifier evita setState — cero basura por frame.",
       "expertise": "Especialidad",
       "core": "Core",
       "tools": "Herramientas",
@@ -378,15 +378,15 @@ class AppLocalizations {
           "Si un navigateur ne supporte pas WasmGC ou a des paramètres de confidentialité stricts, Flutter Web bascule silencieusement vers CanvasKit (JS) ou HTML (DOM) — disponibilité 100%.",
       "techQAQ2":
           "Comment les particules du fond et l'effet souris sont-ils rendus ?",
-      "techQAA2p1Title": "dart:ui FragmentShader — GPU pur",
+      "techQAA2p1Title": "70 rectangles, pas un shader plein écran",
       "techQAA2p1Body":
-          "Le fond est un shader GLSL chargé via ui.FragmentProgram.fromAsset. Sur Impeller (natif) il compile en Metal/Vulkan ; sur le web via CanvasKit/WebGL. ~140M opérations par frame s'exécutent en parallèle sur le GPU — coût CPU quasi nul.",
-      "techQAA2p2Title": "Répulsion de la souris comme uniform du shader",
+          "Le fond est né comme un fragment shader GLSL. Le profilage a montré qu'il parcourait les 70 particules pour chaque pixel de l'écran à chaque vsync : ~140M d'opérations par frame pour allumer quelques centaines de pixels. Ce sont désormais 70 appels drawRect dans un CustomPainter — la même image pour une infime fraction du temps GPU.",
+      "techQAA2p2Title": "Répulsion de la souris avec une courbe smoothstep",
       "techQAA2p2Body":
-          "La position du curseur est envoyée au shader chaque frame via les uniforms uMouseX/uMouseY. La force de répulsion utilise une courbe smoothstep (force² × (3 − 2 × force)) calculée par pixel sur le GPU — aucune boucle physique sur le CPU.",
-      "techQAA2p3Title": "Ticker vsync natif + hot path sans allocation",
+          "La position du curseur vit dans un ValueNotifier lu par le painter. Les particules à moins de 100 px sont repoussées radialement par une courbe smoothstep (force² × (3 − 2 × force)) — 70 évaluations par frame au lieu d'une par pixel.",
+      "techQAA2p3Title": "Timer à 30 fps à la place du Ticker vsync",
       "techQAA2p3Body":
-          "Un Ticker lié au vsync du moteur s'exécute à la cadence native de l'écran (120 fps sur ProMotion, 60 fps sinon). Un Paint est réutilisé chaque frame, RepaintBoundary isole les repaints et un ValueNotifier évite setState — zéro déchets par frame. Un Dart CustomPainter s'active automatiquement en fallback CPU.",
+          "Un Ticker vsync forçait le moteur à composer tout le bureau à la fréquence de l'écran (120 fps sur ProMotion) pour des particules qui avancent d'environ un pixel par frame. Un timer de 33 ms fait désormais avancer l'horloge. Un seul Paint est réutilisé à chaque frame, RepaintBoundary isole les repaints et un ValueNotifier évite setState — zéro déchet par frame.",
       "expertise": "Expertise",
       "core": "Core",
       "tools": "Outils",
@@ -535,15 +535,15 @@ class AppLocalizations {
           "Se un browser non supporta WasmGC o ha impostazioni di privacy rigide, Flutter Web passa silenziosamente a CanvasKit (JS) o HTML (DOM) — disponibilità 100%.",
       "techQAQ2":
           "Come vengono renderizzate le particelle dello sfondo e l'effetto mouse?",
-      "techQAA2p1Title": "dart:ui FragmentShader — GPU pura",
+      "techQAA2p1Title": "70 rettangoli, non uno shader a tutto schermo",
       "techQAA2p1Body":
-          "Lo sfondo è uno shader GLSL caricato con ui.FragmentProgram.fromAsset. Su Impeller (nativo) compila in Metal/Vulkan; sul web tramite CanvasKit/WebGL. ~140M operazioni per frame vengono eseguite in parallelo sulla GPU — costo CPU quasi nullo.",
-      "techQAA2p2Title": "Repulsione del mouse come uniform dello shader",
+          "Lo sfondo è nato come fragment shader GLSL. Il profiling ha mostrato che scorreva tutte le 70 particelle per ogni pixel dello schermo a ogni vsync: ~140M di operazioni per frame per accendere poche centinaia di pixel. Ora sono 70 chiamate drawRect in un CustomPainter — la stessa immagine con una frazione minima del tempo GPU.",
+      "techQAA2p2Title": "Repulsione del mouse con curva smoothstep",
       "techQAA2p2Body":
-          "La posizione del cursore viene inviata allo shader ogni frame come uniform uMouseX/uMouseY. La forza di repulsione usa una curva smoothstep (forza² × (3 − 2 × forza)) calcolata per pixel sulla GPU — nessun ciclo fisico sulla CPU.",
-      "techQAA2p3Title": "Ticker vsync nativo + hot path senza allocazioni",
+          "La posizione del cursore vive in un ValueNotifier letto dal painter. Le particelle entro 100 px vengono spinte radialmente da una curva smoothstep (forza² × (3 − 2 × forza)) — 70 valutazioni per frame invece di una per pixel.",
+      "techQAA2p3Title": "Timer a 30 fps al posto del Ticker vsync",
       "techQAA2p3Body":
-          "Un Ticker collegato al vsync del motore gira alla frequenza nativa dello schermo (120 fps su ProMotion, 60 fps altrimenti). Un Paint viene riutilizzato ogni frame, RepaintBoundary isola i repaint e un ValueNotifier evita setState — zero garbage per frame. Un Dart CustomPainter si attiva automaticamente come fallback CPU.",
+          "Un Ticker vsync costringeva il motore a comporre l'intero desktop alla frequenza dello schermo (120 fps su ProMotion) per particelle che avanzano di circa un pixel per frame. Ora un timer da 33 ms fa avanzare l'orologio. Un solo Paint viene riutilizzato a ogni frame, RepaintBoundary isola i repaint e un ValueNotifier evita setState — zero garbage per frame.",
       "expertise": "Esperienza",
       "core": "Core",
       "tools": "Strumenti",
@@ -692,15 +692,15 @@ class AppLocalizations {
           "Se um navegador não suporta WasmGC ou tem configurações rígidas de privacidade, o Flutter Web faz fallback silencioso para CanvasKit (JS) ou HTML (DOM) — disponibilidade de 100%.",
       "techQAQ2":
           "Como as partículas do fundo e o efeito do mouse são renderizados?",
-      "techQAA2p1Title": "dart:ui FragmentShader — GPU pura",
+      "techQAA2p1Title": "70 retângulos, não um shader de tela cheia",
       "techQAA2p1Body":
-          "O fundo é um shader GLSL carregado com ui.FragmentProgram.fromAsset. No Impeller (nativo) compila para Metal/Vulkan; na web roda via CanvasKit/WebGL. ~140M operações por frame são executadas em paralelo na GPU — custo de CPU quase zero.",
-      "techQAA2p2Title": "Repulsão do mouse como uniform do shader",
+          "O fundo nasceu como um fragment shader GLSL. O profiling mostrou que ele percorria as 70 partículas para cada pixel da tela a cada vsync: ~140M de operações por frame para acender algumas centenas de pixels. Hoje são 70 chamadas drawRect em um CustomPainter — a mesma imagem por uma fração mínima do tempo de GPU.",
+      "techQAA2p2Title": "Repulsão do mouse com curva smoothstep",
       "techQAA2p2Body":
-          "A posição do cursor é enviada ao shader a cada frame como uniforms uMouseX/uMouseY. A força de repulsão usa uma curva smoothstep (força² × (3 − 2 × força)) calculada por pixel na GPU — sem loop de física na CPU.",
-      "techQAA2p3Title": "Ticker de vsync nativo + hot path sem alocações",
+          "A posição do cursor fica em um ValueNotifier lido pelo painter. Partículas a menos de 100 px são empurradas radialmente por uma curva smoothstep (força² × (3 − 2 × força)) — 70 avaliações por frame em vez de uma por pixel.",
+      "techQAA2p3Title": "Timer de 30 fps no lugar do Ticker de vsync",
       "techQAA2p3Body":
-          "Um Ticker vinculado ao vsync do engine roda na taxa de atualização nativa da tela (120 fps no ProMotion, 60 fps nos demais). Um Paint é reutilizado por frame, RepaintBoundary isola os repaints e um ValueNotifier evita setState — zero garbage por frame. Um Dart CustomPainter é ativado automaticamente como fallback de CPU.",
+          "Um Ticker de vsync fazia a engine compor o desktop inteiro na taxa da tela (120 fps em ProMotion) para partículas que andam cerca de um pixel por frame. Agora um timer de 33 ms move o relógio. Um único Paint é reutilizado a cada frame, o RepaintBoundary isola os repaints e um ValueNotifier evita setState — zero lixo por frame.",
       "expertise": "Especialidade",
       "core": "Core",
       "tools": "Ferramentas",
@@ -888,22 +888,22 @@ class AppLocalizations {
     'How are the wallpaper particles and mouse effect rendered?',
   );
   String get techQAA2p1Title =>
-      _str('techQAA2p1Title', 'dart:ui FragmentShader — pure GPU');
+      _str('techQAA2p1Title', '70 rectangles, not a full-screen shader');
   String get techQAA2p1Body => _str(
     'techQAA2p1Body',
-    'The wallpaper is a GLSL fragment shader loaded with ui.FragmentProgram.fromAsset. On Impeller (native) it compiles to Metal/Vulkan; on the web it runs via CanvasKit/WebGL. ~140M operations per frame execute in parallel on the GPU — near-zero CPU cost.',
+    'The wallpaper started as a GLSL fragment shader. Profiling showed it looping over all 70 particles for every pixel of the screen on every vsync: ~140M operations per frame to light a few hundred pixels. It is now 70 drawRect calls in a CustomPainter — the same picture for a tiny fraction of the GPU time.',
   );
   String get techQAA2p2Title =>
-      _str('techQAA2p2Title', 'Mouse repulsion as a shader uniform');
+      _str('techQAA2p2Title', 'Mouse repulsion with a smoothstep curve');
   String get techQAA2p2Body => _str(
     'techQAA2p2Body',
-    'The cursor position is sent to the shader every frame as uMouseX/uMouseY uniforms. The repulsion force uses a smoothstep curve (force² × (3 − 2 × force)) computed per-pixel on the GPU — no CPU physics loop at all.',
+    'The cursor position lives in a ValueNotifier read by the painter. Particles within 100 px are pushed radially by a smoothstep curve (force² × (3 − 2 × force)) — 70 evaluations per frame instead of one per pixel.',
   );
   String get techQAA2p3Title =>
-      _str('techQAA2p3Title', 'Native vsync Ticker + zero-allocation hot path');
+      _str('techQAA2p3Title', '30 fps timer instead of a vsync Ticker');
   String get techQAA2p3Body => _str(
     'techQAA2p3Body',
-    "A Ticker tied to the engine's vsync runs at the screen's native refresh rate (120 fps on ProMotion, 60 fps otherwise). One Paint is reused every frame, RepaintBoundary isolates repaints, and a ValueNotifier avoids setState — zero garbage per frame. A Dart CustomPainter activates automatically as a CPU fallback.",
+    'A vsync Ticker made the engine composite the whole desktop at the display rate (120 fps on ProMotion) for particles that move about one pixel per frame. A 33 ms timer drives the clock now. One Paint is reused every frame, RepaintBoundary isolates repaints, and a ValueNotifier avoids setState — zero garbage per frame.',
   );
   String get expertise => _str('expertise', 'Expertise');
   String get core => _str('core', 'Core');

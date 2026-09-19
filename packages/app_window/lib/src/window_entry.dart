@@ -9,6 +9,9 @@ class WindowEntry {
   final double width;
   final double height;
 
+  /// Opens filling the desktop (the green button restores [width] x [height]).
+  final bool maximized;
+
   WindowEntry({
     required this.id,
     required this.title,
@@ -17,5 +20,6 @@ class WindowEntry {
     required this.position,
     this.width = 480.0,
     this.height = 360.0,
+    this.maximized = false,
   });
 }

@@ -15,6 +15,7 @@ void main() {
         AppStrings.winContact,
         AppStrings.winLicenses,
         AppStrings.winInterceptedHttp,
+        AppStrings.winLava,
       ];
       expect(ids.toSet().length, ids.length);
     });
@@ -33,6 +34,7 @@ void main() {
         AppStrings.urlGitHubLiturgical,
         AppStrings.urlGitHubLazyLoad,
         AppStrings.urlPubDevLazyLoad,
+        AppStrings.urlGitHubLava,
         AppStrings.emailAddress,
       ];
       for (final url in urls) {
@@ -64,6 +66,9 @@ void main() {
       expect(AppStrings.mobileAppSnake, isNotEmpty);
       expect(AppStrings.mobileAppCalc, isNotEmpty);
       expect(AppStrings.mobileAppMetrics, isNotEmpty);
+      expect(AppStrings.mobileAppLava, isNotEmpty);
+      expect(AppStrings.mobileAppLavaSubtitle, isNotEmpty);
+      expect(AppStrings.mobileAppLavaTitle, isNotEmpty);
     });
 
     test('all window titles are non-empty', () {
@@ -77,6 +82,7 @@ void main() {
         AppStrings.titleContact,
         AppStrings.titleLicenses,
         AppStrings.titleInterceptedHttp,
+        AppStrings.titleLava,
       ];
       for (final t in titles) {
         expect(t, isNotEmpty);

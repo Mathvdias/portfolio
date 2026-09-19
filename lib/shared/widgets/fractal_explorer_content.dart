@@ -1,18 +1,50 @@
 import 'dart:async';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import '../../core/services/wasm_engine_service.dart';
 
 class FractalExplorerContent extends StatefulWidget {
-  const FractalExplorerContent({super.key});
+  const FractalExplorerContent({super.key, this.engine});
+
+  /// Engine to render with; defaults to the platform engine. Read once, when
+  /// the window opens.
+  final WasmEngineService? engine;
 
   @override
   State<FractalExplorerContent> createState() => _FractalExplorerContentState();
+}
+
+/// Render size for a view: the widget's aspect ratio (the engine derives its
+/// own from width / height, so anything else stretches the image and shifts
+/// where a tap lands), holding about [pixelBudget] pixels, capped by what the
+/// widget can show and by the engine's buffer.
+@visibleForTesting
+(int, int) fractalRenderSize({
+  required Size viewSize,
+  required double pixelRatio,
+  required double pixelBudget,
+  int maxWidth = 800,
+  int maxHeight = 600,
+  int minPixels = 240 * 180,
+}) {
+  final aspect = (viewSize.width / viewSize.height).clamp(0.4, 3.0);
+  final visible = viewSize.width * viewSize.height * pixelRatio * pixelRatio;
+  final maxPixels = math.max(
+    minPixels.toDouble(),
+    math.min(maxWidth * maxHeight.toDouble(), visible),
+  );
+  final pixels = pixelBudget.clamp(minPixels.toDouble(), maxPixels);
+  var height = math.sqrt(pixels / aspect);
+  var width = height * aspect;
+  final fit = math.min(1.0, math.min(maxWidth / width, maxHeight / height));
+  width *= fit;
+  height *= fit;
+  return (math.max(16, width.floor()), math.max(16, height.floor()));
 }
 
 class FractalScenario {
@@ -38,9 +70,28 @@ class FractalScenario {
 class _FractalExplorerContentState extends State<FractalExplorerContent>
     with SingleTickerProviderStateMixin {
   late final WasmEngineService _engineService;
-  ui.Image? _fractalImage;
+
+  /// The frame on screen. Only the painter listens to it, so a new frame
+  /// repaints one layer instead of rebuilding the window's widget tree.
+  final ValueNotifier<ui.Image?> _frame = ValueNotifier<ui.Image?>(null);
   bool _isLoading = true;
   bool _isRendering = false;
+
+  // The engine runs synchronously on the UI thread, so its cost is frame time
+  // taken from the whole desktop. While animating, the render size follows a
+  // time budget; when the motion stops, one pass at full quality replaces it.
+  static const double _budgetMs = 9.0;
+  static const int _minPixels = 240 * 180;
+  static const Duration _frameInterval = Duration(milliseconds: 33);
+  double _pixelBudget = 360 * 270;
+  Size _viewSize = const Size(800, 600);
+  double _pixelRatio = 1.0;
+  Duration _lastRenderAt = Duration.zero;
+  bool _refined = false;
+
+  /// A full-quality still was asked for while a frame was decoding. No tick
+  /// follows a still, so nothing else would ever draw it.
+  bool _stillOwed = false;
 
   double _zoom = 1.0;
   double _offsetX = -0.5;
@@ -100,7 +151,7 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
   @override
   void initState() {
     super.initState();
-    _engineService = WasmEngineService();
+    _engineService = widget.engine ?? WasmEngineService();
     _ticker = createTicker(_onTick);
     _initEngine();
   }
@@ -128,7 +179,12 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
     _zoom = 1.0;
     _offsetX = _currentScenario.targetX;
     _offsetY = _currentScenario.targetY;
+    // The motion is back: a still would be stale before it was decoded.
+    _stillOwed = false;
     if (!_ticker.isActive) {
+      // A restarted ticker counts from zero again. Pacing against the previous
+      // run's clock would hold every frame back for as long as that run lasted.
+      _lastRenderAt = Duration.zero;
       _ticker.start();
     }
   }
@@ -142,6 +198,10 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
 
   void _onTick(Duration elapsed) {
     if (!_engineService.isReady || !mounted || _isRendering) return;
+    // The zoom is slow: 30 fractal frames a second look the same as 120 and
+    // leave the rest of the UI its frame time.
+    if (elapsed - _lastRenderAt < _frameInterval) return;
+    _lastRenderAt = elapsed;
 
     _currentTime = elapsed.inMicroseconds / 1e6;
 
@@ -152,24 +212,41 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
 
       // Cap zoom to avoid precision loss
       if (newZoom > 1e12) {
-        _stopAutoAnimation();
-      } else {
-        _zoom = newZoom;
+        // Rebuild: the labels say whether the view is still moving.
+        setState(_stopAutoAnimation);
+        // The frame that stays on screen gets the full-quality pass.
+        _renderFractal(fullQuality: true);
+        return;
       }
+      _zoom = newZoom;
     }
 
     _renderFractal();
   }
 
-  Future<void> _renderFractal() async {
-    if (!_engineService.isReady || _isRendering) return;
+  (int, int) _renderSize({required bool fullQuality}) => fractalRenderSize(
+    viewSize: _viewSize,
+    pixelRatio: _pixelRatio,
+    pixelBudget: fullQuality ? double.infinity : _pixelBudget,
+  );
+
+  Future<void> _renderFractal({bool fullQuality = false}) async {
+    if (!_engineService.isReady) return;
+    if (_isRendering) {
+      // A moving frame can be dropped, the next tick draws a newer one. Nothing
+      // comes after a still: it waits for the frame in flight to land.
+      if (fullQuality) _stillOwed = true;
+      return;
+    }
 
     _isRendering = true;
 
     try {
+      final (width, height) = _renderSize(fullQuality: fullQuality);
+      final clock = Stopwatch()..start();
       _engineService.generateFractal(
-        width: renderWidth,
-        height: renderHeight,
+        width: width,
+        height: height,
         zoom: _zoom,
         offsetX: _offsetX,
         offsetY: _offsetY,
@@ -179,32 +256,56 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
         cyJulia: _currentScenario.cyJulia,
         time: _currentTime,
       );
+      final elapsedMs = clock.elapsedMicroseconds / 1000.0;
+      if (!fullQuality && elapsedMs > 0.2) {
+        // Cost is proportional to the pixel count: steer it towards the budget,
+        // damped so one expensive frame does not make the image pump.
+        final wanted = width * height * (_budgetMs / elapsedMs);
+        _pixelBudget = (_pixelBudget * 0.7 + wanted * 0.3).clamp(
+          _minPixels.toDouble(),
+          renderWidth * renderHeight.toDouble(),
+        );
+      }
 
-      final pixels = _engineService.getPixelBuffer();
-      // MUST copy the buffer because decodeImageFromPixels is async and the
-      // underlying WASM memory might be modified before it completes.
-      final pixelsCopy = Uint8List.fromList(pixels);
+      // Rows are packed at the start of the engine's buffer. The copy is needed:
+      // decoding is asynchronous and the WASM memory is reused by the next call.
+      final pixels = Uint8List.fromList(
+        Uint8List.sublistView(
+          _engineService.getPixelBuffer(),
+          0,
+          width * height * 4,
+        ),
+      );
 
-      // Decode pixels into a Flutter ui.Image
       final completer = Completer<ui.Image>();
       ui.decodeImageFromPixels(
-        pixelsCopy,
-        renderWidth,
-        renderHeight,
+        pixels,
+        width,
+        height,
         ui.PixelFormat.rgba8888,
-        (img) => completer.complete(img),
+        completer.complete,
       );
 
       final image = await completer.future;
-      if (mounted) {
-        setState(() {
-          _fractalImage = image;
-        });
+      if (!mounted) {
+        image.dispose();
+        return;
       }
+      // Every frame is a new texture: the previous one must be released, or GPU
+      // memory grows by megabytes per second until the tab stalls.
+      final previous = _frame.value;
+      _refined = fullQuality;
+      _frame.value = image;
+      previous?.dispose();
     } catch (e) {
       debugPrint('Fractal render failed: $e');
     } finally {
       _isRendering = false;
+    }
+
+    if (_stillOwed && mounted) {
+      _stillOwed = false;
+      _renderFractal(fullQuality: true);
     }
   }
 
@@ -227,7 +328,8 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
       _zoom *= 1.5; // Zoom in by 1.5x per tap
     });
 
-    _renderFractal();
+    // Nothing is moving any more: spend the time on a full-quality still.
+    _renderFractal(fullQuality: true);
   }
 
   void _handleReset() {
@@ -252,6 +354,8 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
   @override
   void dispose() {
     _ticker.dispose();
+    _frame.value?.dispose();
+    _frame.dispose();
     super.dispose();
   }
 
@@ -263,20 +367,29 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
       );
     }
 
+    _pixelRatio = MediaQuery.devicePixelRatioOf(context);
     return LayoutBuilder(
       builder: (context, constraints) {
+        if (constraints.hasBoundedWidth && constraints.hasBoundedHeight) {
+          _viewSize = Size(
+            math.max(1.0, constraints.maxWidth),
+            math.max(1.0, constraints.maxHeight),
+          );
+        }
         return Stack(
           children: [
             GestureDetector(
               onTapUp: (details) => _handleTap(details, constraints),
-              child: SizedBox(
-                width: double.infinity,
-                height: double.infinity,
-                child: CustomPaint(
-                  painter:
-                      _fractalImage != null
-                          ? _FractalPainter(image: _fractalImage!)
-                          : null,
+              child: RepaintBoundary(
+                child: SizedBox(
+                  width: double.infinity,
+                  height: double.infinity,
+                  child: CustomPaint(
+                    painter: _FractalPainter(
+                      frame: _frame,
+                      refined: () => _refined,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -365,30 +478,30 @@ class _FractalExplorerContentState extends State<FractalExplorerContent>
 }
 
 class _FractalPainter extends CustomPainter {
-  final ui.Image image;
+  _FractalPainter({required this.frame, required this.refined})
+    : super(repaint: frame);
 
-  _FractalPainter({required this.image});
+  final ValueListenable<ui.Image?> frame;
+  final bool Function() refined;
+
+  final Paint _paint = Paint();
 
   @override
   void paint(Canvas canvas, Size size) {
-    final src = Rect.fromLTWH(
-      0,
-      0,
-      image.width.toDouble(),
-      image.height.toDouble(),
+    final image = frame.value;
+    if (image == null) return;
+    // Bilinear is all a moving, upscaled frame needs; the full-quality still
+    // that follows gets the better filter.
+    _paint.filterQuality = refined() ? FilterQuality.medium : FilterQuality.low;
+    canvas.drawImageRect(
+      image,
+      Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
+      Offset.zero & size,
+      _paint,
     );
-    final dst = Rect.fromLTWH(0, 0, size.width, size.height);
-
-    final paint =
-        Paint()
-          ..filterQuality = FilterQuality.high
-          ..isAntiAlias = true;
-
-    canvas.drawImageRect(image, src, dst, paint);
   }
 
   @override
-  bool shouldRepaint(covariant _FractalPainter oldDelegate) {
-    return oldDelegate.image != image;
-  }
+  bool shouldRepaint(covariant _FractalPainter oldDelegate) =>
+      oldDelegate.frame != frame;
 }

@@ -47,6 +47,8 @@ import '../../../../shared/widgets/skills_window_content.dart'
     deferred as skills_content;
 import '../../../../shared/widgets/snake_game_content.dart'
     deferred as snake_content;
+import '../../../../shared/widgets/lava_studio_content.dart'
+    deferred as lava_content;
 import '../../../../shared/widgets/spotlight_overlay.dart';
 import '../../../../shared/widgets/sticky_note.dart';
 import '../../../../shared/widgets/terminal_content.dart'
@@ -127,11 +129,30 @@ class _DesktopPageState extends State<DesktopPage> {
 
   // ── Deferred load timing ─────────────────────────────────────────
 
+  /// One loader per window, kept for the life of the page: [DeferredWidget]
+  /// recognises a library it already loaded by the identity of its loader, so
+  /// a fresh closure on every open would send a window that is already in
+  /// memory through the placeholder and the cross-fade again.
+  final Map<String, Future<void> Function()> _trackedLoaders = {};
+
   Future<void> Function() _trackedLoad(
     String windowId,
     Future<void> Function() loader,
   ) {
-    return () async {
+    final known = _trackedLoaders[windowId];
+    if (known != null) {
+      if (DeferredWidget.isLoaded(known)) {
+        unawaited(
+          _analytics.logDeferredLoad(
+            windowId: windowId,
+            durationMs: 0,
+            fromCache: true,
+          ),
+        );
+      }
+      return known;
+    }
+    return _trackedLoaders[windowId] = () async {
       final sw = Stopwatch()..start();
       await loader();
       sw.stop();
@@ -219,6 +240,12 @@ class _DesktopPageState extends State<DesktopPage> {
         label: 'WASM Diagnostics',
         iconWidget: Icon(Icons.insights),
         color: AppTheme.pink,
+      ),
+      const SpotlightItem(
+        id: AppStrings.winLava,
+        label: AppStrings.titleLava,
+        iconWidget: Icon(Icons.view_in_ar_rounded),
+        color: AppTheme.peach,
       ),
     ];
   }
@@ -388,6 +415,19 @@ class _DesktopPageState extends State<DesktopPage> {
           width: 540,
           height: 480,
         );
+      case AppStrings.winLava:
+        _desktopVM.openWindow(
+          id,
+          AppStrings.titleLava,
+          DeferredWidget(
+            _trackedLoad(id, lava_content.loadLibrary),
+            () => lava_content.LavaStudioContent(),
+          ),
+          AppTheme.peach,
+          width: 760,
+          height: 680,
+          maximized: true,
+        );
     }
   }
 
@@ -471,7 +511,18 @@ class _DesktopPageState extends State<DesktopPage> {
                     experiences: experiences,
                     onOpenWindow: (id, title, content, accent) {
                       _trackWindowOpen(id);
-                      _desktopVM.openWindow(id, title, content, accent);
+                      // The Lava Studio is a two-column tool: it needs the
+                      // whole desktop, not the default 480x360 window.
+                      final isLava = id == AppStrings.winLava;
+                      _desktopVM.openWindow(
+                        id,
+                        title,
+                        content,
+                        accent,
+                        width: isLava ? 760 : 480,
+                        height: isLava ? 680 : 360,
+                        maximized: isLava,
+                      );
                     },
                   ),
                 ),
@@ -498,6 +549,7 @@ class _DesktopPageState extends State<DesktopPage> {
                                   maximizeColor: AppTheme.green,
                                   width: w.width,
                                   height: w.height,
+                                  startMaximized: w.maximized,
                                   titleBarHeight: AppSizes.windowTitleBarHeight,
                                   trafficLightSize:
                                       AppSizes.windowTrafficLightSize,

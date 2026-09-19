@@ -15,6 +15,7 @@ abstract final class AppStrings {
   static const String winProjectStats = 'project_stats';
   static const String winFractal = 'fractal';
   static const String winWasmDiagnostics = 'wasm_diagnostics';
+  static const String winLava = 'lava';
 
   // Window titles
   static const String titleFinder = 'Finder';
@@ -31,6 +32,7 @@ abstract final class AppStrings {
   static const String titleProjectStats = 'Project Stats';
   static const String titleFractal = 'Fractal (Wasm)';
   static const String titleWasmDiagnostics = 'WASM Diagnostics';
+  static const String titleLava = 'Lava 3D Studio';
 
   // URLs
   static const String urlGitHub = 'https://github.com/Mathvdias';
@@ -52,6 +54,8 @@ abstract final class AppStrings {
       'https://github.com/Mathvdias/flutter_lazy_load_web';
   static const String urlPubDevLazyLoad =
       'https://pub.dev/packages/flutter_lazy_load_web';
+  static const String urlGitHubLava =
+      'https://github.com/Mathvdias/portfolio/tree/main/packages/lava_flutter';
   static const String emailAddress = 'mailto:mattmvc56@gmail.com';
   static const String emailRaw = 'mattmvc56@gmail.com';
 
@@ -69,6 +73,7 @@ abstract final class AppStrings {
   static const String iconInterceptedHttp = 'intercepted\n_http';
   static const String iconFractal = 'Fractal';
   static const String iconWasmDiagnostics = 'WASM Monitor';
+  static const String iconLava = 'Lava 3D';
 
   // Dock labels
   static const String dockGitHub = 'GitHub';
@@ -128,6 +133,9 @@ abstract final class AppStrings {
   static const String mobileAppMetrics = 'METRICS';
   static const String mobileAppMetricsSubtitle = 'CI & 100% Tests';
   static const String mobileAppMetricsTitle = 'METRICS & CI';
+  static const String mobileAppLava = 'LAVA 3D';
+  static const String mobileAppLavaSubtitle = 'Micro-Engine';
+  static const String mobileAppLavaTitle = 'LAVA 3D STUDIO';
 
   // Mobile projects
   static const String projectInterceptedName = 'intercepted_http';
@@ -255,4 +263,93 @@ abstract final class AppStrings {
       'GC: WebAssembly native Garbage Collection active.';
   static const String wasmGcDisabledLog =
       'GC: WebAssembly native Garbage Collection deactivated.';
+
+  // Lava Studio
+  static const String lavaStudioTitle = 'Lava 3D Micro-Animation Engine';
+  static const String lavaStudioSubtitle =
+      'Airbnb-style 3D icons for Flutter: a key frame, an atlas of 32 px tiles and a recipe per frame.';
+  static const String lavaStudioHint =
+      'Drag to scrub • hover to tilt • tap to bounce';
+  static const String lavaStudioAutoRotate = 'Play / pause';
+  static const String lavaStudioReplay = 'Restart';
+  static const String lavaStudioArchitecture = 'Why Lava?';
+  static const String lavaStudioArchitectureDesc =
+      'Lottie is vector-only, so it cannot carry rendered 3D light. GIF has 256 colours and 1-bit alpha, so soft shadows and glows break. Video has no portable alpha channel and cannot be scrubbed frame by frame. Lava keeps full 8-bit alpha and random access: every frame is rebuilt from tiles that are stored once, composed 1:1 on the GPU and cached.';
+  static const String lavaStudioXray = 'X-ray';
+  static const String lavaStudioXrayOn = 'Hide the tile X-ray';
+  static const String lavaStudioXrayOff = 'Show which tiles build this frame';
+  static const String lavaStudioInspector = 'Under the hood';
+  static const String lavaStudioInspectorLead =
+      'Live: what the engine is doing for the frame on screen.';
+  static const String lavaStudioRecipe = 'Frame recipe';
+  static const String lavaStudioFromKey = 'from key frame';
+  static const String lavaStudioFromAtlas = 'from atlas';
+  static const String lavaStudioFree = 'transparent (free)';
+  static const String lavaStudioTiles = 'tiles';
+  static const String lavaStudioBlit = 'copy';
+  static const String lavaStudioBlits = 'copies';
+  static const String lavaStudioDrawCall = 'draw call';
+  static const String lavaStudioDrawCalls = 'draw calls';
+  static const String lavaStudioAtlas = 'Tile atlas';
+  static const String lavaStudioAtlasLead =
+      'Highlighted: the blocks this frame reads. Identical tiles are stored once for the whole loop.';
+  static const String lavaStudioKeyFrame = 'Key frame';
+  static const String lavaStudioFaceOff = 'Same animation, other containers';
+  static const String lavaStudioFaceOffNote =
+      'Measured on these exact frames. Video is left out: it has no portable alpha channel.';
+  static const String lavaStudioFormatLava = 'Lava (AVIF)';
+  static const String lavaStudioFormatWebp = 'Animated WebP';
+  static const String lavaStudioFormatGif = 'GIF';
+  static const String lavaStudioFormatApng = 'APNG';
+  static const String lavaStudioFormatPng = 'PNG sequence';
+  static const String lavaStudioRuntime = 'Runtime';
+  static const String lavaStudioDecoded = 'Decoded';
+  static const String lavaStudioVariant = 'Variant';
+  static const String lavaStudioTexture = 'Atlas texture';
+  static const String lavaStudioCache = 'Composed frames cached';
+  static const String lavaStudioDownload = 'Downloaded';
+  static const String lavaStudioVariantHd = 'Large preview · 360×324';
+  static const String lavaStudioVariantStd = 'Standard · 180×162';
+  static const String lavaStudioLoading = 'loading…';
+  static const String lavaStudioBadgeTile = 'OpenLava format';
+  static const String lavaStudioBadgeAlpha = '8-bit alpha';
+  static const String lavaStudioBadgePerspective = 'Tile dedup';
+  static const String lavaStudioBadgeZeroAlloc = 'AVIF 4:4:4 + WebP';
+  static const String lavaStudioBadgeWasm = 'Web · iOS · Android · Desktop';
+  static const String lavaStudioBtnGithub = 'View on GitHub';
+  static const String lavaStudioBtnPubDev = 'Pub.dev Publisher';
+  static const String lavaStudioFrame = 'FRAME';
+  static const String lavaStudioStatus = 'STATUS';
+  static const String lavaStudioFps = 'FPS';
+  static const String lavaStudioAirbnbNav = 'Airbnb-Inspired Category Showcase';
+  static const String lavaModelMacintosh = 'Macintosh 128K';
+  static const String lavaModelTree = 'Sunflower';
+  static const String lavaModelMacintoshDesc =
+      'OpenLava Diff Tileset • 48-Frame Hover Loop • Blinking CRT Face';
+  static const String lavaModelTreeDesc =
+      'OpenLava Diff Tileset • 48-Frame Wind Loop • Turning Head & Pollen';
+  static const String lavaModelLavaLamp = 'Lava Lamp';
+  static const String lavaModelCampfire = 'Campfire';
+  static const String lavaModelLavaLampDesc =
+      'OpenLava Diff Tileset • 48-Frame Thermal Loop • Glowing Internal Bulb';
+  static const String lavaModelCampfireDesc =
+      'OpenLava Diff Tileset • 48-Frame Fire Loop • Flame Relights Logs & Stones';
+  static const String lavaModelRocket = 'Retro Rocket';
+  static const String lavaModelRocketDesc =
+      'OpenLava Diff Tileset • 48-Frame Thrust Loop • Fire Plume & Embers';
+  static const String lavaModelSenna = 'Capacete do Senna';
+  static const String lavaModelSennaDesc =
+      'OpenLava Diff Tileset • 72-Frame 360° Turntable • Drag to Spin';
+  static const String lavaModelChristmasTree = 'Árvore de Natal';
+  static const String lavaModelF1Car = 'RB19 DRS';
+  static const String lavaModelF1Front = 'RB19 Max';
+  static const String lavaModelSennaMp4 = 'Senna MP4/4';
+  static const String lavaModelSennaMp4Desc =
+      'OpenLava Diff Tileset • 36-Frame Victory Lap • Simulated Cloth Flag';
+  static const String lavaModelF1FrontDesc =
+      'OpenLava Diff Tileset • 72-Frame Weave • Only the Front Wheels Move';
+  static const String lavaModelF1CarDesc =
+      'OpenLava Diff Tileset • 48-Frame Chase Cam • DRS Opens, Sparks Fly, Rain Light Blinks';
+  static const String lavaModelChristmasTreeDesc =
+      'OpenLava Diff Tileset • 60-Frame Winter Loop • Blinking Fairy Lights & Snow';
 }
