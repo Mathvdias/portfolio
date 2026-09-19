@@ -28,6 +28,8 @@ class LavaIcon extends StatefulWidget {
     this.scrubOnHover = false,
     this.onTap,
     this.onStateChanged,
+    this.foregroundPainter,
+    this.onBundleChanged,
   }) : demoType = LavaDemoType.macintosh,
        _isDemo = false,
        _imageAsset = null,
@@ -53,6 +55,8 @@ class LavaIcon extends StatefulWidget {
     this.scrubOnHover = false,
     this.onTap,
     this.onStateChanged,
+    this.foregroundPainter,
+    this.onBundleChanged,
     AssetBundle? assetBundle,
   }) : bundle = null,
        _isDemo = true,
@@ -78,6 +82,8 @@ class LavaIcon extends StatefulWidget {
     this.scrubOnHover = false,
     this.onTap,
     this.onStateChanged,
+    this.foregroundPainter,
+    this.onBundleChanged,
     AssetBundle? assetBundle,
   }) : bundle = null,
        demoType = LavaDemoType.sunflower,
@@ -104,6 +110,8 @@ class LavaIcon extends StatefulWidget {
     this.scrubOnHover = false,
     this.onTap,
     this.onStateChanged,
+    this.foregroundPainter,
+    this.onBundleChanged,
     AssetBundle? assetBundle,
   }) : bundle = null,
        demoType = LavaDemoType.sunflower,
@@ -133,6 +141,8 @@ class LavaIcon extends StatefulWidget {
     this.scrubOnHover = false,
     this.onTap,
     this.onStateChanged,
+    this.foregroundPainter,
+    this.onBundleChanged,
   }) : bundle = null,
        demoType = LavaDemoType.macintosh,
        _isDemo = false,
@@ -197,6 +207,14 @@ class LavaIcon extends StatefulWidget {
   final String? _imageAsset;
   final String? _manifestAsset;
   final AssetBundle? _assetBundle;
+
+  /// Painted over the animation, inside the same tilt / bounce transform
+  /// (debug overlays, badges). Its canvas is the icon's box.
+  final CustomPainter? foregroundPainter;
+
+  /// Called whenever a different bundle goes on screen (first load, a new demo
+  /// type, the swap from the standard to the large-preview variant).
+  final ValueChanged<LavaBundle>? onBundleChanged;
 
   @override
   State<LavaIcon> createState() => _LavaIconState();
@@ -264,6 +282,7 @@ class _LavaIconState extends State<LavaIcon> with TickerProviderStateMixin {
       _isLoading = false;
     });
     _initControllerIfNeeded();
+    widget.onBundleChanged?.call(bundle);
     // Both variants are the same animation: carry the playhead over so the
     // swap to the large one is not a visible restart.
     if (frame > 0 && frame < bundle.manifest.totalFrames) {
@@ -416,6 +435,7 @@ class _LavaIconState extends State<LavaIcon> with TickerProviderStateMixin {
     Widget content = RepaintBoundary(
       child: CustomPaint(
         size: Size(effectiveWidth, effectiveHeight),
+        foregroundPainter: widget.foregroundPainter,
         painter: LavaPainter(
           atlas: _bundle!.atlas,
           images: _bundle!.images,
