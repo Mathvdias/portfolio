@@ -201,6 +201,56 @@ void main() {
       LavaDemoBaker.clearCache();
     });
 
+    testWidgets('LavaIcon frees the composed frames of a bundle it leaves', (
+      tester,
+    ) async {
+      final key = await LavaDemoBaker.bakeAtlas(type: LavaDemoType.macintosh);
+      final atlas = await LavaDemoBaker.bakeAtlas(type: LavaDemoType.sunflower);
+      final bundle = LavaBundle(
+        images: [key, atlas],
+        manifest: const LavaManifest(
+          tileWidth: 64,
+          tileHeight: 64,
+          columns: 2,
+          rows: 2,
+          totalFrames: 2,
+          cellSize: 32,
+          rawFrames: [
+            {'type': 'key', 'imageIndex': 0},
+            {
+              'type': 'diff',
+              'diffs': [
+                [1, 0, 1, 1, 0],
+              ],
+            },
+          ],
+        ),
+      );
+      final controller = LavaController(totalFrames: 2, autoPlay: false);
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: Center(
+            child: LavaIcon(bundle: bundle, controller: controller, size: 64),
+          ),
+        ),
+      );
+      controller.seekToFrame(1);
+      await tester.pump();
+      expect(bundle.compositor!.cachedFrameCount, 1);
+
+      // The widget goes away: the bundle is the caller's, so it stays usable,
+      // but the frames composed for it are given back.
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+      expect(bundle.compositor!.cachedFrameCount, 0);
+      expect(bundle.isDisposed, isFalse);
+
+      controller.dispose();
+      LavaDemoBaker.clearCache(); // the baker owns the two images
+    });
+
     testWidgets(
       'LavaPainter OpenLava diff mode blits with boundary clamping without error',
       (tester) async {

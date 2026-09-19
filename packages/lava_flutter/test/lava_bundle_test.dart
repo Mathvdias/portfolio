@@ -30,10 +30,17 @@ final Uint8List _brokenAvif = Uint8List.fromList([
 /// In-memory OpenLava bundle: `image_N.avif` primaries with `image_N.webp`
 /// fallbacks. [primary] is what the `.avif` names serve (`null` = 404).
 class _FallbackAssetBundle extends Fake implements AssetBundle {
-  _FallbackAssetBundle(this.fallbackBytes, {required this.primary});
+  _FallbackAssetBundle(
+    this.fallbackBytes, {
+    required this.primary,
+    this.canvasWidth = 32,
+  });
 
   final Uint8List fallbackBytes;
   final Uint8List? primary;
+
+  /// Manifest width: above [LavaBundle.demoBaseWidth] it is a large preview.
+  final int canvasWidth;
   final List<String> loads = [];
 
   @override
@@ -42,7 +49,7 @@ class _FallbackAssetBundle extends Fake implements AssetBundle {
         'version': 1,
         'fps': 30,
         'cellSize': 32,
-        'width': 32,
+        'width': canvasWidth,
         'height': 32,
         'images': [
           {'url': 'image_1.avif', 'fallbackUrl': 'image_1.webp'},
@@ -318,6 +325,97 @@ void main() {
         });
       },
     );
+
+    testWidgets('releasing a large-preview bundle evicts and disposes it', (
+      tester,
+    ) async {
+      await tester.runAsync(() async {
+        LavaBundle.evictOpenLavaCache();
+        final wide = await _pngBytes(width: 360);
+        final assets = _FallbackAssetBundle(
+          wide,
+          primary: null,
+          canvasWidth: 360,
+        );
+
+        final bundle = await LavaBundle.openLavaAsset(
+          assetPath: 'icons/hd',
+          bundle: assets,
+        );
+        bundle
+          ..retain()
+          ..retain()
+          ..release();
+        await Future<void>.delayed(Duration.zero);
+        expect(bundle.isDisposed, isFalse, reason: 'one user is still there');
+
+        bundle.release();
+        await Future<void>.delayed(Duration.zero);
+        expect(bundle.isDisposed, isTrue);
+
+        // Evicted: asking again decodes a fresh bundle instead of the dead one.
+        final again = await LavaBundle.openLavaAsset(
+          assetPath: 'icons/hd',
+          bundle: assets,
+        );
+        expect(again, isNot(same(bundle)));
+        expect(again.isDisposed, isFalse);
+        LavaBundle.evictOpenLavaCache();
+      });
+    });
+
+    testWidgets('releasing a standard bundle keeps it cached', (tester) async {
+      await tester.runAsync(() async {
+        LavaBundle.evictOpenLavaCache();
+        final assets = _FallbackAssetBundle(await _pngBytes(), primary: null);
+
+        final bundle = await LavaBundle.openLavaAsset(
+          assetPath: 'icons/std',
+          bundle: assets,
+        );
+        bundle
+          ..retain()
+          ..release();
+        await Future<void>.delayed(Duration.zero);
+
+        expect(bundle.isDisposed, isFalse);
+        expect(
+          await LavaBundle.openLavaAsset(
+            assetPath: 'icons/std',
+            bundle: assets,
+          ),
+          same(bundle),
+        );
+        LavaBundle.evictOpenLavaCache();
+      });
+    });
+
+    testWidgets('a bundle retained again within the same frame survives', (
+      tester,
+    ) async {
+      await tester.runAsync(() async {
+        LavaBundle.evictOpenLavaCache();
+        final wide = await _pngBytes(width: 360);
+        final assets = _FallbackAssetBundle(
+          wide,
+          primary: null,
+          canvasWidth: 360,
+        );
+        final bundle = await LavaBundle.openLavaAsset(
+          assetPath: 'icons/swap',
+          bundle: assets,
+        );
+
+        bundle
+          ..retain()
+          ..release()
+          ..retain(); // handed to another widget before the microtask runs
+        await Future<void>.delayed(Duration.zero);
+
+        expect(bundle.isDisposed, isFalse);
+        LavaBundle.evictOpenLavaCache();
+      });
+    });
 
     testWidgets('openLavaAsset rethrows when there is no fallback to try', (
       tester,

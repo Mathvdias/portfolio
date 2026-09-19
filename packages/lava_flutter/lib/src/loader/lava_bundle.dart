@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
@@ -34,6 +35,38 @@ class LavaBundle {
   final List<String> imageFiles;
 
   LavaFrameCompositor? _compositor;
+
+  int _retainCount = 0;
+  bool _disposed = false;
+  String? _cacheKey;
+
+  /// Whether [dispose] has run: the textures are gone and the bundle must be
+  /// loaded again.
+  bool get isDisposed => _disposed;
+
+  /// A widget that puts this bundle on screen calls [retain], and [release]
+  /// when it lets go. When the last user leaves, the composed frames are
+  /// dropped, and a large-preview bundle (its atlas is 2-22 MB of texture) is
+  /// evicted from the loader cache and disposed; the small standard bundles
+  /// stay cached, which is what makes switching icons instant.
+  void retain() => _retainCount++;
+
+  /// See [retain].
+  void release() {
+    if (_retainCount > 0) _retainCount--;
+    if (_retainCount > 0) return;
+    // Not synchronously: a rebuild may hand the same bundle to another widget
+    // within this frame.
+    scheduleMicrotask(() {
+      if (_retainCount > 0 || _disposed) return;
+      _compositor?.clearCache();
+      final key = _cacheKey;
+      if (key != null && manifest.tileWidth > demoBaseWidth) {
+        _openLavaCache.remove(key);
+        dispose();
+      }
+    });
+  }
 
   /// Frame assembler for OpenLava key/diff bundles (`null` for grid atlases).
   ///
@@ -156,7 +189,10 @@ class LavaBundle {
     return _openLavaCache[cacheKey] ??= _decodeOpenLava(
       assetPath,
       effectiveBundle,
-    ).onError((Object error, StackTrace stackTrace) {
+    ).then((loaded) => loaded.._cacheKey = cacheKey).onError((
+      Object error,
+      StackTrace stackTrace,
+    ) {
       _openLavaCache.remove(cacheKey);
       Error.throwWithStackTrace(error, stackTrace);
     });
@@ -403,6 +439,7 @@ class LavaBundle {
 
   /// Releases the GPU texture resources.
   void dispose() {
+    _disposed = true;
     _compositor?.dispose();
     _compositor = null;
     atlas?.dispose();

@@ -276,6 +276,11 @@ class _LavaIconState extends State<LavaIcon> with TickerProviderStateMixin {
 
   void _showBundle(LavaBundle bundle, {required bool owned}) {
     if (identical(bundle, _bundle)) return;
+    if (bundle.isDisposed) {
+      // Its last user let go between our request and now: load it again.
+      _loadBundleAsync();
+      return;
+    }
     final frame = _internalController?.currentFrame ?? 0;
     setState(() {
       _setBundle(bundle, owned: owned);
@@ -291,8 +296,15 @@ class _LavaIconState extends State<LavaIcon> with TickerProviderStateMixin {
   }
 
   void _setBundle(LavaBundle bundle, {bool owned = false}) {
-    if (_ownsBundle && !identical(_bundle, bundle)) _bundle?.dispose();
+    if (identical(_bundle, bundle)) return;
+    final previous = _bundle;
+    bundle.retain();
     _bundle = bundle;
+    if (_ownsBundle) {
+      previous?.dispose();
+    } else {
+      previous?.release();
+    }
     _ownsBundle = owned;
   }
 
@@ -419,7 +431,11 @@ class _LavaIconState extends State<LavaIcon> with TickerProviderStateMixin {
   @override
   void dispose() {
     _internalController?.dispose();
-    if (_ownsBundle) _bundle?.dispose();
+    if (_ownsBundle) {
+      _bundle?.dispose();
+    } else {
+      _bundle?.release();
+    }
     super.dispose();
   }
 

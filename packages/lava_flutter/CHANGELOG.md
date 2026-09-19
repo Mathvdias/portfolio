@@ -11,9 +11,14 @@
 * New `LavaFrameCompositor`: the manifest is compiled once into typed-data blit plans and every
   diff frame is assembled 1:1 with one `drawRawAtlas` call per source image, then scaled as a
   single image. No per-frame parsing or allocation, no seams or atlas bleeding whatever the
-  packing, and composed frames sit in an LRU cache (16 MB budget) so a looping icon stops
-  compositing after its first pass. The compositor lives in the `LavaBundle`, so every widget
+  packing, and composed frames are cached so a looping icon stops compositing after its first
+  pass. The cache is all or nothing: a loop that fits the 40 MiB budget is kept whole, one that
+  does not keeps only the frame on screen (a partial cache of a loop played in order misses on
+  every frame and only costs memory). The compositor lives in the `LavaBundle`, so every widget
   showing the same bundle shares it.
+* `LavaBundle.retain` / `release`: widgets count themselves as users of a bundle. When the last
+  one leaves, its composed frames are freed, and a large-preview (`_hd`) bundle is also evicted
+  from the decode cache and disposed; `LavaIcon` loads it again if it comes back.
 * `LavaBundle.openLavaAsset` caches decoded bundles per asset path (`evictOpenLavaCache` releases
   them): a category bar and a preview showing the same icon decode it once.
 * Fixed: dragging an interactive icon paused playback for good (`LavaInteractive` now resumes it
