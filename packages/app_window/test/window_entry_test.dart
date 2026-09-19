@@ -97,5 +97,49 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Child Content'), findsOneWidget);
     });
+
+    testWidgets('startMaximized fills the desktop and the button restores it', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Stack(
+              children: [
+                AppWindow(
+                  title: 'Studio',
+                  initialPosition: const Offset(60, 90),
+                  width: 760,
+                  height: 680,
+                  maximizeTopOffset: 28,
+                  maximizeBottomOffset: 80,
+                  startMaximized: true,
+                  onClose: () {},
+                  onFocus: () {},
+                  child: const SizedBox.expand(),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final frame = find.descendant(
+        of: find.byType(AppWindow),
+        matching: find.byType(AnimatedContainer),
+      );
+      expect(tester.getTopLeft(frame.first), const Offset(0, 28));
+      expect(tester.getSize(frame.first), const Size(1200, 800 - 28 - 80));
+
+      // A maximized window follows the viewport.
+      tester.view.physicalSize = const Size(900, 700);
+      await tester.pumpAndSettle();
+      expect(tester.getSize(frame.first), const Size(900, 700 - 28 - 80));
+    });
   });
 }

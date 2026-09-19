@@ -26,6 +26,7 @@ class AppWindow extends StatefulWidget {
     this.maximizeTopOffset = 28.0,
     this.maximizeBottomOffset = 80.0,
     this.titleFontSize = 7.0,
+    this.startMaximized = false,
   });
 
   final String title;
@@ -49,6 +50,12 @@ class AppWindow extends StatefulWidget {
   final double maximizeBottomOffset;
   final double titleFontSize;
 
+  /// Opens filling the desktop between [maximizeTopOffset] and
+  /// [maximizeBottomOffset]; the maximize button restores [width] x [height]
+  /// at [initialPosition]. For content that needs the room (a studio, a
+  /// dashboard) and is unusable in the default small window.
+  final bool startMaximized;
+
   @override
   State<AppWindow> createState() => _AppWindowState();
 }
@@ -59,14 +66,18 @@ class _AppWindowState extends State<AppWindow>
   late double _width;
   late double _height;
   late final TextStyle _titleStyle;
-  bool _isMaximized = false;
+  late bool _isMaximized = widget.startMaximized;
   Offset? _preMaximizePosition;
   Size? _preMaximizeSize;
 
   @override
   void initState() {
     super.initState();
-    _positionNotifier = ValueNotifier(widget.initialPosition);
+    _positionNotifier = ValueNotifier(
+      widget.startMaximized
+          ? Offset(0, widget.maximizeTopOffset)
+          : widget.initialPosition,
+    );
     _width = widget.width;
     _height = widget.height;
     _titleStyle = GoogleFonts.pressStart2p(
@@ -92,22 +103,26 @@ class _AppWindowState extends State<AppWindow>
     } else {
       _preMaximizePosition = _positionNotifier.value;
       _preMaximizeSize = Size(_width, _height);
-      final mq = MediaQuery.of(context);
       _positionNotifier.value = Offset(0, widget.maximizeTopOffset);
-      setState(() {
-        _width = mq.size.width;
-        _height =
-            mq.size.height -
-            widget.maximizeTopOffset -
-            widget.maximizeBottomOffset;
-        _isMaximized = true;
-      });
+      setState(() => _isMaximized = true);
     }
     widget.onFocus();
   }
 
   @override
   Widget build(BuildContext context) {
+    // A maximized window tracks the viewport, so it keeps filling the desktop
+    // when the browser is resized instead of freezing at the size it had when
+    // the button was pressed.
+    final viewport = MediaQuery.sizeOf(context);
+    final width = _isMaximized ? viewport.width : _width;
+    final height =
+        _isMaximized
+            ? viewport.height -
+                widget.maximizeTopOffset -
+                widget.maximizeBottomOffset
+            : _height;
+
     return ValueListenableBuilder<Offset>(
       valueListenable: _positionNotifier,
       builder:
@@ -120,8 +135,8 @@ class _AppWindowState extends State<AppWindow>
             AnimatedContainer(
               duration: const Duration(milliseconds: 250),
               curve: Curves.easeInOut,
-              width: _width,
-              height: _height,
+              width: width,
+              height: height,
               decoration: BoxDecoration(
                 color: widget.titleBarColor,
                 border: Border.all(
