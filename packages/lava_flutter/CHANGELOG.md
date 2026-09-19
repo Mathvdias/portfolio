@@ -35,6 +35,10 @@
   the standard 180 px (in device pixels), shows the standard bundle first and swaps the large one
   in when its atlas is decoded, keeping the playhead; it never switches back, so resizing a window
   around the threshold does not reload the icon.
+* Inspection hooks: `LavaFrameCompositor.blits(frame)` lists the tile blocks a frame is built
+  from (source image, source rect, destination rect), `LavaBundle.imageFiles` names the files that
+  were actually decoded, `LavaIcon.foregroundPainter` paints inside the icon's tilt / bounce
+  transform and `LavaIcon.onBundleChanged` reports the bundle on screen.
 * Decoder blame is evidence-based: an extension is only remembered as undecodable when the bytes
   really carry that container's signature (an SPA host answers a missing asset with 200 +
   index.html), a width mismatch falls back without blaming anything, a missing fallback file
