@@ -158,6 +158,15 @@ python3 tool/openlava_encode.py assets/lava/christmastree --avif 65 --fallback-w
   tiles instead of 1230. `shadow_floor` keys out the baked shadow trapped between the wheels. No
   logos or sponsor decals were asked for in the still.
 
+- `F1Front`: the pair is wheels straight / "front wheels steered slightly to the left, about 12
+  degrees, nothing else changes". The still is symmetric, so the steer to the right is the same
+  edit mirrored about the car's centre line (asked for directly, the other side came back with a
+  different angle and different brake ducts). Only what the edit changed inside the wheel boxes is
+  swapped in, through a soft mask. Five distinct frames in a 72-frame loop: 63 atlas tiles, 36 KB.
+  The helmet is white, so the keyer gets a `protect` box; `pocket_chroma` accepts the bluish tint
+  of this render's backdrop and `shadow_floor` takes several rules as the baked shadow darkens
+  towards the car. The helmet follows a real driver's colours and lion, without sponsor logos.
+
 Backdrop: white is fine for the campfire (the smooth baked drop shadow is flood-filled away, the
 textured stones stop the fill). Anything white at the silhouette (snow) needs a chroma backdrop:
 ask for "a perfectly flat uniform pure magenta background #FF00FF (chroma key)"; `key_backdrop`
