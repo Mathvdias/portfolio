@@ -49,7 +49,7 @@ def shrink(mask, px):
     return np.array(Image.fromarray(mask.astype(np.uint8) * 255).filter(ImageFilter.MinFilter(2 * px + 1))) > 0
 
 
-def key_backdrop(img, thr=34, matte=70.0, shadow_min=None, neutral_pockets=None):
+def key_backdrop(img, thr=34, matte=70.0, shadow_min=None, neutral_pockets=None, shadow_floor=None):
     """Flat-backdrop keyer (white or chroma): flood fill from the border on colour distance, soft
     matte on the outline, colours unpremultiplied against the backdrop. Returns float RGBA."""
     rgb = np.array(img.convert("RGB")).astype(np.float32)
@@ -79,6 +79,13 @@ def key_backdrop(img, thr=34, matte=70.0, shadow_min=None, neutral_pockets=None)
         # backdrop or baked shadow showing through a gap, even where no path leads to the border
         mn = rgb.min(axis=2)
         bg = bg | ((rgb.max(axis=2) - mn < 26) & (mn > neutral_pockets))
+    if shadow_floor is not None:
+        # baked contact shadow trapped between the wheels: below `row` (a share of the height),
+        # anything colourless and lighter than the black tyres and floor is shadow on the backdrop
+        row, lightest = shadow_floor
+        mn = rgb.min(axis=2)
+        below = (np.arange(h) > row * h)[:, None]
+        bg = bg | ((rgb.max(axis=2) - mn < 22) & (mn > lightest) & below)
     alpha = np.where(bg, 0.0, 1.0).astype(np.float32)
     ring = grow(bg, 3) & ~bg
     a = np.clip(dist[ring] / matte, 0.0, 1.0)
@@ -331,138 +338,144 @@ class ChristmasTree(Relit):
 
 
 class F1Car(Relit):
-    """Formula 1 car at speed. `lit` is the still with the DRS flap closed, `unlit` the pixel-aligned
-    edit with it open. Ask for a toy-like, exaggerated opening ("the upper flap lifted like an open
-    letterbox lid, a big gap with the background visible through it"): a realistic slot is a dark
-    hairline on a dark wing and does not read at icon size.
+    """Formula 1 car from the TV chase camera. `lit` is the still with the DRS closed, `unlit` the
+    pixel-aligned edit with it open ("the upper flap has rotated flat, pivoting about its top edge:
+    a thin blade at the top, and through the gap you see the engine cover ahead of the wing").
 
-    The loop tells one story: the flap opens, the car gains speed, titanium sparks pour out from
-    under the diffuser and trail behind; the flap closes and they die down.
+    The camera matters more than anything else here: from the front or from above the flap is a
+    thin strip and an open DRS is a hairline (an image model asked to exaggerate it lifts a whole
+    second wing, endplates and all). From behind, at wing height, the flap is a tall band, and
+    when it lies flat the livery shows through the gap - readable at 44 px.
 
-    Tile economy first: the body has two states (a one-pixel engine vibration), the wheel glints
-    four phases and the flap four positions, so the car's tiles repeat; what is unique per frame is
-    small - the sparks behind the car and the speed streaks on the ground.
-    Coordinates below are in source-still pixels (1024x1024, car pointing to the lower left)."""
+    The flap moves the way the mechanism does. Between the two stills, the in-between positions
+    squash the closed flap against its top edge (the pivot), column by column, over the open
+    still, so the gap grows from the bottom of the flap upwards.
+
+    One story per loop: the flap opens, the car gains speed, titanium sparks pour out from under
+    the diffuser towards the camera; the flap closes and they die down. The rain light blinks.
+
+    Tile economy: two body states (a one-pixel engine vibration), four flap positions, two
+    rain-light states - the car's tiles repeat; only the sparks and streaks are new per frame.
+    Coordinates are in source-still pixels (1024x1024)."""
 
     n_frames, fps = 48, 30
-    fill, base_y, width_fill = 0.80, 0.88, 0.80
-    offset = (-0.06, 0.0)                     # leave room behind the car (upper right) for the sparks
-    key = dict(thr=34, matte=70.0, shadow_min=150, neutral_pockets=150)
+    fill, base_y, width_fill = 0.74, 0.84, 0.80
+    key = dict(thr=34, matte=70.0, shadow_min=150, neutral_pockets=150, shadow_floor=(0.70, 78))
 
-    AXIS = np.array([0.727, -0.687])          # image direction from the nose to the rear wing
-    SIDE = np.array([0.74, 0.67])             # ground direction towards the viewer's side
-    WHEELS = [((572, 682), (58, 92), -8.0), ((932, 428), (42, 70), -8.0)]   # centre, radii, tilt of the visible faces
-    DIFFUSER = (842, 402)                     # ground point under the rear of the floor
-    WING = (570, 90, 1015, 435)               # box that holds everything the DRS edit may change
+    FLAP = (292, 330, 846, 470)               # columns of the flap between the endplates, rows to search
+    RAIN_LIGHT = (546, 664, 602, 746)
+    DIFFUSER = ((392, 836), (756, 836))       # ground line under the diffuser
+    VANISHING = (512, 300)                    # where the track converges
+    FLAP_STEPS = (1.0, 0.64, 0.34, 0.0)       # share of the closed flap still standing: closed .. open
 
     def prepare(self):
-        closed, opened = self.lit, self.unlit.copy()
-        x0, y0 = self.at(*self.WING[:2])
-        x1, y1 = self.at(*self.WING[2:])
-        box = np.zeros((self.h, self.w), bool)
-        box[int(y0):int(y1), int(x0):int(x1)] = True
-        changed = (np.abs(closed - opened).max(axis=2) > 28) & box
-        self.flap = blur(grow(changed, max(2, int(5 * self.px))).astype(np.float32) * 255.0, 1.5 * self.px)[..., None] / 255.0
-        self.closed, self.opened = closed, opened
+        closed, opened = self.lit, self.unlit
+        x0, y0 = (int(v) for v in self.at(*self.FLAP[:2]))
+        x1, y1 = (int(v) for v in self.at(*self.FLAP[2:]))
+        differs = np.abs(closed - opened).max(axis=2) > 36
+        changed = blur(grow(differs, max(2, int(3 * self.px))).astype(np.float32) * 255.0, 1.2 * self.px)[..., None] / 255.0
+
+        self.states = []
+        for share in self.FLAP_STEPS:
+            if share == 1.0:
+                self.states.append(closed)
+                continue
+            # everything the edit changed (endplate tips included) follows the opening...
+            car = closed * (1.0 - changed) + opened * changed
+            if share > 0.0:
+                # ...and the part of the flap still standing is the closed flap, squashed against
+                # its top edge over the open still
+                for x in range(x0, x1):
+                    rows = np.where(differs[y0:y1, x])[0]
+                    if len(rows) < 4:
+                        continue
+                    top, bottom = y0 + int(rows[0]), y0 + int(rows[-1]) + 1
+                    new_h = max(2, int(round((bottom - top) * share)))
+                    src = np.linspace(0, bottom - top - 1, new_h)
+                    band = closed[top:bottom, x]
+                    car[top:top + new_h, x] = np.stack(
+                        [np.interp(src, np.arange(bottom - top), band[:, c]) for c in range(4)], axis=1)
+            self.states.append(car)
+
+        lx0, ly0 = (int(v) for v in self.at(*self.RAIN_LIGHT[:2]))
+        lx1, ly1 = (int(v) for v in self.at(*self.RAIN_LIGHT[2:]))
+        lamp = np.zeros((self.h, self.w), np.float32)
+        lamp[ly0:ly1, lx0:lx1] = 255.0
+        red = (closed[..., 0] > 150) & (closed[..., 1] < 120)
+        self.lamp = blur(lamp * red, 1.5 * self.px)[..., None] / 255.0
+
         rng = np.random.default_rng(19)
-        self.sparks = rng.uniform(0.0, 1.0, (40, 5))
-        self.streaks = rng.uniform(0.0, 1.0, (7, 3))
+        self.sparks = rng.uniform(0.0, 1.0, (46, 5))
+        self.streaks = rng.uniform(0.0, 1.0, (10, 3))
 
-    @staticmethod
-    def drs(i, n):
-        """Flap position for frame i: 0 closed .. 1 open, in four steps (tiles repeat)."""
-        # two in-between frames: the flap snaps, and a longer cross-fade would ghost
-        open_at, close_at, steps = int(n * 0.22), int(n * 0.74), 2
-        if i < open_at:
-            return 0.0
-        if i < open_at + steps:
-            return (i - open_at + 1) / (steps + 1)
-        if i < close_at:
-            return 1.0
-        if i < close_at + steps:
-            return 1.0 - (i - close_at + 1) / (steps + 1)
-        return 0.0
-
-    def wheel_glints(self, phase):
-        """Three soft arcs per wheel face, rotated by `phase` turns: reads as a spinning rim."""
-        layer = Image.new("L", (self.w, self.h), 0)
-        draw = ImageDraw.Draw(layer)
-        for (cx, cy), (rx, ry), tilt in self.WHEELS:
-            x, y = self.at(cx, cy)
-            rx, ry = rx * self.px, ry * self.px
-            for k in range(3):
-                # The car drives towards the lower left, so the top of a rolling wheel moves left on
-                # screen and its bottom moves right: anticlockwise (PIL angles grow clockwise).
-                a0 = -360.0 * (phase + k / 3.0)
-                for r, width in ((0.80, 0.10), (0.50, 0.08)):
-                    box = [x - rx * r, y - ry * r, x + rx * r, y + ry * r]
-                    draw.arc(box, a0 + tilt, a0 + tilt + 38, fill=150, width=max(2, int(rx * width)))
-        return np.array(layer.filter(ImageFilter.GaussianBlur(0.012 * self.w))).astype(np.float32)
+    def drs(self, i):
+        """Index into `states` for frame i: the flap snaps through the in-between positions, one
+        frame each, and stays open for half of the loop."""
+        n, last = self.n_frames, len(self.FLAP_STEPS) - 1
+        open_at, close_at = int(n * 0.22), int(n * 0.74)
+        if open_at <= i < close_at:
+            return min(last, i - open_at + 1)
+        if i >= close_at:
+            return max(0, last - (i - close_at + 1))
+        return 0
 
     def frame(self, t):
         i = int(round(t * self.n_frames)) % self.n_frames
-        drs = self.drs(i, self.n_frames)
-        k = self.flap * drs
-        # blend premultiplied so the slot opens cleanly instead of fringing
-        ca, oa = self.closed[..., 3:4] / 255.0, self.opened[..., 3:4] / 255.0
-        alpha = ca * (1.0 - k) + oa * k
-        rgb = (self.closed[..., :3] * ca * (1.0 - k) + self.opened[..., :3] * oa * k) / np.maximum(alpha, 1e-4)
-        car = np.dstack([rgb, alpha * 255.0])
+        state = self.drs(i)
+        drs = state / (len(self.FLAP_STEPS) - 1)           # 0 closed .. 1 open
+        car = self.states[state].copy()
+
+        lamp_on = (i // 6) % 2 == 0                        # rain light: four flashes per loop
+        car[..., :3] = car[..., :3] * (1.0 - self.lamp * (0.0 if lamp_on else 0.62))
         if (i // 2) % 2:                                   # engine vibration: two body states
             car = np.roll(car, int(round(0.8 * SS * SCALE)), axis=0)
-        glint = self.wheel_glints((i % 4) / 12.0) * (car[..., 3] / 255.0)
-        car[..., :3] = np.clip(car[..., :3] + glint[..., None] * 0.55, 0, 255)
 
-        # speed streaks on the ground, under the car
+        # the track rushing away: streaks along rays from the vanishing point, under the car
+        vx, vy = self.at(*self.VANISHING)
         under = Image.new("L", (self.w, self.h), 0)
         draw = ImageDraw.Draw(under)
         for s0, s1, s2 in self.streaks:
             life = (t * 2.0 + s0) % 1.0                    # two passes per loop
-            start = np.array(self.at(130 + 300 * s1, 905 - 60 * s1)) + self.SIDE * self.px * (s2 - 0.35) * 260
-            head = start + self.AXIS * self.px * (life * 1150 - 120)
-            tail = head - self.AXIS * self.px * (90 + 120 * s2)
-            fade = math.sin(math.pi * life) ** 0.8
-            draw.line([tuple(tail), tuple(head)], fill=int(150 * fade), width=max(2, int(0.006 * self.w)))
+            side = -1.0 if s1 < 0.5 else 1.0
+            ray = np.array([side * (0.62 + 0.55 * s2), 1.0])
+            ray /= np.linalg.norm(ray)
+            near = self.px * (360 + 560 * life ** 1.6)     # accelerates towards the camera
+            head = np.array([vx, vy]) + ray * near
+            tail = np.array([vx, vy]) + ray * (near - self.px * (40 + 150 * life))
+            fade = math.sin(math.pi * life) ** 0.7
+            draw.line([tuple(tail), tuple(head)], fill=int(165 * fade), width=max(2, int(0.004 * self.w * (0.6 + life))))
         streaks = np.array(under.filter(ImageFilter.GaussianBlur(0.004 * self.w))).astype(np.float32)
-        ground = np.dstack([np.full((self.h, self.w, 3), 235.0, np.float32), streaks * 0.55])
+        out = over(np.dstack([np.full((self.h, self.w, 3), 235.0, np.float32), streaks * 0.5]), car)
 
-        # Titanium sparks: struck by the skid block under the floor, they leave from under the
-        # diffuser and trail BEHIND the car along its axis, hopping as they cool. They are drawn
-        # under the car, so the rear wheel and wing hide where they are born.
-        speed = 0.30 + 0.70 * drs                          # flat out with the flap open
+        # Titanium sparks: struck by the skid block, they leave from under the diffuser and fly
+        # towards the camera, fanning out and hopping as they cool. In front of the car.
+        speed = 0.28 + 0.72 * drs                          # flat out with the flap open
         hot = Image.new("RGB", (self.w, self.h), (0, 0, 0))
         draw = ImageDraw.Draw(hot)
-        ex, ey = self.at(*self.DIFFUSER)
+        (dx0, dy0), (dx1, _) = self.DIFFUSER
         for s0, s1, s2, s3, s4 in self.sparks:
             if s4 > speed:                                 # fewer sparks when the car is slower
                 continue
             life = (t * 3.0 + s0) % 1.0                    # three bursts per loop
-            origin = np.array([ex, ey]) + self.SIDE * self.px * (s1 - 0.5) * 120
-            reach = self.px * (230 + 250 * s2) * (0.75 + 0.25 * drs)
-            pos = origin + self.AXIS * reach * life + self.SIDE * self.px * (s3 - 0.5) * 90 * life
-            pos[1] -= self.px * 46 * abs(math.sin(math.pi * life * (1.5 + s3))) * (1.0 - life)
-            tail = pos - self.AXIS * self.px * (40 * (1.0 - life) + 8)
-            heat = (1.0 - life) ** 1.3
+            ox, oy = self.at(dx0 + (dx1 - dx0) * s1, dy0)
+            ray = np.array([ox - vx, oy - vy])
+            ray /= np.linalg.norm(ray)
+            ray[0] += (s3 - 0.5) * 0.9                     # fan out sideways
+            reach = self.px * (150 + 240 * s2) * (0.7 + 0.3 * drs)
+            pos = np.array([ox, oy]) + ray * reach * life
+            pos[1] -= self.px * 54 * abs(math.sin(math.pi * life * (1.4 + s3))) * (1.0 - life)
+            tail = pos - ray / np.linalg.norm(ray) * self.px * (30 * (1.0 - life) + 8) * (0.7 + life)
+            heat = (1.0 - life) ** 1.3 * min(1.0, life * 10.0)
             colour = (255, int(120 + 135 * heat), int(30 + 190 * heat ** 2))
             draw.line([tuple(tail), tuple(pos)], fill=tuple(int(c * (0.35 + 0.65 * heat)) for c in colour),
-                      width=max(2, int(0.0034 * self.w * (0.6 + 0.8 * heat))))
+                      width=max(2, int(0.0034 * self.w * (0.6 + 0.8 * heat) * (0.8 + 0.6 * life))))
         hot = np.array(hot).astype(np.float32)
-        sparks = hot + 1.4 * blur(hot, 0.008 * self.w) + 0.8 * blur(hot, 0.03 * self.w)
-        sparks = np.where(sparks.max(axis=2, keepdims=True) < 10.0, 0.0, sparks)
-        out = over(add_glow(ground, sparks, 1.0), car)
-        # the glow still spills over the rear of the car, like light would
-        return add_glow(out, blur(hot, 0.02 * self.w) * 0.5, 1.0), 0.0, 1.0
-
-    def shadow(self, size, position):
-        """Contact shadow cast by the silhouette itself: squashed, dropped a little and blurred, so it
-        follows the diagonal of the car instead of sitting in an ellipse under its middle."""
-        alpha = Image.fromarray(self.closed[..., 3].astype(np.uint8))
-        squashed = alpha.resize((alpha.width, int(alpha.height * 0.55)))
-        sh = Image.new("L", size, 0)
-        x, y = position
-        sh.paste(squashed.point(lambda v: int(v * 0.42)),
-                 (int(x), int(y + alpha.height * 0.45 + self.h * 0.035)))
-        return sh.filter(ImageFilter.GaussianBlur(6 * SS * SCALE))
+        glow = hot + 1.4 * blur(hot, 0.008 * self.w) + 0.8 * blur(hot, 0.03 * self.w)
+        if lamp_on:
+            halo = self.lamp * np.array([255.0, 40.0, 30.0], np.float32)
+            glow = glow + 0.9 * blur(halo, 0.012 * self.w) + 0.6 * blur(halo, 0.04 * self.w)
+        glow = np.where(glow.max(axis=2, keepdims=True) < 10.0, 0.0, glow)
+        return add_glow(out, glow, 1.0), 0.0, 1.0
 
 
 SUBJECTS = {"campfire": Campfire, "christmastree": ChristmasTree, "f1car": F1Car}
