@@ -49,7 +49,9 @@ void main() {
             final boundary =
                 key.currentContext!.findRenderObject() as RenderRepaintBoundary;
             final image = await boundary.toImage(pixelRatio: 2.0);
-            final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+            final bytes = await image.toByteData(
+              format: ui.ImageByteFormat.png,
+            );
             final file = File(
               '$outDir/${type.name}_${size.toInt()}_f${f.toString().padLeft(3, '0')}.png',
             );
