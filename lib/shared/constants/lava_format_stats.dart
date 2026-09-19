@@ -108,13 +108,13 @@ class LavaFormatStats {
     ),
     LavaDemoType.f1Front: LavaFormatStats(
       frames: 72,
-      pngSequence: 2624010,
-      apng: 253574,
-      gif: 823169,
-      animatedWebp: 64964,
-      lavaAvif: 35876,
-      lavaWebp: 48525,
-      lavaHdAvif: 70091,
+      pngSequence: 2955830,
+      apng: 197103,
+      gif: 907933,
+      animatedWebp: 67346,
+      lavaAvif: 28424,
+      lavaWebp: 36195,
+      lavaHdAvif: 50432,
     ),
   };
 }
