@@ -92,6 +92,13 @@ flutter:
     - assets/fonts/
     - assets/icons/
     - assets/wasm/
+    - assets/lava/macintosh/
+    - assets/lava/sunflower/
+    - assets/lava/lavalamp/
+    - assets/lava/campfire/
+    - assets/lava/rocket/
+    - assets/lava/senna/
+    - assets/lava/christmastree/
 
   fonts:
     - family: Noto Sans
