@@ -308,21 +308,18 @@ class ChristmasTree(Scene):
         return srgb(255, 196, 48)[None] * np.full((p.shape[0], 1), 0.55 + 0.25 * math.sin(TAU * 2 * t), F)
 
 
-class PlayPause(Scene):
-    """Play / pause key: the glyph turns a quarter and splits from a triangle into two bars.
+class LavaKey(Scene):
+    """A round key in a bezel, facing the camera: the body shared by the transport controls.
 
-    It is a control, not a loop, so the frames are three segments the widget plays on demand:
+    A control is not a loop: its frames are segments the widget plays on demand. Only the cap and
+    the glyph move, so the bezel tiles are shared by the whole bundle, and the glow stays on the
+    object: light thrown on the floor would touch every tile under the key.
 
-        TO_PAUSE   the key sinks, the glyph morphs play -> pause and lights up, the key comes back
-        PLAYING    the lit glyph breathes (ping-pong: every level is rendered once and stored once)
-        TO_PLAY    TO_PAUSE backwards, frame for frame: the tile packer stores none of it again
-
-    Only the cap and the glyph move, so the bezel tiles are shared by the whole bundle.
+    Subclasses give `key_state(t) -> (press, glow)` and `glyph2d(x, z, t)`, the signed distance of
+    the glyph on the cap (+x is right on screen).
     """
 
-    TO_PAUSE, LEVELS = 14, 10
-    SEGMENTS = (TO_PAUSE, 2 * LEVELS, TO_PAUSE)
-    frames, fps = sum(SEGMENTS), 30
+    fps = 30
     view_height, look_at, pitch = 2.70, (0.0, 0.96, 0.0), 14.0
     bound_radius = 1.5
     shadow_strength = 0.30
@@ -330,7 +327,7 @@ class PlayPause(Scene):
 
     CENTRE = (0.0, 1.16, 0.0)
     TURN, TILT = math.radians(-17.0), math.radians(-66.0)
-    LAVA_CORE, LAVA_RIM = srgb(255, 176, 74), srgb(232, 78, 44)
+    CAP_CORE, CAP_RIM = srgb(255, 176, 74), srgb(232, 78, 44)
     CREAM, GLOW = srgb(255, 244, 226), srgb(255, 214, 140)
     GLYPH_Y, GLYPH_H = 0.49, 0.075
 
@@ -342,22 +339,14 @@ class PlayPause(Scene):
             Material(srgb(30, 30, 44), spec=0.15, shininess=12.0, rim=0.05),       # well
         )
 
-    # -- timeline ----------------------------------------------------------------------------
-    def state(self, t):
-        """(press, morph, glow) for loop phase t; mirrored frames get identical numbers."""
-        i = int(round(t * self.frames))
-        a, b, _ = self.SEGMENTS
-        if i >= a + b:                      # TO_PLAY is TO_PAUSE read backwards
-            i = a - 1 - (i - a - b)
-        if i < a:
-            k = i / (a - 1)
-            press = math.sin(math.pi * min(k / 0.78, 1.0)) ** 0.8
-            press -= 0.16 * math.sin(math.pi * max(0.0, (k - 0.78) / 0.22))      # spring back
-            morph = float(sdf.smoothstep(0.10, 0.74, np.float32(k)))
-            return press, morph, float(sdf.smoothstep(0.55, 1.0, np.float32(k)))
-        j = i - a
-        level = j if j < self.LEVELS else 2 * self.LEVELS - 1 - j
-        return 0.0, 1.0, 1.0 - 0.34 * (level / (self.LEVELS - 1)) ** 1.4
+    def frame_index(self, t):
+        return int(round(t * self.frames))
+
+    def key_state(self, t):
+        raise NotImplementedError
+
+    def glyph2d(self, x, z, t):
+        raise NotImplementedError
 
     # -- geometry ----------------------------------------------------------------------------
     def to_object(self, p):
@@ -379,22 +368,18 @@ class PlayPause(Scene):
             sign = np.where((c1 & c2 & c3) | (~c1 & ~c2 & ~c3), -sign, sign)
         return sign * np.sqrt(d)
 
-    def glyph2d(self, x, z, morph):
-        """Rounded triangle pointing +x at morph 0, two bars along x at morph 1, a quarter turn
-        apart: the bars end up upright."""
-        a = math.radians(90.0) * morph
-        gx, gz = x * math.cos(a) + z * math.sin(a), -x * math.sin(a) + z * math.cos(a)
-        tri = self.sd_polygon(gx + 0.035, gz, [(-0.215, -0.30), (0.335, 0.0), (-0.215, 0.30)]) - 0.055
-        bar = np.abs(np.stack([gx, np.abs(gz) - 0.165], -1)) - np.array([0.265, 0.060], F)
-        bars = np.minimum(bar.max(-1), 0.0) + np.sqrt((np.maximum(bar, 0.0) ** 2).sum(-1)) - 0.045
-        return tri * (1.0 - morph) + bars * morph
+    @staticmethod
+    def press_curve(k, down=0.78):
+        """Sinks, comes back and overshoots a little, as a sprung key does."""
+        press = math.sin(math.pi * min(k / down, 1.0)) ** 0.8
+        return press - 0.16 * math.sin(math.pi * max(0.0, (k - down) / (1.0 - down)))
 
     @staticmethod
     def cap_offset(press):
         return -0.16 * press
 
     def parts(self, p, t):
-        press, morph, _ = self.state(t)
+        press, _ = self.key_state(t)
         q = self.to_object(p)
         ring = sdf.sd_cylinder(q, v3(0, -0.20, 0), 1.0, 0.50, rounding=0.09)
         well = sdf.sd_cylinder(q, v3(0, 0.02, 0), 0.80, 0.60)
@@ -405,7 +390,7 @@ class PlayPause(Scene):
         cap = sdf.sd_cylinder(c, v3(0, -0.05, 0), 0.745, 0.42, rounding=0.10)
         cap = sdf.smin(cap, sdf.sd_ellipsoid(c, v3(0, 0.36, 0), v3(0.70, 0.13, 0.70)), 0.08)
 
-        d2 = self.glyph2d(c[:, 0], c[:, 2], morph)
+        d2 = self.glyph2d(c[:, 0], c[:, 2], t)
         dy = np.abs(c[:, 1] - self.GLYPH_Y) - self.GLYPH_H
         glyph = (np.minimum(np.maximum(d2, dy), 0.0)
                  + np.sqrt(np.maximum(d2, 0.0) ** 2 + np.maximum(dy, 0.0) ** 2) - 0.018)
@@ -413,7 +398,7 @@ class PlayPause(Scene):
 
     # -- look --------------------------------------------------------------------------------
     def lights(self, t):
-        press, _, glow = self.state(t)
+        press, glow = self.key_state(t)
         if glow <= 0.0:
             return []
         q = np.asarray([[0.0, self.GLYPH_Y + 0.30 + self.cap_offset(press), 0.0]], F)
@@ -423,21 +408,108 @@ class PlayPause(Scene):
     def lava(self, scene, p, n, t):
         q = self.to_object(p)
         r = np.sqrt(q[:, 0] ** 2 + q[:, 2] ** 2) / 0.745
-        col = mix(np.broadcast_to(self.LAVA_CORE, q.shape), self.LAVA_RIM, sdf.smoothstep(0.15, 1.0, r))
+        col = mix(np.broadcast_to(self.CAP_CORE, q.shape), self.CAP_RIM, sdf.smoothstep(0.15, 1.0, r))
         refl = 2.0 * (n @ scene.eye)[:, None] * n - scene.eye
         return col + (0.10 * sdf.smoothstep(0.30, 0.85, refl[:, 1]))[:, None]
 
     def ink(self, scene, p, n, t):
-        _, _, glow = self.state(t)
+        _, glow = self.key_state(t)
         return np.broadcast_to(self.CREAM * (1.0 - 0.25 * glow), p.shape)
 
     def lit(self, scene, p, n, v, t):
-        _, _, glow = self.state(t)
+        _, glow = self.key_state(t)
         return np.broadcast_to(self.GLOW * (0.62 * glow), p.shape)
 
 
+class PlayPause(LavaKey):
+    """Play / pause key: the glyph turns a quarter and splits from a triangle into two bars.
+
+        TO_PAUSE   the key sinks, the glyph morphs play -> pause and lights up, the key comes back
+        PLAYING    the lit glyph breathes (ping-pong: every level is rendered once and stored once)
+        TO_PLAY    TO_PAUSE backwards, frame for frame: the tile packer stores none of it again
+    """
+
+    TO_PAUSE, LEVELS = 14, 10
+    SEGMENTS = (TO_PAUSE, 2 * LEVELS, TO_PAUSE)
+    frames = sum(SEGMENTS)
+
+    def state(self, t):
+        """(press, morph, glow) for loop phase t; mirrored frames get identical numbers."""
+        i = self.frame_index(t)
+        a, b, _ = self.SEGMENTS
+        if i >= a + b:                      # TO_PLAY is TO_PAUSE read backwards
+            i = a - 1 - (i - a - b)
+        if i < a:
+            k = i / (a - 1)
+            morph = float(sdf.smoothstep(0.10, 0.74, np.float32(k)))
+            return self.press_curve(k), morph, float(sdf.smoothstep(0.55, 1.0, np.float32(k)))
+        j = i - a
+        level = j if j < self.LEVELS else 2 * self.LEVELS - 1 - j
+        return 0.0, 1.0, 1.0 - 0.34 * (level / (self.LEVELS - 1)) ** 1.4
+
+    def key_state(self, t):
+        press, _, glow = self.state(t)
+        return press, glow
+
+    def glyph2d(self, x, z, t):
+        """Rounded triangle pointing +x at morph 0, two bars along x at morph 1, a quarter turn
+        apart: the bars end up upright."""
+        morph = self.state(t)[1]
+        a = math.radians(90.0) * morph
+        gx, gz = x * math.cos(a) + z * math.sin(a), -x * math.sin(a) + z * math.cos(a)
+        tri = self.sd_polygon(gx + 0.035, gz, [(-0.215, -0.30), (0.335, 0.0), (-0.215, 0.30)]) - 0.055
+        bar = np.abs(np.stack([gx, np.abs(gz) - 0.165], -1)) - np.array([0.265, 0.060], F)
+        bars = np.minimum(bar.max(-1), 0.0) + np.sqrt((np.maximum(bar, 0.0) ** 2).sum(-1)) - 0.045
+        return tri * (1.0 - morph) + bars * morph
+
+
+class Restart(LavaKey):
+    """Restart key, in cooled lava: one press, the circular arrow makes a full turn the way it
+    points, heating up on the way and cooling down again. The last frame is the first one."""
+
+    frames = 24
+    CAP_CORE, CAP_RIM = srgb(104, 108, 142), srgb(46, 47, 70)
+    GLOW = srgb(255, 170, 84)
+    RADIUS, THICK, HALF_ARC = 0.325, 0.068, math.radians(126.0)
+    AXIS = math.radians(-38.0)            # the arc is symmetric about this direction; the gap is opposite
+    UP, SPIN = -1.0, 1.0                  # on the key face: which way +z and a positive turn go on screen
+
+    def progress(self, t):
+        i = self.frame_index(t) % (self.frames - 1)      # the last frame is frame 0 again, exactly
+        return i / (self.frames - 1)
+
+    def key_state(self, t):
+        k = self.progress(t)
+        return self.press_curve(k, down=0.62), math.sin(math.pi * k) ** 1.6
+
+    def glyph2d(self, x, z, t):
+        k = self.progress(t)
+        turn = float(sdf.smoothstep(0.06, 0.94, np.float32(k)))
+        turn = turn * turn * (3.0 - 2.0 * turn)                       # slow start, slow stop
+        a = self.AXIS + self.SPIN * 2.0 * math.pi * turn
+        sx, sy = x, self.UP * z
+        # arc in its own frame: symmetric about +v
+        u = np.abs(sx * math.sin(a) - sy * math.cos(a))
+        v = sx * math.cos(a) + sy * math.sin(a)
+        s, c = math.sin(self.HALF_ARC), math.cos(self.HALF_ARC)
+        end = np.sqrt((u - s * self.RADIUS) ** 2 + (v - c * self.RADIUS) ** 2)
+        ring = np.abs(np.sqrt(u * u + v * v) - self.RADIUS)
+        arc = np.where(c * u > s * v, end, ring) - self.THICK
+
+        tip = a + self.SPIN * self.HALF_ARC                           # the end the arrow head sits on
+        px, py = self.RADIUS * math.cos(tip), self.RADIUS * math.sin(tip)
+        tx, ty = -self.SPIN * math.sin(tip), self.SPIN * math.cos(tip)
+        nx, ny = math.cos(tip), math.sin(tip)
+        head = self.sd_polygon(sx, sy, [
+            (px + tx * 0.25, py + ty * 0.25),
+            (px - tx * 0.04 + nx * 0.205, py - ty * 0.04 + ny * 0.205),
+            (px - tx * 0.04 - nx * 0.205, py - ty * 0.04 - ny * 0.205),
+        ]) - 0.028
+        return np.minimum(arc, head)
+
+
 SCENES = {"senna": SennaHelmet, "campfire": Campfire, "christmastree": ChristmasTree,
-          "playpause": PlayPause}
+          "playpause": PlayPause, "restart": Restart}
 
 
 def _render(job):

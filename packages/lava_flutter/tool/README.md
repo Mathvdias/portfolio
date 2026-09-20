@@ -233,6 +233,16 @@ python3 tool/sdf_scenes.py playpause <lossless_dir> --frames-dir pp_frames
 python3 tool/openlava_encode.py assets/lava/playpause --fps 30 --avif 68 --fallback-webp 92 pp_frames/frame_*.png
 ```
 
+`restart` is its sibling in cooled lava: one press, the circular arrow makes a full turn the way it
+points, heating up on the way. It is a single 24-frame run whose last frame is the first one again.
+Both keys share their body (`LavaKey`: bezel, sprung cap, glyph extrusion, glow); a new key only
+gives its timeline and the 2D signed distance of its glyph.
+
+```sh
+python3 tool/sdf_scenes.py restart <lossless_dir> --frames-dir rs_frames
+python3 tool/openlava_encode.py assets/lava/restart --fps 30 --avif 68 --fallback-webp 92 rs_frames/frame_*.png
+```
+
 In the app, `LavaController` plays "intro, then loop" natively: seek to the first frame of the
 intro with the loop bounds set to the playing segment. A toggle in the middle of a transition jumps
 to the mirrored frame of the other one (`47 - frame`), so the key never snaps.
