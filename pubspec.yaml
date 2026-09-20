@@ -110,6 +110,7 @@ flutter:
     - assets/lava/sennamp4/
     - assets/lava/sennamp4_hd/
     - assets/lava/playpause/
+    - assets/lava/restart/
 
   fonts:
     - family: Noto Sans
