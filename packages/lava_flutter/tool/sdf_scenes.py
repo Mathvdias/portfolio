@@ -308,7 +308,136 @@ class ChristmasTree(Scene):
         return srgb(255, 196, 48)[None] * np.full((p.shape[0], 1), 0.55 + 0.25 * math.sin(TAU * 2 * t), F)
 
 
-SCENES = {"senna": SennaHelmet, "campfire": Campfire, "christmastree": ChristmasTree}
+class PlayPause(Scene):
+    """Play / pause key: the glyph turns a quarter and splits from a triangle into two bars.
+
+    It is a control, not a loop, so the frames are three segments the widget plays on demand:
+
+        TO_PAUSE   the key sinks, the glyph morphs play -> pause and lights up, the key comes back
+        PLAYING    the lit glyph breathes (ping-pong: every level is rendered once and stored once)
+        TO_PLAY    TO_PAUSE backwards, frame for frame: the tile packer stores none of it again
+
+    Only the cap and the glyph move, so the bezel tiles are shared by the whole bundle.
+    """
+
+    TO_PAUSE, LEVELS = 14, 10
+    SEGMENTS = (TO_PAUSE, 2 * LEVELS, TO_PAUSE)
+    frames, fps = sum(SEGMENTS), 30
+    view_height, look_at, pitch = 2.70, (0.0, 0.96, 0.0), 14.0
+    bound_radius = 1.5
+    shadow_strength = 0.30
+    lights_reach_ground = False
+
+    CENTRE = (0.0, 1.16, 0.0)
+    TURN, TILT = math.radians(-17.0), math.radians(-66.0)
+    LAVA_CORE, LAVA_RIM = srgb(255, 176, 74), srgb(232, 78, 44)
+    CREAM, GLOW = srgb(255, 244, 226), srgb(255, 214, 140)
+    GLYPH_Y, GLYPH_H = 0.49, 0.075
+
+    def __init__(self):
+        self.materials = (
+            Material(srgb(196, 202, 226), spec=0.75, shininess=64.0, rim=0.30),    # bezel
+            Material(self.lava, spec=0.85, shininess=90.0, rim=0.28),              # cap
+            Material(self.ink, spec=0.35, shininess=30.0, emissive=self.lit),      # glyph
+            Material(srgb(30, 30, 44), spec=0.15, shininess=12.0, rim=0.05),       # well
+        )
+
+    # -- timeline ----------------------------------------------------------------------------
+    def state(self, t):
+        """(press, morph, glow) for loop phase t; mirrored frames get identical numbers."""
+        i = int(round(t * self.frames))
+        a, b, _ = self.SEGMENTS
+        if i >= a + b:                      # TO_PLAY is TO_PAUSE read backwards
+            i = a - 1 - (i - a - b)
+        if i < a:
+            k = i / (a - 1)
+            press = math.sin(math.pi * min(k / 0.78, 1.0)) ** 0.8
+            press -= 0.16 * math.sin(math.pi * max(0.0, (k - 0.78) / 0.22))      # spring back
+            morph = float(sdf.smoothstep(0.10, 0.74, np.float32(k)))
+            return press, morph, float(sdf.smoothstep(0.55, 1.0, np.float32(k)))
+        j = i - a
+        level = j if j < self.LEVELS else 2 * self.LEVELS - 1 - j
+        return 0.0, 1.0, 1.0 - 0.34 * (level / (self.LEVELS - 1)) ** 1.4
+
+    # -- geometry ----------------------------------------------------------------------------
+    def to_object(self, p):
+        """Object space: the key's axis is +y, its face looks at the camera, a bit from the left."""
+        q = p - np.asarray(self.CENTRE, F)
+        return sdf.rot_x(sdf.rot_y(q, self.TURN), self.TILT)
+
+    @staticmethod
+    def sd_polygon(x, z, pts):
+        d = np.full(x.shape, 1e9, F)
+        sign = np.ones(x.shape, F)
+        for i, (ax, az) in enumerate(pts):
+            bx, bz = pts[(i + 1) % len(pts)]
+            ex, ez = bx - ax, bz - az
+            wx, wz = x - ax, z - az
+            h = np.clip((wx * ex + wz * ez) / (ex * ex + ez * ez), 0.0, 1.0)
+            d = np.minimum(d, (wx - ex * h) ** 2 + (wz - ez * h) ** 2)
+            c1, c2, c3 = z >= az, z < bz, ex * wz > ez * wx
+            sign = np.where((c1 & c2 & c3) | (~c1 & ~c2 & ~c3), -sign, sign)
+        return sign * np.sqrt(d)
+
+    def glyph2d(self, x, z, morph):
+        """Rounded triangle pointing +x at morph 0, two bars along x at morph 1, a quarter turn
+        apart: the bars end up upright."""
+        a = math.radians(90.0) * morph
+        gx, gz = x * math.cos(a) + z * math.sin(a), -x * math.sin(a) + z * math.cos(a)
+        tri = self.sd_polygon(gx + 0.035, gz, [(-0.215, -0.30), (0.335, 0.0), (-0.215, 0.30)]) - 0.055
+        bar = np.abs(np.stack([gx, np.abs(gz) - 0.165], -1)) - np.array([0.265, 0.060], F)
+        bars = np.minimum(bar.max(-1), 0.0) + np.sqrt((np.maximum(bar, 0.0) ** 2).sum(-1)) - 0.045
+        return tri * (1.0 - morph) + bars * morph
+
+    @staticmethod
+    def cap_offset(press):
+        return -0.16 * press
+
+    def parts(self, p, t):
+        press, morph, _ = self.state(t)
+        q = self.to_object(p)
+        ring = sdf.sd_cylinder(q, v3(0, -0.20, 0), 1.0, 0.50, rounding=0.09)
+        well = sdf.sd_cylinder(q, v3(0, 0.02, 0), 0.80, 0.60)
+        bezel = sdf.smax(ring, -well, 0.05)
+        floor = sdf.sd_cylinder(q, v3(0, -0.12, 0), 0.82, 0.12)
+
+        c = q - v3(0.0, self.cap_offset(press), 0.0)
+        cap = sdf.sd_cylinder(c, v3(0, -0.05, 0), 0.745, 0.42, rounding=0.10)
+        cap = sdf.smin(cap, sdf.sd_ellipsoid(c, v3(0, 0.36, 0), v3(0.70, 0.13, 0.70)), 0.08)
+
+        d2 = self.glyph2d(c[:, 0], c[:, 2], morph)
+        dy = np.abs(c[:, 1] - self.GLYPH_Y) - self.GLYPH_H
+        glyph = (np.minimum(np.maximum(d2, dy), 0.0)
+                 + np.sqrt(np.maximum(d2, 0.0) ** 2 + np.maximum(dy, 0.0) ** 2) - 0.018)
+        return [(bezel, 0), (cap, 1), (glyph, 2), (floor, 3)]
+
+    # -- look --------------------------------------------------------------------------------
+    def lights(self, t):
+        press, _, glow = self.state(t)
+        if glow <= 0.0:
+            return []
+        q = np.asarray([[0.0, self.GLYPH_Y + 0.30 + self.cap_offset(press), 0.0]], F)
+        q = sdf.rot_y(sdf.rot_x(q, -self.TILT), -self.TURN)
+        return [(q[0] + np.asarray(self.CENTRE, F), self.GLOW, 0.85 * glow, 2.6)]
+
+    def lava(self, scene, p, n, t):
+        q = self.to_object(p)
+        r = np.sqrt(q[:, 0] ** 2 + q[:, 2] ** 2) / 0.745
+        col = mix(np.broadcast_to(self.LAVA_CORE, q.shape), self.LAVA_RIM, sdf.smoothstep(0.15, 1.0, r))
+        refl = 2.0 * (n @ scene.eye)[:, None] * n - scene.eye
+        return col + (0.10 * sdf.smoothstep(0.30, 0.85, refl[:, 1]))[:, None]
+
+    def ink(self, scene, p, n, t):
+        _, _, glow = self.state(t)
+        return np.broadcast_to(self.CREAM * (1.0 - 0.25 * glow), p.shape)
+
+    def lit(self, scene, p, n, v, t):
+        _, _, glow = self.state(t)
+        return np.broadcast_to(self.GLOW * (0.62 * glow), p.shape)
+
+
+SCENES = {"senna": SennaHelmet, "campfire": Campfire, "christmastree": ChristmasTree,
+          "playpause": PlayPause}
 
 
 def _render(job):
