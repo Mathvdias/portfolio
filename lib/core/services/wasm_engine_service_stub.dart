@@ -25,6 +25,9 @@ class WasmEngineServiceImpl implements WasmEngineService {
 
   @override
   Uint8List getPixelBuffer() => Uint8List(0);
+
+  @override
+  int get memoryBytes => 0;
 }
 
 WasmEngineService getService() => WasmEngineServiceImpl();

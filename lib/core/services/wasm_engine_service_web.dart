@@ -131,6 +131,13 @@ class WasmEngineServiceImpl implements WasmEngineService {
 
     return Uint8List.view(buffer, ptr.toDartInt, size.toDartInt);
   }
+
+  @override
+  int get memoryBytes {
+    if (!_isReady) return 0;
+    final memory = _instance!.exports['memory'] as WebAssemblyMemory;
+    return memory.buffer.toDart.lengthInBytes;
+  }
 }
 
 @JS('Function.prototype.apply.call')
