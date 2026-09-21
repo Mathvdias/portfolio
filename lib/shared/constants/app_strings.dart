@@ -214,55 +214,60 @@ abstract final class AppStrings {
   // Experience
   static const String techLabel = 'TECH:';
 
-  // WASM Diagnostics
+  // WASM Diagnostics: every label below describes a value that is measured,
+  // never simulated. `%s` slots are filled in order.
   static const String wasmFps = 'FPS';
-  static const String wasmFrameLatency = 'Frame latency';
-  static const String wasmHeap = 'WASM Heap';
-  static const String wasmGcPause = 'GC Pause';
-  static const String wasmTimelineTitle = 'WASM Frame Timeline';
-  static const String wasmTargetBudgetPrefix = 'Target budget: ';
-  static const String wasmHotReload = 'Hot Reload';
-  static const String wasmCompiling = 'Compiling...';
-  static const String wasmTriggerGc = 'Trigger GC';
+  static const String wasmFrameCpu = 'Frame CPU';
+  static const String wasmHeap = 'JS Heap';
+  static const String wasmRustMemory = 'Rust memory';
+  static const String wasmNotAvailable = 'n/a';
+  static const String wasmFpsCaption = '%s ms/frame';
+  static const String wasmFrameCpuCaption = 'build %s · raster %s';
+  static const String wasmFrameCpuWaiting = 'waiting for timings';
+  static const String wasmHeapCaption = 'performance.memory';
+  static const String wasmHeapUnavailableCaption = 'Chromium only';
+  static const String wasmRustMemoryCaption = 'linear memory';
+  static const String wasmRustMemoryLoading = 'loading engine';
+  static const String wasmRustMemoryUnavailable = 'engine not loaded';
+  static const String wasmTimelineTitle = 'Frame Timeline';
+  static const String wasmTargetBudgetPrefix = 'Budget: ';
+  static const String wasmLegendInterval = 'frame interval';
+  static const String wasmLegendWorst = 'worst frame';
+  static const String wasmLegendCpu = 'build + raster';
+  static const String wasmSlowFrames = 'Slow frames: %s / %s';
+  static const String wasmRunBenchmark = 'Run benchmark';
+  static const String wasmBenchmarkRunning = 'Running...';
   static const String wasmSimd = 'SIMD';
   static const String wasmWasmGc = 'WASM GC';
-  static const String wasmConsoleTitle = 'Engine Diagnostic Console';
-  static const String wasmCompilerVersion = 'WASM compiler: v3.29.0';
-  static const String wasmEngineInit =
-      'Engine: Flutter WebAssembly (Wasm GC) v3.29.0 initialized.';
-  static const String wasmCpuDetect =
-      'CPU: %d execution threads detected. RAM: %s GB.';
+  static const String wasmCapabilityYes = 'supported by this browser';
+  static const String wasmCapabilityNo = 'not supported by this browser';
+  static const String wasmRuntimeWasm = 'dart2wasm';
+  static const String wasmRuntimeJs = 'dart2js';
+  static const String wasmRuntimeNative = 'Dart VM';
+  static const String wasmConsoleTitle = 'Diagnostic Console';
+  static const String wasmRuntimeLog = 'App compiled with %s.';
+  static const String wasmFlutterVersionLog = 'Flutter %s · Dart %s.';
+  static const String wasmCpuDetect = '%s logical cores · device memory %s.';
+  static const String wasmDeviceMemoryGb = '%s GB';
+  static const String wasmDeviceMemoryCapped = '8 GB or more';
   static const String wasmRendererDetect = 'Renderer: %s (%s).';
-  static const String wasmSimdSupported =
-      'SIMD support: verified (128-bit hardware acceleration active)';
-  static const String wasmSimdUnsupported =
-      'SIMD support: unsupported (using software fallback emulation)';
-  static const String wasmGcSupported =
-      'Native Wasm GC: supported (V8 native Garbage Collection active)';
-  static const String wasmGcUnsupported =
-      'Native Wasm GC: unsupported (using legacy polyfill garbage collection)';
+  static const String wasmHeapUnavailableLog =
+      'performance.memory is not exposed by this browser: JS heap not shown.';
   static const String wasmProfilingActive =
-      'Diagnostics: Frame latency timeline profiling active at hardware refresh rate.';
-  static const String wasmHotReloadTrigger =
-      'Compiler: Hot Reload triggered. Scanning file hierarchy...';
-  static const String wasmHotReloadCompile =
-      'Compiler: Compiling and translating main.dart modules to WASM GC format...';
-  static const String wasmHotReloadSuccess =
-      'Compiler: Reload success: main.dart.wasm re-built in 42ms. Pipelines synchronized.';
-  static const String wasmHotReloadToast =
-      'WASM Engine Hot Reload Complete (42ms)!';
-  static const String wasmGcAuto = 'Automatic';
-  static const String wasmGcManual = 'Manual';
-  static const String wasmGcLogTemplate =
-      '%s sweep triggered. V8/Wasm GC heap: %s MB. Pause: %sms.';
-  static const String wasmSimdEnabledLog =
-      'SIMD: Optimizations enabled (level 3).';
-  static const String wasmSimdDisabledLog =
-      'SIMD: Optimizations disabled (software fallback mode).';
-  static const String wasmGcEnabledLog =
-      'GC: WebAssembly native Garbage Collection active.';
-  static const String wasmGcDisabledLog =
-      'GC: WebAssembly native Garbage Collection deactivated.';
+      'Measuring every frame: vsync interval from a Ticker, build and raster from FrameTiming.';
+  static const String wasmRefreshLog = 'Display refresh rate detected: %s Hz.';
+  static const String wasmSlowFramesLog =
+      '%s slow frames in the last %s s (worst %s ms, budget %s ms).';
+  static const String wasmEngineLoadedLog =
+      'mathos_engine.wasm (Rust) loaded: %s MB of linear memory.';
+  static const String wasmEngineUnavailableLog =
+      'mathos_engine.wasm (Rust) could not be loaded here.';
+  static const String wasmBenchmarkStartLog =
+      'Mandelbrot %sx%s, %s iterations, median of %s runs.';
+  static const String wasmBenchmarkResultLog = '%s: %s ms (%s Mpx/s).';
+  static const String wasmBenchmarkVerdictLog = '%s is %sx faster than %s.';
+  static const String wasmBenchmarkRust = 'Rust → WASM';
+  static const String wasmBenchmarkDart = 'Dart → %s';
 
   // Lava Studio
   static const String lavaStudioTitle = 'Lava 3D Micro-Animation Engine';
