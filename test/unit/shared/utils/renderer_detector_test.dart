@@ -21,24 +21,21 @@ void main() {
       expect(subtitle, contains('Metal'));
     });
 
-    test('getJsHeapSize returns stub default', () {
-      expect(getJsHeapSize(), 18.2);
+    test('getJsHeapSize reports "not available" instead of a made-up value', () {
+      expect(getJsHeapSize(), 0.0);
     });
 
-    test('isHardwareSimdSupported returns stub default', () {
-      expect(isHardwareSimdSupported(), isTrue);
+    test('WebAssembly features are not claimed off the web', () {
+      expect(isHardwareSimdSupported(), isFalse);
+      expect(isHardwareWasmGcSupported(), isFalse);
     });
 
-    test('isHardwareWasmGcSupported returns stub default', () {
-      expect(isHardwareWasmGcSupported(), isTrue);
+    test('getHardwareCpuCores reads the real processor count', () {
+      expect(getHardwareCpuCores(), greaterThan(0));
     });
 
-    test('getHardwareCpuCores returns stub default', () {
-      expect(getHardwareCpuCores(), 8);
-    });
-
-    test('getHardwareDeviceMemory returns stub default', () {
-      expect(getHardwareDeviceMemory(), 8.0);
+    test('getHardwareDeviceMemory reports "not available"', () {
+      expect(getHardwareDeviceMemory(), 0.0);
     });
   });
 }
