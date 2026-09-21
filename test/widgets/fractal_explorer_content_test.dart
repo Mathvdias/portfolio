@@ -75,6 +75,9 @@ class _FakeEngine implements WasmEngineService {
   bool get isReady => ready;
 
   @override
+  int get memoryBytes => _memory.length;
+
+  @override
   Future<void> init() async {
     if (initGate != null) await initGate!.future;
     if (initError != null) throw initError!;

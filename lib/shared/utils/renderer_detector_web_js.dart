@@ -32,7 +32,7 @@ double getMemoryHeapSize() {
       }
     }
   } catch (_) {}
-  return 18.2;
+  return 0.0;
 }
 
 bool isSimdSupported() {
@@ -67,7 +67,7 @@ int getCpuCores() {
       if (cores != null) return (cores as num).toInt();
     }
   } catch (_) {}
-  return 4;
+  return 0;
 }
 
 double getDeviceMemoryGb() {
@@ -78,5 +78,5 @@ double getDeviceMemoryGb() {
       if (mem != null) return (mem as num).toDouble();
     }
   } catch (_) {}
-  return 8.0;
+  return 0.0;
 }

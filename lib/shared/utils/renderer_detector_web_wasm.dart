@@ -36,7 +36,7 @@ double getMemoryHeapSize() {
       }
     }
   } catch (_) {}
-  return 18.2;
+  return 0.0;
 }
 
 bool isSimdSupported() {
@@ -63,16 +63,16 @@ bool isWasmGcSupported() {
 
 int getCpuCores() {
   try {
-    final res = _jsEval('navigator.hardwareConcurrency || 4'.toJS);
+    final res = _jsEval('navigator.hardwareConcurrency || 0'.toJS);
     return (res as JSNumber).toDartInt;
   } catch (_) {}
-  return 4;
+  return 0;
 }
 
 double getDeviceMemoryGb() {
   try {
-    final res = _jsEval('navigator.deviceMemory || 8'.toJS);
+    final res = _jsEval('navigator.deviceMemory || 0'.toJS);
     return (res as JSNumber).toDartDouble;
   } catch (_) {}
-  return 8.0;
+  return 0.0;
 }

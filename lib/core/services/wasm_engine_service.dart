@@ -23,4 +23,7 @@ abstract class WasmEngineService {
 
   /// Returns the pointer memory RGBA pixel buffer
   Uint8List getPixelBuffer();
+
+  /// Size of the module's linear memory in bytes, 0 until it is loaded.
+  int get memoryBytes;
 }
