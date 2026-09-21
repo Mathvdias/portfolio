@@ -11,6 +11,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../theme/app_theme.dart';
 import '../constants/app_strings.dart';
 import '../constants/lava_format_stats.dart';
+import 'lava_play_pause_button.dart';
+import 'lava_restart_button.dart';
 
 /// Interactive showcase window for the `lava_flutter` package.
 ///
@@ -136,6 +138,14 @@ class _LavaStudioContentState extends State<LavaStudioContent>
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
+    }
+  }
+
+  void _togglePlayback() {
+    if (_controller.isPlaying) {
+      _controller.pause();
+    } else {
+      _controller.play();
     }
   }
 
@@ -393,39 +403,22 @@ class _LavaStudioContentState extends State<LavaStudioContent>
             spacing: 12,
             runSpacing: 10,
             children: [
-              IconButton.filled(
-                tooltip: AppStrings.lavaStudioAutoRotate,
-                iconSize: 26,
-                constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-                onPressed: () {
-                  if (_controller.isPlaying) {
-                    _controller.pause();
-                  } else {
-                    _controller.play();
-                  }
+              // Rebuilt on status changes only: the merged listenable also
+              // fires on every frame of the stage.
+              ValueListenableBuilder<LavaPlaybackStatus>(
+                valueListenable: _controller.statusNotifier,
+                builder: (context, status, _) {
+                  return LavaPlayPauseButton(
+                    playing: status == LavaPlaybackStatus.playing,
+                    playTooltip: AppStrings.lavaStudioPlay,
+                    pauseTooltip: AppStrings.lavaStudioPause,
+                    onPressed: _togglePlayback,
+                  );
                 },
-                style: IconButton.styleFrom(
-                  backgroundColor: AppTheme.peach,
-                  foregroundColor: AppTheme.background,
-                ),
-                icon: AnimatedBuilder(
-                  animation: _controller,
-                  builder: (context, _) {
-                    return Icon(
-                      _controller.isPlaying ? Icons.pause : Icons.play_arrow,
-                    );
-                  },
-                ),
               ),
-              IconButton.outlined(
+              LavaRestartButton(
                 tooltip: AppStrings.lavaStudioReplay,
-                constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
                 onPressed: () => _controller.reset(),
-                style: IconButton.styleFrom(
-                  foregroundColor: AppTheme.subtext,
-                  side: const BorderSide(color: AppTheme.surface0),
-                ),
-                icon: const Icon(Icons.replay),
               ),
               SegmentedButton<double>(
                 segments: const [

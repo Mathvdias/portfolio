@@ -354,16 +354,16 @@ void main() {
       await tester.pump();
 
       // The preview plays on its own: pause it, then resume
-      expect(find.byIcon(Icons.pause), findsOneWidget);
-      await tester.tap(find.byIcon(Icons.pause));
+      expect(find.byTooltip(AppStrings.lavaStudioPause), findsOneWidget);
+      await tester.tap(find.byTooltip(AppStrings.lavaStudioPause));
       await tester.pump();
-      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
-      await tester.tap(find.byIcon(Icons.play_arrow));
+      expect(find.byTooltip(AppStrings.lavaStudioPlay), findsOneWidget);
+      await tester.tap(find.byTooltip(AppStrings.lavaStudioPlay));
       await tester.pump();
-      expect(find.byIcon(Icons.pause), findsOneWidget);
+      expect(find.byTooltip(AppStrings.lavaStudioPause), findsOneWidget);
 
       // Tap reset
-      await tester.tap(find.byIcon(Icons.replay));
+      await tester.tap(find.byTooltip(AppStrings.lavaStudioReplay));
       await tester.pump();
 
       // The X-ray toggle flips on and brings its legend with it

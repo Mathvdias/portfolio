@@ -270,7 +270,8 @@ abstract final class AppStrings {
       'Airbnb-style 3D icons for Flutter: a key frame, an atlas of 32 px tiles and a recipe per frame.';
   static const String lavaStudioHint =
       'Drag to scrub • hover to tilt • tap to bounce';
-  static const String lavaStudioAutoRotate = 'Play / pause';
+  static const String lavaStudioPlay = 'Play';
+  static const String lavaStudioPause = 'Pause';
   static const String lavaStudioReplay = 'Restart';
   static const String lavaStudioArchitecture = 'Why Lava?';
   static const String lavaStudioArchitectureDesc =
