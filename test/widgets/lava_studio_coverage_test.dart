@@ -10,6 +10,7 @@ import 'package:lava_flutter/lava_flutter.dart';
 import 'package:portifolio/l10n/app_localizations.dart';
 import 'package:portifolio/shared/constants/app_strings.dart';
 import 'package:portifolio/shared/constants/lava_format_stats.dart';
+import 'package:portifolio/shared/widgets/lava_play_pause_button.dart';
 import 'package:portifolio/shared/widgets/lava_studio_content.dart';
 import 'package:portifolio/theme/app_theme.dart';
 
@@ -126,6 +127,20 @@ final _paintedIcons = find.descendant(
   matching: find.byType(CustomPaint),
 );
 
+/// The transport's play / pause key once the Lava engine paints it (a
+/// Material stand-in shows until its bundle is decoded).
+final _playPauseKey = find.descendant(
+  of: find.byType(LavaPlayPauseButton),
+  matching: find.byWidgetPredicate(
+    (widget) => widget is CustomPaint && widget.painter is LavaPainter,
+  ),
+);
+
+int _playPauseFrame(WidgetTester tester) {
+  final paint = tester.widget<CustomPaint>(_playPauseKey);
+  return (paint.painter! as LavaPainter).controller.currentFrame;
+}
+
 /// Pumps the studio and waits, on the real event loop (image decoding never
 /// completes under the fake clock), until [ready] holds.
 Future<void> _pumpDecodedStudio(
@@ -152,8 +167,8 @@ Future<void> _pumpDecodedStudio(
 }
 
 Future<void> _pause(WidgetTester tester) async {
-  await tester.ensureVisible(find.byIcon(Icons.pause));
-  await tester.tap(find.byIcon(Icons.pause));
+  await tester.ensureVisible(find.byTooltip(AppStrings.lavaStudioPause));
+  await tester.tap(find.byTooltip(AppStrings.lavaStudioPause));
   await tester.pump();
 }
 
@@ -785,10 +800,10 @@ void main() {
       }
       expect(_frameOnTransport(tester), greaterThan(1));
 
-      await tester.tap(find.byIcon(Icons.pause));
+      await tester.tap(find.byTooltip(AppStrings.lavaStudioPause));
       await tester.pump();
       expect(find.text('PAUSED • 30 FPS'), findsOneWidget);
-      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+      expect(find.byTooltip(AppStrings.lavaStudioPlay), findsOneWidget);
       final paused = _frameOnTransport(tester);
       await tester.pump(const Duration(milliseconds: 300));
       expect(_frameOnTransport(tester), paused);
@@ -797,10 +812,81 @@ void main() {
       await tester.pump();
       expect(_frameOnTransport(tester), 1);
 
-      await tester.tap(find.byIcon(Icons.play_arrow));
+      await tester.tap(find.byTooltip(AppStrings.lavaStudioPlay));
       await tester.pump();
       expect(find.text('PLAYING • 30 FPS'), findsOneWidget);
-      expect(find.byIcon(Icons.pause), findsOneWidget);
+      expect(find.byTooltip(AppStrings.lavaStudioPause), findsOneWidget);
+    });
+
+    testWidgets(
+      'the play / pause control is a Lava key that follows playback',
+      (tester) async {
+        _setView(tester);
+        await _pumpDecodedStudio(
+          tester,
+          ready: () => _playPauseKey.evaluate().isNotEmpty,
+        );
+        await tester.ensureVisible(find.byTooltip(AppStrings.lavaStudioPause));
+
+        // Playing: the lit pause bars breathe, no Material glyph is left.
+        expect(find.byIcon(Icons.pause), findsNothing);
+        expect(
+          _playPauseFrame(tester),
+          inInclusiveRange(
+            LavaPlayPauseButton.playingStart,
+            LavaPlayPauseButton.playingEnd,
+          ),
+        );
+
+        // Pausing runs the key back to the play glyph, where it stops.
+        await _pause(tester);
+        expect(find.text('PAUSED • 30 FPS'), findsOneWidget);
+        expect(_playPauseFrame(tester), LavaPlayPauseButton.toPlayStart);
+        for (var i = 0; i < 20; i++) {
+          await tester.pump(const Duration(milliseconds: 34));
+        }
+        expect(_playPauseFrame(tester), LavaPlayPauseButton.lastFrame);
+        expect(find.byTooltip(AppStrings.lavaStudioPlay), findsOneWidget);
+        expect(find.byIcon(Icons.play_arrow), findsNothing);
+
+        // Pressing it again resumes the stage and lights the bars.
+        await tester.tap(find.byTooltip(AppStrings.lavaStudioPlay));
+        await tester.pump();
+        expect(find.text('PLAYING • 30 FPS'), findsOneWidget);
+        for (var i = 0; i < 20; i++) {
+          await tester.pump(const Duration(milliseconds: 34));
+        }
+        expect(
+          _playPauseFrame(tester),
+          inInclusiveRange(
+            LavaPlayPauseButton.playingStart,
+            LavaPlayPauseButton.playingEnd,
+          ),
+        );
+      },
+    );
+
+    testWidgets('frames of the stage do not rebuild the play / pause key', (
+      tester,
+    ) async {
+      _setView(tester);
+      await tester.pumpWidget(_studio());
+      await tester.pump();
+      final key = find.byType(LavaPlayPauseButton);
+
+      final playing = tester.widget<LavaPlayPauseButton>(key);
+      expect(playing.playing, isTrue);
+      final before = _frameOnTransport(tester);
+      for (var i = 0; i < 4; i++) {
+        await tester.pump(const Duration(milliseconds: 100));
+      }
+      expect(_frameOnTransport(tester), isNot(before));
+      expect(tester.widget<LavaPlayPauseButton>(key), same(playing));
+
+      // A status change is what it listens to.
+      await tester.ensureVisible(key);
+      await _pause(tester);
+      expect(tester.widget<LavaPlayPauseButton>(key).playing, isFalse);
     });
 
     testWidgets('speed selector changes how fast frames advance', (
@@ -812,11 +898,11 @@ void main() {
       await tester.ensureVisible(find.text('2.0x'));
 
       Future<int> framesPlayedAt(String speed) async {
-        await tester.tap(find.byIcon(Icons.pause));
+        await tester.tap(find.byTooltip(AppStrings.lavaStudioPause));
         await tester.pump();
         await tester.tap(find.byTooltip(AppStrings.lavaStudioReplay));
         await tester.tap(find.text(speed));
-        await tester.tap(find.byIcon(Icons.play_arrow));
+        await tester.tap(find.byTooltip(AppStrings.lavaStudioPlay));
         for (var i = 0; i < 5; i++) {
           await tester.pump(const Duration(milliseconds: 50));
         }
