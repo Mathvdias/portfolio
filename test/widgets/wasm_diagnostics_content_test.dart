@@ -136,6 +136,7 @@ void main() {
       );
       await tester.pump();
       expect(find.text(AppStrings.wasmRustMemoryUnavailable), findsOneWidget);
+      expect(WasmEngineService().memoryBytes, 0);
     });
 
     testWidgets('FPS, frame cost, heap and Rust memory are the measured ones', (
@@ -164,9 +165,10 @@ void main() {
         'a gap on the chart', (tester) async {
       final state = await pumpMonitor(tester);
 
+      // Timed, timed, gap, timed: the cost line is drawn, broken and resumed.
       for (var window = 0; window < 4; window++) {
         feed(state, List.filled(5, 16), startMs: window * 5000);
-        if (window.isEven) {
+        if (window != 2) {
           state.handleTimings([_timing(buildMicros: 1000, rasterMicros: 1000)]);
         }
         state.flushWindow();
