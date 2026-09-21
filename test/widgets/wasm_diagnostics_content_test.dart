@@ -100,7 +100,10 @@ void main() {
     testWidgets('shows n/a instead of inventing what it cannot measure', (
       tester,
     ) async {
-      final state = await pumpMonitor(tester, engine: _FakeEngine(ready: false));
+      final state = await pumpMonitor(
+        tester,
+        engine: _FakeEngine(ready: false),
+      );
 
       // No frame measured, no performance.memory, no engine: three unknowns.
       expect(find.text(AppStrings.wasmNotAvailable), findsNWidgets(4));
@@ -212,26 +215,27 @@ void main() {
       );
     });
 
-    testWidgets('slow frames are counted and reported, a suspended tab is not', (
-      tester,
-    ) async {
-      final state = await pumpMonitor(tester);
+    testWidgets(
+      'slow frames are counted and reported, a suspended tab is not',
+      (tester) async {
+        final state = await pumpMonitor(tester);
 
-      // 100 ms blows the 16.7 ms budget; 5 s means the tab was in background.
-      feed(state, [16, 100, 16, 5000, 16]);
-      expect(state.slowFrames, 1);
+        // 100 ms blows the 16.7 ms budget; 5 s means the tab was in background.
+        feed(state, [16, 100, 16, 5000, 16]);
+        expect(state.slowFrames, 1);
 
-      for (var window = 0; window < 8; window++) {
-        state.flushWindow();
-        feed(state, [16], startMs: 10000 + window * 5000);
-      }
-      await tester.pump();
+        for (var window = 0; window < 8; window++) {
+          state.flushWindow();
+          feed(state, [16], startMs: 10000 + window * 5000);
+        }
+        await tester.pump();
 
-      expect(find.textContaining('Slow frames: 1 /'), findsOneWidget);
-      final report = state.logs.singleWhere((l) => l.contains('slow frames'));
-      expect(report, contains('1 slow frames in the last 2 s'));
-      expect(report, contains('worst 100.0 ms'));
-    });
+        expect(find.textContaining('Slow frames: 1 /'), findsOneWidget);
+        final report = state.logs.singleWhere((l) => l.contains('slow frames'));
+        expect(report, contains('1 slow frames in the last 2 s'));
+        expect(report, contains('worst 100.0 ms'));
+      },
+    );
 
     testWidgets('history and log stay bounded', (tester) async {
       final state = await pumpMonitor(tester);
@@ -371,7 +375,10 @@ void main() {
         WasmDiagnosticsContentState.benchmarkVerdict(null, 10, 'Dart'),
         isNull,
       );
-      expect(WasmDiagnosticsContentState.benchmarkVerdict(0, 10, 'Dart'), isNull);
+      expect(
+        WasmDiagnosticsContentState.benchmarkVerdict(0, 10, 'Dart'),
+        isNull,
+      );
     });
   });
 }

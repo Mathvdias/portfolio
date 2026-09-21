@@ -19,11 +19,7 @@ import '../utils/renderer_detector.dart';
 /// the heap from `performance.memory`, the Rust figures from the loaded
 /// `mathos_engine.wasm`. What the browser does not expose is shown as "n/a".
 class WasmDiagnosticsContent extends StatefulWidget {
-  const WasmDiagnosticsContent({
-    super.key,
-    this.heapSizeOverride,
-    this.engine,
-  });
+  const WasmDiagnosticsContent({super.key, this.heapSizeOverride, this.engine});
 
   /// Replaces the `performance.memory` read (MB, 0 = not available).
   final double Function()? heapSizeOverride;
@@ -276,9 +272,7 @@ class WasmDiagnosticsContentState extends State<WasmDiagnosticsContent>
           'Frames',
           _fill(AppStrings.wasmSlowFramesLog, [
             '$_pendingSlow',
-            _trimmed(
-              _windowsSinceSlowLog * _window.inMilliseconds / 1000.0,
-            ),
+            _trimmed(_windowsSinceSlowLog * _window.inMilliseconds / 1000.0),
             _pendingWorst.toStringAsFixed(1),
             (1000.0 / _detectedRefreshRate).toStringAsFixed(1),
           ]),
@@ -430,7 +424,11 @@ class WasmDiagnosticsContentState extends State<WasmDiagnosticsContent>
     );
   }
 
-  static String? benchmarkVerdict(double? rustMs, double dartMs, String dartLabel) {
+  static String? benchmarkVerdict(
+    double? rustMs,
+    double dartMs,
+    String dartLabel,
+  ) {
     if (rustMs == null || rustMs <= 0.0 || dartMs <= 0.0) return null;
     final rustWins = rustMs <= dartMs;
     final ratio = rustWins ? dartMs / rustMs : rustMs / dartMs;
@@ -976,7 +974,8 @@ class _BenchmarkBars extends StatelessWidget {
           child: Align(
             alignment: Alignment.centerLeft,
             child: FractionallySizedBox(
-              widthFactor: slowest > 0.0 ? (ms / slowest).clamp(0.02, 1.0) : 1.0,
+              widthFactor:
+                  slowest > 0.0 ? (ms / slowest).clamp(0.02, 1.0) : 1.0,
               child: Container(
                 height: 8,
                 decoration: BoxDecoration(

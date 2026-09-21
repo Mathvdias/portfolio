@@ -21,9 +21,12 @@ void main() {
       expect(subtitle, contains('Metal'));
     });
 
-    test('getJsHeapSize reports "not available" instead of a made-up value', () {
-      expect(getJsHeapSize(), 0.0);
-    });
+    test(
+      'getJsHeapSize reports "not available" instead of a made-up value',
+      () {
+        expect(getJsHeapSize(), 0.0);
+      },
+    );
 
     test('WebAssembly features are not claimed off the web', () {
       expect(isHardwareSimdSupported(), isFalse);
