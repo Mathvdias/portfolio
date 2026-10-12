@@ -33,7 +33,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: ^0.20.2
-  url_launcher: ^6.3.2
+  url_launcher: ^6.3.3
   google_fonts: ^8.2.1
   firebase_core: ^4.14.0
   firebase_analytics: ^12.5.0
