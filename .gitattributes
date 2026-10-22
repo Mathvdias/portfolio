@@ -1,0 +1,2 @@
+assets/models/*.glb filter=lfs diff=lfs merge=lfs -text
+assets/models/*.hdr filter=lfs diff=lfs merge=lfs -text

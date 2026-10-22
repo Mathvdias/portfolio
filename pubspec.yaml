@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.7.0
+  sdk: ^3.12.0
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -47,6 +47,9 @@ dependencies:
     path: packages/lava_flutter
   flutter_lazy_load_web: ^0.1.2
   flutter_svg: ^2.3.0
+  flutter_scene: ^0.23.0
+  vector_math: ^2.4.2
+
 
 dev_dependencies:
   flutter_test:
@@ -88,6 +91,12 @@ flutter:
   assets:
     - assets/fonts/
     - assets/icons/
+    - assets/models/car.glb
+    - assets/models/sennamp4.glb
+    - assets/models/dash.glb
+    - assets/models/studio.hdr
+
+
     - assets/wasm/
     - assets/lava/macintosh/
     - assets/lava/macintosh_hd/
